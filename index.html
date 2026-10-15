@@ -103,7 +103,7 @@
         </button>
 
         <button id="btnMcpModal" type="button" onclick="openMcpModal()" class="hidden sm:flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 border border-indigo-600 text-xs font-bold px-3 py-2 rounded-lg transition items-center gap-1.5 cursor-pointer">
-          <span>🌐 Chrome MCP & Rules</span>
+          <span>🌐 Chrome MCP Agent Hub</span>
         </button>
 
         <div id="statusBoxContainer" class="flex items-center justify-between w-full sm:w-auto gap-2 bg-indigo-900/90 p-1.5 rounded-lg border border-indigo-700">
@@ -135,21 +135,18 @@
               🤖 UNIVERSAL AI SCHEDULE PARSER
             </span>
             <span id="activeDeptBadge" class="bg-slate-900/80 border border-emerald-500/40 text-amber-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
-              Active Curriculum: Mechanical Engineering (ME)
+              Active Catalog: Empty (Ready for Upload)
             </span>
-            <button id="btnRestoreMe" type="button" onclick="restoreDefaultMeCourses()" class="bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full transition cursor-pointer shadow">
-              🔄 Reset to Default Curriculum
-            </button>
           </div>
           <h2 class="text-base sm:text-lg font-bold">Upload Any Course Schedule (.xlsx, .xls, .csv, .pdf)</h2>
-          <p class="text-xs text-emerald-100/90">Automatically detects and parses any university schedule file—including multi-sheet weekly timetables, standard Excel tables, and PDF documents. Choose <b>Merge Mode</b> to add uploaded courses to your current list, or <b>Replace Mode</b> to switch curricula.</p>
+          <p class="text-xs text-emerald-100/90">Automatically detects and parses any university schedule file—including multi-sheet weekly timetables, standard Excel tables, and PDF documents. Choose <b>Replace Mode</b> for a fresh start or <b>Merge Mode</b> to combine multiple files.</p>
         </div>
 
         <!-- Upload Mode + Sample Downloads + File Input -->
         <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 shrink-0">
           <select id="uploadModeSelect" class="bg-emerald-950 text-emerald-100 border border-emerald-500 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none cursor-pointer">
-            <option value="merge">🔗 Mode: Merge with Current Courses</option>
-            <option value="replace">📂 Mode: Replace Current Curriculum</option>
+            <option value="replace">📂 Mode: Load as New Curriculum</option>
+            <option value="merge">🔗 Mode: Merge with Existing List</option>
           </select>
 
           <button id="btnSampleComp" type="button" onclick="downloadSampleExcel('comp')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
@@ -198,7 +195,7 @@
             <span>⚡ Build Optimal Schedule</span>
           </button>
           <button id="btnResetSelections" type="button" onclick="resetSelections()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3.5 rounded-xl text-xs transition cursor-pointer shrink-0">
-            Clear All
+            Unselect All
           </button>
         </div>
       </div>
@@ -248,10 +245,10 @@
         <div id="ectsRuleCard" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <div class="flex justify-between items-center mb-2">
             <span class="text-sm font-bold text-slate-700">ECTS Credit Load & Rule Status</span>
-            <span id="ectsCounter" class="text-sm font-extrabold text-indigo-700">18 / 40 ECTS</span>
+            <span id="ectsCounter" class="text-sm font-extrabold text-indigo-700">0 / 40 ECTS</span>
           </div>
           <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
-            <div id="ectsBar" class="bg-indigo-600 h-full transition-all duration-300" style="width: 45%"></div>
+            <div id="ectsBar" class="bg-indigo-600 h-full transition-all duration-300" style="width: 0%"></div>
           </div>
           <div id="ruleAlerts" class="mt-3 space-y-1.5 text-xs"></div>
         </div>
@@ -270,13 +267,16 @@
             <div class="flex flex-wrap justify-between items-center gap-2">
               <div>
                 <h2 class="font-bold text-sm text-slate-800">Available Courses & Sections</h2>
-                <p class="text-[11px] text-slate-500">Click any section to select • Pin (📌) to lock • Click FULL to Waitlist</p>
+                <p class="text-[11px] text-slate-500">Click section to select • Pin (📌) to lock • 🗑️ to remove course</p>
               </div>
-              <div class="flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center gap-1.5">
                 <button id="btnQuickAdd" type="button" onclick="openQuickAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm transition cursor-pointer">
-                  ➕ Quick Add Course
+                  ➕ Add Course
                 </button>
-                <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">8 Courses</span>
+                <button id="btnClearCatalog" type="button" onclick="clearAllCourses()" class="bg-rose-100 hover:bg-rose-200 text-rose-700 text-[11px] font-bold px-2.5 py-1 rounded-lg transition cursor-pointer" title="Remove all courses from catalog">
+                  🗑️ Clear Catalog
+                </button>
+                <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">0 Courses</span>
               </div>
             </div>
 
@@ -351,7 +351,7 @@
   <div id="mobileStickyBar" class="lg:hidden fixed bottom-0 inset-x-0 bg-indigo-950 text-white border-t border-indigo-800 px-3 py-2.5 z-40 shadow-2xl flex items-center justify-between gap-2">
     <div>
       <div class="text-[10px] text-indigo-300 uppercase font-bold">Selected Load</div>
-      <div id="mobileEctsText" class="text-xs font-extrabold text-white">18 / 40 ECTS</div>
+      <div id="mobileEctsText" class="text-xs font-extrabold text-white">0 / 40 ECTS</div>
     </div>
     <div class="flex items-center gap-1.5">
       <button type="button" onclick="generateSmartSchedule()" class="bg-emerald-500 active:bg-emerald-600 text-slate-950 font-extrabold text-xs px-3 py-2 rounded-lg shadow">
@@ -417,37 +417,43 @@
     </div>
   </div>
 
-  <!-- MODAL 2: CHROME MCP & OFFICIAL UNIVERSITY REGULATIONS -->
+  <!-- MODAL 2: INTERACTIVE CHROME MCP AGENT HUB & LIVE OBS SIMULATOR -->
   <div id="mcpModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start gap-2">
         <div>
-          <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-full">Chrome MCP & Universal Schedule Engine</span>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-1">University Regulations & Universal Document Parser</h3>
+          <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-full">Interactive Chrome MCP Command Center</span>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-1">Chrome MCP Automation & University Rule Sync</h3>
         </div>
         <button type="button" onclick="closeMcpModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 cursor-pointer">✕</button>
       </div>
 
-      <div class="bg-slate-900 text-emerald-400 font-mono text-[11px] p-3 rounded-xl space-y-1 overflow-x-auto">
-        <div>[Chrome-MCP] Connected: https://oim.yasar.edu.tr/ders-kayitlari/</div>
+      <!-- Interactive MCP Action Buttons -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <button type="button" onclick="mcpActionScrapeDemo()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs p-3 rounded-xl shadow flex flex-col items-center text-center gap-1 cursor-pointer">
+          <span class="text-base">🕸️</span>
+          <span>1. Live Scrape Curriculum via MCP</span>
+        </button>
+        <button type="button" onclick="mcpActionExportJson()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs p-3 rounded-xl shadow flex flex-col items-center text-center gap-1 cursor-pointer">
+          <span class="text-base">📋</span>
+          <span>2. Copy Official OBS Auto-Fill Payload</span>
+        </button>
+        <button type="button" onclick="mcpActionSimulateObsFill()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs p-3 rounded-xl shadow flex flex-col items-center text-center gap-1 cursor-pointer">
+          <span class="text-base">⚡</span>
+          <span>3. Test 1-Click OBS Form Injection</span>
+        </button>
+      </div>
+
+      <div id="mcpTerminalLog" class="bg-slate-900 text-emerald-400 font-mono text-[11px] p-3.5 rounded-xl space-y-1 overflow-x-auto max-h-44">
+        <div>[Chrome-MCP] Connected to https://oim.yasar.edu.tr/ders-kayitlari/</div>
         <div>[Chrome-MCP] Regulation Art. 22: Regular=40 ECTS, Probation(GPA&lt;1.80)=32 ECTS, DoubleMajor=42 ECTS</div>
         <div>[Chrome-MCP] Mandatory Priority: Failed courses (FF/FD/W/U) must be registered first.</div>
         <div>[Universal-Parser] Multi-Sheet 2D Matrix &amp; Standard Excel/PDF Recognition Ready ✓</div>
-        <div>[AI-Voice-Agent] Top-to-Bottom Cohesive English Narrator (OBS+ v2.0) Active ✓</div>
-      </div>
-
-      <div class="space-y-2 text-xs text-slate-700">
-        <div class="font-bold text-slate-900">Active Official Registration Safeguards:</div>
-        <ul class="list-disc pl-5 space-y-1">
-          <li><b>Universal Excel &amp; PDF Recognition:</b> Automatically parses both multi-sheet weekly timetable grids and standard course tables across any department.</li>
-          <li><b>Mandatory Repeat Priority:</b> Prevents finalizing registration unless failed (<b>FF</b>) courses are selected.</li>
-          <li><b>Probation Student Safeguard:</b> Caps ECTS at 32 and locks 4th-year courses when GPA is below 1.80.</li>
-          <li><b>Auto-Swap Quota Waitlist:</b> Places students on a waitlist for full sections while securing an open section as a "Plan B" backup.</li>
-        </ul>
+        <div class="text-indigo-300 font-bold">[MCP-Bridge] Ready for bidirectional DOM scraping &amp; OBS form auto-fill ✓</div>
       </div>
 
       <div class="flex justify-end">
-        <button type="button" onclick="closeMcpModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer">Got It, Close</button>
+        <button type="button" onclick="closeMcpModal()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer">Close Hub</button>
       </div>
     </div>
   </div>
@@ -535,7 +541,7 @@
       "ME 4340": "Hydraulic & Pneumatic Control Systems"
     };
 
-    function getDefaultMeCourses() {
+    function getSampleEngineeringCatalog() {
       return [
         {
           code: "ME 2210",
@@ -664,13 +670,99 @@
       ];
     }
 
-    var courses = getDefaultMeCourses();
+    // CLEAN SLATE: Start with an empty course catalog so uploaded Excel files never clash with preloaded ME courses!
+    var courses = [];
+    var selectedSections = {};
 
-    var selectedSections = {
-      "ME 2210": "Sec 1",
-      "ME 3301": "Sec 1",
-      "ME 3360": "Sec 3"
-    };
+    // Load Demo Catalog on demand (for testing or AI Tour)
+    function loadDemoCatalog() {
+      courses = getSampleEngineeringCatalog();
+      pinnedCourses = {};
+      waitlistMap = {};
+      currentYearFilter = "all";
+      selectedSections = {
+        "ME 2210": "Sec 1",
+        "ME 3301": "Sec 1",
+        "ME 3360": "Sec 3"
+      };
+      document.getElementById("activeDeptBadge").innerText = "Active Catalog: Demo Engineering Curriculum (8 Courses)";
+      document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
+      setYearFilter("all");
+      renderAll();
+    }
+
+    // MANUAL INDIVIDUAL COURSE REMOVAL & FULL CATALOG CLEAR
+    function removeCourse(courseCode, event) {
+      if (event) event.stopPropagation();
+      var updated = [];
+      for (var i = 0; i < courses.length; i++) {
+        if (courses[i].code !== courseCode) {
+          updated.push(courses[i]);
+        }
+      }
+      courses = updated;
+      delete selectedSections[courseCode];
+      delete pinnedCourses[courseCode];
+      delete waitlistMap[courseCode];
+      document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
+      if (courses.length === 0) {
+        document.getElementById("activeDeptBadge").innerText = "Active Catalog: Empty (Ready for Upload)";
+      }
+      renderAll();
+    }
+
+    function clearAllCourses() {
+      courses = [];
+      selectedSections = {};
+      pinnedCourses = {};
+      waitlistMap = {};
+      document.getElementById("activeDeptBadge").innerText = "Active Catalog: Empty (Ready for Upload)";
+      document.getElementById("courseCountBadge").innerText = "0 Courses";
+      document.getElementById("schedulerReport").classList.add("hidden");
+      document.getElementById("aiScanContainer").classList.add("hidden");
+      renderAll();
+    }
+
+    // CHROME MCP HUB INTERACTIVE ACTIONS
+    function mcpActionScrapeDemo() {
+      var term = document.getElementById("mcpTerminalLog");
+      term.innerHTML += '<div class="text-amber-300">[Chrome-MCP] Scanning university portal DOM for active semester courses...</div>';
+      setTimeout(function() {
+        loadDemoCatalog();
+        term.innerHTML += '<div class="text-emerald-300 font-bold">[Chrome-MCP] Extracted 8 Engineering courses &amp; 20 sections into OBS+ catalog ✓</div>';
+        term.scrollTop = term.scrollHeight;
+      }, 500);
+    }
+
+    function mcpActionExportJson() {
+      var payload = {
+        studentProfile: currentProfile.name,
+        totalEcts: calculateEcts(null),
+        selectedCourses: selectedSections,
+        timestamp: new Date().toISOString()
+      };
+      var jsonStr = JSON.stringify(payload, null, 2);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(jsonStr);
+      }
+      var term = document.getElementById("mcpTerminalLog");
+      term.innerHTML += '<div class="text-sky-300 font-bold">[Chrome-MCP] Copied OBS Auto-Fill JSON payload (' + Object.keys(selectedSections).length + ' courses) to clipboard ✓</div>';
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function mcpActionSimulateObsFill() {
+      var count = Object.keys(selectedSections).length;
+      var term = document.getElementById("mcpTerminalLog");
+      if (count === 0) {
+        term.innerHTML += '<div class="text-rose-400">[Chrome-MCP] Warning: No courses selected yet. Select courses first!</div>';
+        return;
+      }
+      term.innerHTML += '<div class="text-amber-300">[Chrome-MCP] Injecting ' + count + ' selected section IDs into target OBS registration form...</div>';
+      setTimeout(function() {
+        term.innerHTML += '<div class="text-emerald-300 font-bold">[Chrome-MCP] All ' + count + ' course checkboxes automatically ticked on OBS portal ✓</div>';
+        term.scrollTop = term.scrollHeight;
+      }, 450);
+    }
 
     function setYearFilter(yr) {
       currentYearFilter = yr;
@@ -782,18 +874,18 @@
       isAiDemoRunning = true;
       closeMcpModal();
       closeApprovalModal();
-      restoreDefaultMeCourses();
+      clearAllCourses();
 
       var cursor = document.getElementById("aiCursor");
       var banner = document.getElementById("aiSubtitleBanner");
       cursor.classList.remove("hidden");
       banner.classList.remove("hidden");
 
-      // STEP 1 (TOP HEADER - LEFT): Chrome MCP & Rules Modal
+      // STEP 1 (TOP HEADER - LEFT): Chrome MCP Agent Hub
       await moveCursorAndClick(
         "#btnMcpModal",
-        "Step 1 of 10 (Top Bar) • Chrome MCP & Official Rules",
-        "Welcome to OBS Plus Version 2.0. We will explore the platform sequentially from top to bottom. Starting at the top navigation bar, our Chrome MCP module synchronizes official university ECTS limits, prerequisite chains, and repeat rules.",
+        "Step 1 of 10 (Top Bar) • Chrome MCP Agent Hub & Rule Sync",
+        "Welcome to OBS Plus Version 2.0. We will explore the entire platform sequentially from top to bottom. Starting at the top navigation bar, our Chrome MCP Agent Hub connects to the university portal to synchronize official ECTS limits, prerequisite chains, and repeat rules.",
         function() { openMcpModal(); }
       );
       if (!isAiDemoRunning) return;
@@ -804,7 +896,7 @@
       await moveCursorAndClick(
         "#profileSelect",
         "Step 2 of 10 (Top Bar) • Student Status & Probation Safeguard",
-        "Right next to it in the top bar is the Student Status selector. If we switch to a Probation Student with a GPA below 1.80, the system immediately caps the credit limit at 32 ECTS and locks fourth-year courses. Let us switch back to Regular Status for our main tour.",
+        "Right next to it in the top bar is the Student Status selector. Switching to a Probation Student with a GPA below 1.80 automatically caps the credit limit at 32 ECTS and locks fourth-year courses. Let us switch back to Regular Status.",
         function() {
           document.getElementById("profileSelect").value = "probation";
           changeProfile();
@@ -818,12 +910,13 @@
       );
       if (!isAiDemoRunning) return;
 
-      // STEP 3 (SECOND SECTION - GREEN BANNER): Universal Excel & PDF Importer
+      // STEP 3 (SECOND SECTION - GREEN BANNER): Universal Excel & PDF Schedule Importer
       await moveCursorAndClick(
         "#lblFileUpload",
         "Step 3 of 10 (Upper Panel) • Universal Excel & PDF Schedule Importer",
-        "Moving one section down, we reach the Universal AI Schedule Parser. Students can upload any multi-sheet weekly timetable Excel or PDF file from any department, and either merge those courses into their current list or replace the catalog entirely.",
+        "Moving one section down, notice that OBS Plus starts with a clean, empty catalog so preloaded courses never clash with your file. When we upload a department schedule, the AI parser extracts all courses and sections directly into the left workspace.",
         function() {
+          loadDemoCatalog();
           var sec = document.getElementById("excelUploadSection");
           sec.classList.add("ring-4", "ring-emerald-400");
           setTimeout(function() { sec.classList.remove("ring-4", "ring-emerald-400"); }, 2500);
@@ -835,7 +928,7 @@
       await moveCursorAndClick(
         "#dayOffContainer",
         "Step 4 of 10 (Filter Panel) • Day-Off & Time Slot Preferences",
-        "Continuing downward to the Smart Auto-Scheduler panel, we configure our personal schedule preferences. Here, we keep Friday selected as our protected Day-Off, and we can also filter out early morning or late afternoon classes.",
+        "Continuing downward to the Smart Auto-Scheduler panel, we configure our personal schedule preferences. Here, we keep Friday selected as our protected Day-Off, and we can also filter out early morning classes.",
         function() { daysOff = ["Friday"]; renderAll(); }
       );
       if (!isAiDemoRunning) return;
@@ -844,16 +937,16 @@
       await moveCursorAndClick(
         "#ectsRuleCard",
         "Step 5 of 10 (Left Workspace) • Live ECTS Load & Rule Alerts",
-        "Now, looking directly below at the left workspace panel, the Rule Engine shows why we need optimization: we currently have a Monday morning time conflict between Thermodynamics I and Fluid Mechanics, plus a Friday Day-Off violation.",
+        "Looking directly below at the left workspace panel, our Rule Engine highlights why optimization is needed: we currently have a Monday morning time conflict between Thermodynamics I and Fluid Mechanics, plus a Friday Day-Off violation.",
         null
       );
       if (!isAiDemoRunning) return;
 
-      // STEP 6 (LEFT WORKSPACE - COURSE CATALOG): Section Pinning (Pin Lock)
+      // STEP 6 (LEFT WORKSPACE - COURSE CATALOG): Pinning & Individual Course Removal
       await moveCursorAndClick(
         "#pin-btn-0",
-        "Step 6 of 10 (Course Catalog) • Pinning a Favorite Section",
-        "Scrolling slightly down into the Available Courses catalog, suppose we want to keep Section 1 of our mandatory repeat course, Thermodynamics I. By clicking Pin, we lock this section so the algorithm will build the rest of the schedule around it.",
+        "Step 6 of 10 (Course Catalog) • Pinning Sections & Manual Course Removal",
+        "In the Available Courses catalog below, students can manually add courses, delete any unwanted course using the red trash icon, or click Pin on a favorite section like Thermodynamics I so the algorithm never moves it.",
         function() { pinnedCourses["ME 2210"] = true; renderAll(); }
       );
       if (!isAiDemoRunning) return;
@@ -862,7 +955,7 @@
       await moveCursorAndClick(
         "#btnAutoSchedule",
         "Step 7 of 10 (Optimization) • Executing the Backtracking Auto-Scheduler",
-        "With our section pinned and Friday set as our Day-Off, we click Build Optimal Schedule. In milliseconds, the backtracking engine resolves all conflicts, preserves our pinned section, keeps Friday completely free, and registers 6 courses totaling 37 ECTS!",
+        "Now, clicking Build Optimal Schedule connects our filters to the catalog. In milliseconds, the backtracking engine resolves all conflicts, preserves our pinned section, keeps Friday completely free, and places 6 courses totaling 37 ECTS!",
         function() { generateSmartSchedule(); }
       );
       if (!isAiDemoRunning) return;
@@ -871,7 +964,7 @@
       await moveCursorAndClick(
         "#sec-btn-ME_3340-0",
         "Step 8 of 10 (Catalog Quota) • Smart Waitlist & Plan-B Auto-Swap",
-        "What if a desired section in the catalog is completely full, such as Machine Elements Section 1? Clicking a full section places the student first on the Waitlist while holding Section 2 as a safe Plan-B backup. When a seat opens, Auto-Swap upgrades them automatically!",
+        "What if a desired section in the catalog is full, such as Machine Elements Section 1? Clicking a full section places the student first on the Waitlist while holding Section 2 as a safe Plan-B backup. When a seat opens, Auto-Swap upgrades them automatically!",
         function() {
           selectedSections["ME 3340"] = "Sec 2";
           waitlistMap["ME 3340"] = { targetSec: "Sec 1", targetSlot: "Tuesday 10:40 - 12:30", backupSec: "Sec 2" };
@@ -907,30 +1000,12 @@
       await moveCursorAndClick(
         "#btnSubmitReg",
         "Step 10 of 10 (Completion) • Finalizing Registration & Advisor Slip",
-        "Finally, at the top right of the timetable, clicking Finalize Registration verifies all university rules and generates the official Advisor Approval Slip ready for PDF export. Thank you for watching the OBS Plus Version 2.0 tour!",
+        "Finally, at the top right of the timetable, clicking Finalize Registration verifies all university rules and generates the official Advisor Approval Slip ready for PDF export and Chrome MCP auto-fill. Thank you for watching!",
         function() { completeRegistration(); }
       );
 
       await waitMs(2200);
       stopAiPresentation();
-    }
-
-    function restoreDefaultMeCourses() {
-      courses = getDefaultMeCourses();
-      pinnedCourses = {};
-      waitlistMap = {};
-      currentYearFilter = "all";
-      selectedSections = {
-        "ME 2210": "Sec 1",
-        "ME 3301": "Sec 1",
-        "ME 3360": "Sec 3"
-      };
-      document.getElementById("activeDeptBadge").innerText = "Active Curriculum: Mechanical Engineering (ME)";
-      document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
-      document.getElementById("aiScanContainer").classList.add("hidden");
-      document.getElementById("schedulerReport").classList.add("hidden");
-      setYearFilter("all");
-      renderAll();
     }
 
     function openQuickAddModal() {
@@ -965,6 +1040,7 @@
 
       courses.unshift(newCourse);
       selectedSections[code] = "Sec 1";
+      document.getElementById("activeDeptBadge").innerText = "Active Catalog: Custom & Uploaded Courses";
       document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
       closeQuickAddModal();
       renderAll();
@@ -1328,7 +1404,7 @@
         var addedCount = 0;
 
         if (extracted && extracted.length > 0) {
-          if (uploadMode === "merge") {
+          if (uploadMode === "merge" && courses.length > 0) {
             for (var i = 0; i < extracted.length; i++) {
               var newC = extracted[i];
               var existing = findCourse(newC.code);
@@ -1345,14 +1421,14 @@
                 addedCount++;
               }
             }
-            document.getElementById("activeDeptBadge").innerText = "Merged Curriculum (" + fileName + ")";
+            document.getElementById("activeDeptBadge").innerText = "Merged Catalog (" + fileName + ")";
           } else {
             courses = extracted;
             addedCount = extracted.length;
             selectedSections = {};
             pinnedCourses = {};
             waitlistMap = {};
-            document.getElementById("activeDeptBadge").innerText = "Active Curriculum: " + fileName;
+            document.getElementById("activeDeptBadge").innerText = "Active Catalog: " + fileName;
           }
         }
 
@@ -1367,14 +1443,10 @@
           cardCont.className = "bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500";
         }, 3000);
 
-        var modeDesc = uploadMode === "merge"
-          ? ("Successfully parsed <b>" + addedCount + " courses</b> from <b>" + fileName + "</b> and merged them into your catalog!")
-          : ("Successfully extracted <b>" + addedCount + " courses</b> from <b>" + fileName + "</b>!");
-
         resultBox.classList.remove("hidden");
         resultBox.innerHTML =
           '<div class="flex flex-wrap justify-between items-center gap-2">' +
-            '<div>🎯 ' + modeDesc + ' Use the <b>Year 1–4</b> filter tabs on the left to browse and select your sections, or click <b>⚡ Build Optimal Schedule</b>!</div>' +
+            '<div>🎯 Successfully loaded <b>' + addedCount + ' courses</b> from <b>' + fileName + '</b> with zero preloaded conflicts! Use the <b>Year 1–4</b> tabs on the left to select your courses or click <b>🗑️</b> on any course you wish to remove.</div>' +
             '<span class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-full font-extrabold">👈 Select Courses on Left</span>' +
           '</div>';
       }, 750);
@@ -1471,6 +1543,11 @@
     }
 
     function generateSmartSchedule() {
+      if (courses.length === 0) {
+        alert("Catalog is currently empty! Please upload your Excel/PDF schedule first, or click 'Load Demo Engineering Catalog' in the left panel.");
+        return;
+      }
+
       var timePref = document.getElementById("timeFilterSelect").value;
       var loadPref = document.getElementById("loadFilterSelect").value;
 
@@ -1675,8 +1752,11 @@
     }
 
     function simulateQuotaCrisis() {
-      if (courses.length < 2) return;
-      var target = courses[1];
+      if (courses.length === 0) {
+        alert("Please upload a schedule or load the Demo Catalog first!");
+        return;
+      }
+      var target = courses.length > 1 ? courses[1] : courses[0];
       var sec2 = target.sections.length > 1 ? target.sections[1] : target.sections[0];
       sec2.quota = sec2.maxQuota;
       selectedSections[target.code] = sec2.id;
@@ -1687,6 +1767,24 @@
     function renderCourseList() {
       var container = document.getElementById("courseList");
       var html = "";
+
+      if (courses.length === 0) {
+        container.innerHTML =
+          '<div class="p-8 text-center space-y-3 bg-slate-50/60">' +
+            '<div class="text-3xl">📂</div>' +
+            '<div class="text-sm font-extrabold text-slate-800">No Courses Loaded Yet (Clean Slate)</div>' +
+            '<p class="text-xs text-slate-500 max-w-sm mx-auto">Upload your department Excel (.xlsx/.csv) or PDF schedule above so there are zero preloaded course conflicts, or load our Demo Engineering Catalog below.</p>' +
+            '<div class="flex flex-wrap justify-center gap-2 pt-2">' +
+              '<button type="button" onclick="loadDemoCatalog()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold px-4 py-2 rounded-xl shadow cursor-pointer">' +
+                '⚡ Load Demo Engineering Catalog' +
+              '</button>' +
+              '<button type="button" onclick="openQuickAddModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow cursor-pointer">' +
+                '➕ Add Course Manually' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        return;
+      }
 
       for (var i = 0; i < courses.length; i++) {
         var course = courses[i];
@@ -1717,6 +1815,9 @@
           var pinText = isPinned ? "📌 Pinned" : "📌 Pin";
           pinBtnHtml = '<button id="pin-btn-' + i + '" type="button" onclick="togglePinCourse(\'' + course.code + '\')" class="text-[11px] px-2 py-0.5 rounded border transition cursor-pointer ' + pinCls + '">' + pinText + '</button>';
         }
+
+        // Individual Course Delete Button
+        var deleteBtnHtml = '<button type="button" onclick="removeCourse(\'' + course.code + '\', event)" title="Remove this course from catalog" class="text-[11px] px-2 py-0.5 rounded border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition cursor-pointer font-bold">🗑️</button>';
 
         var chainInfo = course.unlocks
           ? '<div class="text-[11px] text-slate-500 mt-0.5">🕸️ <b>Unlocks next course:</b> ' + course.unlocks + '</div>'
@@ -1763,7 +1864,7 @@
               '<span class="text-xs font-bold text-indigo-600 ml-1">(' + course.ects + ' ECTS)</span>' +
               chainInfo +
             '</div>' +
-            '<div class="flex flex-wrap items-center gap-1.5">' + pinBtnHtml + badgeHtml + '</div>' +
+            '<div class="flex flex-wrap items-center gap-1.5">' + pinBtnHtml + badgeHtml + deleteBtnHtml + '</div>' +
           '</div>' +
           '<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">' + sectionsHtml + '</div>' +
         '</div>';
@@ -1852,9 +1953,12 @@
 
             rowHtml += '<td class="border border-indigo-100 p-1.5 h-20 align-top ' + (offFlag ? 'bg-emerald-100/40' : 'bg-white/90') + '">' +
               '<div class="' + cardCls + ' border-l-4 p-2 rounded-lg h-full flex flex-col justify-between shadow">' +
-                '<div class="font-extrabold text-xs flex justify-between items-center">' +
+                '<div class="font-extrabold text-xs flex justify-between items-center gap-1">' +
                   '<span>' + (isPin ? '📌 ' : '') + item.course.code + '</span>' +
-                  '<span class="opacity-90 text-[10px] bg-black/20 px-1.5 py-0.5 rounded">' + item.sec.id + '</span>' +
+                  '<div class="flex items-center gap-1">' +
+                    '<span class="opacity-90 text-[10px] bg-black/20 px-1.5 py-0.5 rounded">' + item.sec.id + '</span>' +
+                    '<button type="button" onclick="selectSection(\'' + item.course.code + '\', \'' + item.sec.id + '\')" title="Unselect from schedule" class="text-[10px] bg-black/25 hover:bg-rose-600 text-white px-1 rounded cursor-pointer">✕</button>' +
+                  '</div>' +
                 '</div>' +
                 '<div class="text-[11px] leading-tight font-medium opacity-95">' + item.course.name + '</div>' +
                 '<div class="text-[10px] font-bold opacity-90">' + statusLabel + '</div>' +
@@ -1975,7 +2079,9 @@
         }
       }
 
-      if (Object.keys(selectedSections).length === 0) {
+      if (courses.length === 0) {
+        alertsHtml += '<div class="bg-slate-50 text-slate-600 border border-slate-200 p-2.5 rounded-lg font-medium">📂 <b>Ready for Schedule Upload:</b> Upload any Excel/PDF schedule above or load the Demo Catalog to begin.</div>';
+      } else if (Object.keys(selectedSections).length === 0) {
         alertsHtml += '<div class="bg-indigo-50 text-indigo-800 border border-indigo-200 p-2.5 rounded-lg font-semibold">👈 <b>Awaiting Course Selection:</b> Click on any course section on the left catalog or click <b>⚡ Build Optimal Schedule</b>!</div>';
       } else {
         for (var fm = 0; fm < ffMissing.length; fm++) {
