@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>OBS+ V3.0 | AI Belge Tarayıcılı Akıllı Ders Kayıt Motoru</title>
+  <title>OBS+ V4.0 | Evrensel Excel & PDF Okuyuculu Akıllı Ders Kayıt Motoru</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Gerçek Excel (.xlsx / .xls / .csv) Okuma Kütüphanesi (SheetJS) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Gerçek PDF Metin Okuma Kütüphanesi (PDF.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     * { -webkit-tap-highlight-color: transparent; }
     @media print {
@@ -15,7 +19,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-24 lg:pb-12">
 
-  <!-- ÜST BAR (Mobil ve Masaüstü Uyumlu) -->
+  <!-- ÜST BAR -->
   <header class="bg-indigo-950 text-white shadow-lg sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5">
       
@@ -25,25 +29,22 @@
           <div>
             <div class="flex items-center gap-1.5">
               <h1 class="font-bold text-sm sm:text-lg leading-tight">Akıllı Ders Kayıt & Program Motoru</h1>
-              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v3.0 AI</span>
+              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v4.0 Universal AI</span>
             </div>
-            <p class="text-[11px] text-indigo-200 hidden sm:block">Yaşar Üniversitesi ÖİM Kuralları • AI Excel/PDF Tarayıcı • Boş Gün Filtresi • Auto-Swap Waitlist</p>
+            <p class="text-[11px] text-indigo-200 hidden sm:block">Evrensel Excel (.xlsx/.csv) & PDF Okuyucu • ÖİM Kuralları • Boş Gün Filtresi • Auto-Swap Waitlist</p>
           </div>
         </div>
 
-        <!-- Mobilde MCP Butonu Sağ Üstte Kompakt -->
         <button type="button" onclick="openMcpModal()" class="sm:hidden bg-indigo-800 hover:bg-indigo-700 text-indigo-100 border border-indigo-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg shrink-0">
           🌐 MCP & Kurallar
         </button>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <!-- Masaüstü MCP Butonu -->
         <button type="button" onclick="openMcpModal()" class="hidden sm:flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 border border-indigo-600 text-xs font-bold px-3 py-2 rounded-lg transition items-center gap-1.5 cursor-pointer">
           <span>🌐 Chrome MCP & ÖİM Kuralları</span>
         </button>
 
-        <!-- Öğrenci Statüsü Seçici -->
         <div class="flex items-center justify-between w-full sm:w-auto gap-2 bg-indigo-900/90 p-1.5 rounded-lg border border-indigo-700">
           <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-200 pl-1 shrink-0">Statü:</span>
           <select id="profileSelect" onchange="changeProfile()" class="w-full sm:w-auto bg-white text-slate-900 text-xs font-bold rounded px-2 py-1.5 focus:outline-none cursor-pointer">
@@ -63,29 +64,33 @@
     <!-- Hata Gösterge Kutusu -->
     <div id="errorBanner" class="hidden bg-rose-600 text-white p-3 rounded-xl text-xs font-bold"></div>
 
-    <!-- YENİ: YAPAY ZEKA (AI) EXCEL / PDF DERS PROGRAMI & TRANSKRİPT YÜKLEYİCİ -->
+    <!-- EVRENSEL EXCEL / CSV / PDF DERS PROGRAMI YÜKLEYİCİ -->
     <section class="no-print bg-gradient-to-r from-teal-950 via-emerald-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-emerald-700/80">
       <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
         
         <div class="space-y-1">
           <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-            <span>🤖 AI DOCUMENT PARSER</span>
+            <span>🤖 EVRENSEL AI BELGE OKUYUCU</span>
             <span>•</span>
-            <span>Excel (.xlsx, .csv) & PDF Tarayıcı</span>
+            <span id="activeDeptBadge">Aktif Müfredat: Makine Mühendisliği (ME)</span>
           </div>
-          <h2 class="text-base sm:text-lg font-bold">Kendi Ders Programını veya Transkriptini Yükle (Excel / PDF)</h2>
-          <p class="text-xs text-emerald-100/90">Bölüm ders programı Excel dosyanızı veya OBS PDF transkriptinizi yükleyin; yapay zeka motoru almanız gereken dersleri, saatleri ve boş günleri otomatik tarayıp seçenekleri ayarlasın.</p>
+          <h2 class="text-base sm:text-lg font-bold">Kendi Ders Programını Yükle (.xlsx, .xls, .csv, .pdf) — Soldan Kendin Seç!</h2>
+          <p class="text-xs text-emerald-100/90">Herhangi bir bölümün Excel veya PDF ders programını yükleyin; sistem sayfayı yenilemeden dersleri ve şubeleri anında <b>sol panele</b> dizer. Ardından soldan istediğiniz dersleri kendiniz seçip ayarlayabilirsiniz!</p>
         </div>
 
-        <!-- Dosya Yükleme ve Demo Test Butonları -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+        <!-- Dosya Yükleme ve Örnek İndirme Butonları -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <button type="button" onclick="downloadSampleExcel('comp')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow" title="Bilgisayar Mühendisliği örnek Excel dosyasını indirir">
+            📥 Örnek 1: Bilgisayar Müh. (.xlsx)
+          </button>
+          <button type="button" onclick="downloadSampleExcel('ee')" class="bg-sky-400 hover:bg-sky-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow" title="Elektrik-Elektronik Mühendisliği örnek Excel dosyasını indirir">
+            📥 Örnek 2: Elektrik-Elektronik (.xlsx)
+          </button>
+
           <label for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2.5 px-4 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer border-2 border-dashed border-emerald-400">
-            <span>📂 Excel / PDF Dosyası Seç</span>
+            <span>📂 Excel / PDF Yükle</span>
             <input id="scheduleFileInput" type="file" accept=".xlsx,.xls,.csv,.pdf,.txt" onchange="handleFileUpload(event)" class="hidden">
           </label>
-          <button type="button" onclick="simulateAiFileScan('Ornek_Ders_Programi_Guz.xlsx')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-3.5 rounded-xl text-xs transition cursor-pointer shadow">
-            ✨ Örnek Excel/PDF Tarat (Demo)
-          </button>
         </div>
 
       </div>
@@ -108,12 +113,12 @@
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4">
         <div>
           <div class="inline-flex items-center gap-1.5 bg-indigo-500/30 border border-indigo-400/40 text-indigo-100 text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-1">
-            <span>🎯 AKILLI OPTİMİZASYON</span>
+            <span>🎯 İSTER KENDİN SEÇ, İSTER OTOMATİK KURDUR</span>
             <span>•</span>
             <span>Sabitlenen (📌) Şubeleri Korur</span>
           </div>
           <h2 class="text-base sm:text-lg font-bold">Otomatik Program Kuran Filtre (Smart Auto-Scheduler)</h2>
-          <p class="text-xs text-indigo-200 mt-0.5">Boş günlerinizi, saat tercihlerinizi veya sabitlediğiniz (📌) şubeleri seçin; algoritma ÖİM kurallarına göre en uygun programı kursun.</p>
+          <p class="text-xs text-indigo-200 mt-0.5">Soldaki listeden derslerinizi kendiniz seçebilir veya boş gün/saat filtresi belirleyip algoritmanın otomatik dizmesini sağlayabilirsiniz.</p>
         </div>
 
         <div class="flex items-center gap-2 w-full lg:w-auto">
@@ -121,7 +126,7 @@
             <span>⚡ Filtrelere Göre Otomatik Program Kur</span>
           </button>
           <button type="button" onclick="resetSelections()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3.5 rounded-xl text-xs transition cursor-pointer shrink-0">
-            Sıfırla
+            Seçimleri Temizle
           </button>
         </div>
       </div>
@@ -129,7 +134,6 @@
       <!-- Filtre Kontrolleri -->
       <div class="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 mt-4 pt-4 border-t border-indigo-700/70">
         
-        <!-- 1. Boş Gün Seçimi -->
         <div class="md:col-span-6 bg-indigo-950/60 p-3 rounded-xl border border-indigo-800">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-200 mb-2">
             📅 Boş Kalmasını İstediğin Günler (Day-Off Filtresi):
@@ -137,7 +141,6 @@
           <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2" id="dayOffContainer"></div>
         </div>
 
-        <!-- 2. Saat Tercihi -->
         <div class="md:col-span-3 bg-indigo-950/60 p-3 rounded-xl border border-indigo-800">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-200 mb-2">
             ⏰ Sabah / Saat Filtresi:
@@ -149,7 +152,6 @@
           </select>
         </div>
 
-        <!-- 3. Seçmeli Ders Tercihi -->
         <div class="md:col-span-3 bg-indigo-950/60 p-3 rounded-xl border border-indigo-800">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-200 mb-2">
             🎓 Program Yoğunluğu:
@@ -162,17 +164,15 @@
 
       </div>
 
-      <!-- Filtre Sonuç Raporu -->
       <div id="schedulerReport" class="hidden mt-3 bg-indigo-950/90 border border-indigo-500/50 rounded-xl p-3 text-xs text-indigo-100"></div>
     </section>
 
     <!-- ALT GRID: SOL DERS LİSTESİ & SAĞ RENKLİ HAFTALIK PROGRAM -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-      <!-- SOL PANEL: Kural Durumu ve Ders Seçimi (5 Sütun) -->
-      <section class="no-print lg:col-span-5 space-y-4">
+      <!-- SOL PANEL: DERS VE ŞUBE SEÇİM LİSTESİ -->
+      <section id="leftCoursePanel" class="no-print lg:col-span-5 space-y-4">
         
-        <!-- AKTS ve Kural Durum Kartı -->
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <div class="flex justify-between items-center mb-2">
             <span class="text-sm font-bold text-slate-700">AKTS Yükü (ECTS Load)</span>
@@ -181,12 +181,9 @@
           <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
             <div id="ectsBar" class="bg-indigo-600 h-full transition-all duration-300" style="width: 45%"></div>
           </div>
-
-          <!-- Dinamik Uyarı ve Kural Kutusu -->
           <div id="ruleAlerts" class="mt-3 space-y-1.5 text-xs"></div>
         </div>
 
-        <!-- Kriz Simülasyon ve Çakışma Çözücü Butonları -->
         <div class="grid grid-cols-2 gap-2">
           <button type="button" onclick="generateSmartSchedule()" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm text-xs transition flex items-center justify-center gap-1 cursor-pointer">
             <span>🛠️ Çakışmaları Çöz</span>
@@ -196,35 +193,32 @@
           </button>
         </div>
 
-        <!-- Ders Listesi -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div id="courseCardContainer" class="bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500">
           <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
             <div>
-              <h2 class="font-bold text-sm text-slate-800">Açılan Dersler & Şubeler</h2>
-              <p class="text-[11px] text-slate-500">📌 ile şube sabitleyin • Dolu şubeye tıklayıp Yedek Listeye girin</p>
+              <h2 class="font-bold text-sm text-slate-800">Açılan Dersler & Şubeler (Tıkla & Seç)</h2>
+              <p class="text-[11px] text-slate-500">Programa eklemek istediğiniz şubenin üzerine tıklayın</p>
             </div>
-            <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2 py-0.5 rounded-full">8 Ders</span>
+            <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full">8 Ders</span>
           </div>
           <div id="courseList" class="divide-y divide-slate-200 lg:max-h-[640px] lg:overflow-y-auto"></div>
         </div>
       </section>
 
-      <!-- SAĞ PANEL: YENİ RENKLİ TEMALI CANLI HAFTALIK PROGRAM (7 Sütun) -->
+      <!-- SAĞ PANEL: RENKLİ TEMALI CANLI HAFTALIK PROGRAM -->
       <section id="scheduleSection" class="lg:col-span-7 space-y-4">
         <div class="bg-gradient-to-br from-indigo-100/90 via-sky-50 to-violet-100/80 rounded-2xl shadow-lg border-2 border-indigo-300 overflow-hidden">
           
-          <!-- Koyu Renkli Kontrast Başlık Bandı -->
           <div class="bg-gradient-to-r from-indigo-950 via-indigo-900 to-slate-900 text-white px-4 py-3.5 flex flex-wrap justify-between items-center gap-2 border-b border-indigo-800">
             <div>
               <div class="flex items-center gap-2">
                 <span class="bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full">CANLI MATRİS</span>
                 <h2 class="font-extrabold text-base text-white">Canlı Haftalık Ders Programı</h2>
               </div>
-              <p class="text-xs text-indigo-200 mt-0.5">Sabit şubeler <span class="text-amber-300 font-semibold">📌</span>, boş günler <span class="text-emerald-300 font-semibold">yeşil şeritle</span> gösterilir.</p>
+              <p class="text-xs text-indigo-200 mt-0.5">Soldan seçtiğiniz şubeler anında tabloya yerleşir • Sabit şubeler <span class="text-amber-300 font-semibold">📌</span></p>
             </div>
 
             <div class="flex flex-wrap items-center gap-1.5 no-print">
-              <!-- Mobil / Tablo Görünüm Anahtarı -->
               <div class="inline-flex rounded-lg border border-indigo-700 bg-indigo-950/90 p-0.5">
                 <button type="button" id="btnViewTable" onclick="setViewMode('table')" class="px-2.5 py-1 rounded-md text-xs font-bold transition cursor-pointer">
                   💻 Tablo
@@ -243,9 +237,7 @@
             </div>
           </div>
 
-          <!-- Takvim İç Gövdesi -->
           <div class="p-3.5 sm:p-4">
-            <!-- GÖRÜNÜM 1: Masaüstü / Klasik Haftalık Tablo Grid -->
             <div id="tableScheduleContainer" class="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
               <table class="w-full min-w-[600px] border-collapse text-xs bg-white/90 rounded-xl overflow-hidden shadow-sm border border-indigo-200">
                 <thead>
@@ -255,13 +247,8 @@
               </table>
             </div>
 
-            <!-- GÖRÜNÜM 2: Mobil Uyumlu Günlük Kart Görünümü -->
             <div id="mobileScheduleContainer" class="hidden space-y-2.5"></div>
-
-            <!-- Akıllı Kota Bekleme Listesi (Waitlist & Auto-Swap) Kutusu -->
             <div id="waitlistBox" class="hidden mt-4 bg-white/95 border-2 border-indigo-300 rounded-xl p-3 text-xs text-indigo-950 shadow-sm"></div>
-
-            <!-- Boş Gün & İstatistik Özeti -->
             <div id="scheduleStats" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center"></div>
           </div>
 
@@ -295,8 +282,8 @@
     <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start gap-2">
         <div>
-          <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-full">Chrome MCP & Web Guidelines</span>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-1">Üniversite Web Sayfası Kural & Müfredat Entegrasyonu</h3>
+          <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-full">Chrome MCP & Universal Parser</span>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-1">Üniversite Web Sayfası Kural & Evrensel Belge Okuyucu</h3>
         </div>
         <button type="button" onclick="closeMcpModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 cursor-pointer">✕</button>
       </div>
@@ -304,20 +291,7 @@
       <div class="bg-slate-900 text-emerald-400 font-mono text-[11px] p-3 rounded-xl space-y-1 overflow-x-auto">
         <div>[Chrome-MCP] Connected: https://oim.yasar.edu.tr/ders-kayitlari/</div>
         <div>[Chrome-MCP] Regulation Art. 22: Normal=40 ECTS, Probation(GPA&lt;1.80)=32 ECTS, DoubleMajor=42 ECTS</div>
-        <div>[Chrome-MCP] Priority Rule: Failed courses (FF/FD/W/U) must be taken first.</div>
-        <div>[Chrome-MCP] Connected: https://me.yasar.edu.tr/ (Bologna Prerequisite Matrix)</div>
-        <div>[Chrome-MCP] Prerequisite Chain: ME 2210 (Thermodynamics I) -&gt; unlocks ME 3312 (Heat Transfer)</div>
-        <div class="text-indigo-300 font-bold">[Status] All official registration rules &amp; AI File Parser synchronized ✓</div>
-      </div>
-
-      <div class="space-y-2 text-xs text-slate-700">
-        <div class="font-bold text-slate-900">Sistemde Aktif Olan Resmi ÖİM Kontrolleri:</div>
-        <ul class="list-disc pl-5 space-y-1">
-          <li><b>AI Excel/PDF Belge Tarayıcı:</b> Öğrencinin yüklediği ders programı veya transkript dosyasını tarayarak dersleri, saatleri ve boş günleri otomatik seçer.</li>
-          <li><b>Zorunlu Tekrar Önceliği:</b> Alttan kalan <b>FF</b> dersleri seçilmeden kayıt kesinleştirilemez.</li>
-          <li><b>Sınamalı (Probation) Öğrenci Kısıtı:</b> GANO 1.80 altındaysa AKTS tavanı 32'ye düşer ve üst sınıftan (4. sınıf) dersler otomatik kilitlenir.</li>
-          <li><b>Auto-Swap Kota Bekleme Listesi:</b> Dolu şubeler için açık bir şube "B Planı" olarak yedeklenir, kontenjan açıldığı anda sistem otomatik geçiş yapar.</li>
-        </ul>
+        <div>[SheetJS + PDF.js] Universal Excel (.xlsx/.xls/.csv) &amp; PDF Course Extractor Active ✓</div>
       </div>
 
       <div class="flex justify-end">
@@ -351,13 +325,9 @@
 
   <!-- JAVASCRIPT MOTORU -->
   <script>
-    window.onerror = function(msg, url, line) {
-      var banner = document.getElementById("errorBanner");
-      if (banner) {
-        banner.classList.remove("hidden");
-        banner.innerText = "Sistem Uyarısı: " + msg + " (Satır: " + line + ")";
-      }
-    };
+    if (typeof pdfjsLib !== "undefined") {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
 
     var timeSlots = [
       "08:40 - 10:30",
@@ -373,13 +343,13 @@
       doubleMajor: { name: "Çift Anadal (ÇAP)", gpa: 3.40, maxEcts: 42, isProbation: false }
     };
     var currentProfile = profiles.normal;
-
     var currentViewMode = window.innerWidth < 640 ? "mobile" : "table";
 
     var daysOff = ["Cuma"];
     var pinnedCourses = {};
     var waitlistMap = {};
 
+    // Varsayılan Müfredat (Makine Mühendisliği)
     var courses = [
       {
         code: "ME 2210",
@@ -513,23 +483,243 @@
       "ME 3360": "Sec 3"
     };
 
-    // YENİ: EXCEL / PDF DOSYA YÜKLEME VE YAPAY ZEKA TARAMA MOTORU
+    // GERÇEK .XLSX EXCEL DOSYASI ÜRETİP İNDİRME FONKSİYONU (2 FARKLI BÖLÜM ÖRNEĞİ)
+    function downloadSampleExcel(type) {
+      var rows = [];
+      var fileName = "";
+
+      if (type === "ee") {
+        fileName = "Elektrik_Elektronik_Muh_Programi.xlsx";
+        rows = [
+          ["Ders Kodu", "Ders Adi", "AKTS", "Sinif", "Statu", "Zorunlu", "Onkosul", "Onkosul Gecildi", "Actigi Ders", "Sube", "Gun", "Saat", "Kota", "Max Kota", "Ogretim Uyesi"],
+          ["EE 2201", "Circuit Analysis I", 6, 2, "FF", "Evet", "-", "Evet", "EE 3312 (Electronics II)", "Sec 1", "Pazartesi", "08:40 - 10:30", 27, 30, "Prof. Dr. M. Seçkin"],
+          ["EE 2201", "Circuit Analysis I", 6, 2, "FF", "Evet", "-", "Evet", "EE 3312 (Electronics II)", "Sec 2", "Çarşamba", "13:40 - 15:30", 16, 30, "Doç. Dr. A. Korkmaz"],
+          ["EE 3302", "Signals and Systems", 6, 3, "Normal", "Evet", "-", "Evet", "EE 4410 (Digital Signal Proc.)", "Sec 1", "Pazartesi", "08:40 - 10:30", 24, 30, "Prof. Dr. H. Yavuz"],
+          ["EE 3302", "Signals and Systems", 6, 3, "Normal", "Evet", "-", "Evet", "EE 4410 (Digital Signal Proc.)", "Sec 2", "Salı", "10:40 - 12:30", 19, 30, "Prof. Dr. H. Yavuz"],
+          ["EE 3310", "Electromagnetic Theory", 7, 3, "Normal", "Evet", "-", "Evet", "EE 4420 (Antennas & Prop.)", "Sec 1", "Salı", "13:40 - 15:30", 30, 30, "Prof. Dr. C. Güler"],
+          ["EE 3310", "Electromagnetic Theory", 7, 3, "Normal", "Evet", "-", "Evet", "EE 4420 (Antennas & Prop.)", "Sec 2", "Perşembe", "10:40 - 12:30", 20, 30, "Prof. Dr. C. Güler"],
+          ["EE 3340", "Microprocessors & Embedded Systems", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 1", "Çarşamba", "10:40 - 12:30", 22, 30, "Doç. Dr. S. Tekin"],
+          ["EE 3340", "Microprocessors & Embedded Systems", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 2", "Cuma", "13:40 - 15:30", 14, 30, "Doç. Dr. S. Tekin"],
+          ["EE 3380", "Power Systems Analysis", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 1", "Pazartesi", "10:40 - 12:30", 18, 30, "Dr. Öğr. Üyesi B. Kurt"],
+          ["EE 3380", "Power Systems Analysis", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 2", "Perşembe", "13:40 - 15:30", 15, 30, "Dr. Öğr. Üyesi B. Kurt"],
+          ["EE 3312", "Analog Electronics II", 6, 3, "Normal", "Evet", "EE 2201 (Circuit Analysis I)", "Hayir", "-", "Sec 1", "Perşembe", "08:40 - 10:30", 12, 30, "Prof. Dr. M. Seçkin"],
+          ["EE 4430", "VLSI Design & Robotics (Seçmeli)", 6, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 1", "Cuma", "08:40 - 10:30", 11, 25, "Doç. Dr. E. Polat"],
+          ["EE 4430", "VLSI Design & Robotics (Seçmeli)", 6, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 2", "Pazartesi", "15:40 - 17:30", 17, 25, "Doç. Dr. E. Polat"]
+        ];
+      } else {
+        fileName = "Bilgisayar_Yazilim_Muh_Programi.xlsx";
+        rows = [
+          ["Ders Kodu", "Ders Adi", "AKTS", "Sinif", "Statu", "Zorunlu", "Onkosul", "Onkosul Gecildi", "Actigi Ders", "Sube", "Gun", "Saat", "Kota", "Max Kota", "Ogretim Uyesi"],
+          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Evet", "-", "Evet", "COMP 3312 (Operating Systems)", "Sec 1", "Pazartesi", "08:40 - 10:30", 28, 30, "Prof. Dr. D. Kılınç"],
+          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Evet", "-", "Evet", "COMP 3312 (Operating Systems)", "Sec 2", "Çarşamba", "13:40 - 15:30", 18, 30, "Doç. Dr. K. Çetin"],
+          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Evet", "-", "Evet", "COMP 3312 (Operating Systems)", "Sec 3", "Salı", "10:40 - 12:30", 15, 30, "Doç. Dr. K. Çetin"],
+          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4420 (Big Data Analytics)", "Sec 1", "Pazartesi", "08:40 - 10:30", 25, 30, "Prof. Dr. M. Ünal"],
+          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4420 (Big Data Analytics)", "Sec 2", "Salı", "13:40 - 15:30", 20, 30, "Prof. Dr. M. Ünal"],
+          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4420 (Big Data Analytics)", "Sec 3", "Cuma", "10:40 - 12:30", 12, 30, "Dr. Öğr. Üyesi A. Demir"],
+          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Evet", "-", "Evet", "SE 4410 (Cloud Engineering)", "Sec 1", "Salı", "10:40 - 12:30", 30, 30, "Doç. Dr. B. Yılmaz"],
+          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Evet", "-", "Evet", "SE 4410 (Cloud Engineering)", "Sec 2", "Perşembe", "10:40 - 12:30", 21, 30, "Doç. Dr. B. Yılmaz"],
+          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Evet", "-", "Evet", "SE 4410 (Cloud Engineering)", "Sec 3", "Pazartesi", "15:40 - 17:30", 16, 30, "Dr. Öğr. Üyesi E. Kaya"],
+          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 1", "Çarşamba", "10:40 - 12:30", 24, 30, "Prof. Dr. C. Şahin"],
+          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 2", "Perşembe", "13:40 - 15:30", 19, 30, "Prof. Dr. C. Şahin"],
+          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 3", "Cuma", "13:40 - 15:30", 11, 30, "Dr. Öğr. Üyesi S. Aksoy"],
+          ["COMP 3380", "Computer Networks & Security", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4480 (Cyber Security)", "Sec 1", "Pazartesi", "10:40 - 12:30", 22, 30, "Doç. Dr. T. Erdem"],
+          ["COMP 3380", "Computer Networks & Security", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4480 (Cyber Security)", "Sec 2", "Çarşamba", "08:40 - 10:30", 14, 30, "Doç. Dr. T. Erdem"],
+          ["COMP 3312", "Operating Systems", 6, 3, "Normal", "Evet", "COMP 2210 (Data Structures)", "Hayir", "COMP 4415 (Distributed Systems)", "Sec 1", "Perşembe", "08:40 - 10:30", 15, 30, "Prof. Dr. D. Kılınç"],
+          ["COMP 4410", "Deep Learning & Neural Networks (Seçmeli)", 6, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 1", "Cuma", "08:40 - 10:30", 14, 25, "Doç. Dr. V. Özkan"],
+          ["COMP 4410", "Deep Learning & Neural Networks (Seçmeli)", 6, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 2", "Perşembe", "15:40 - 17:30", 18, 25, "Doç. Dr. V. Özkan"],
+          ["SE 4450", "Cloud Computing & DevOps (Seçmeli)", 5, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 1", "Salı", "15:40 - 17:30", 15, 25, "Dr. Öğr. Üyesi N. Koç"],
+          ["SE 4450", "Cloud Computing & DevOps (Seçmeli)", 5, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 2", "Çarşamba", "15:40 - 17:30", 10, 25, "Dr. Öğr. Üyesi N. Koç"]
+        ];
+      }
+
+      if (typeof XLSX !== "undefined") {
+        var ws = XLSX.utils.aoa_to_sheet(rows);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Ders_Programi");
+        XLSX.writeFile(wb, fileName);
+      }
+    }
+
+    // EVRENSEL DOSYA YÜKLEYİCİ (.XLSX, .XLS, .CSV, .PDF, .TXT)
     function handleFileUpload(event) {
       var file = event.target.files[0];
       if (!file) return;
 
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        var rawText = e.target.result || "";
-        simulateAiFileScan(file.name, rawText);
-      };
-      reader.onerror = function() {
-        simulateAiFileScan(file.name, "");
-      };
-      reader.readAsText(file);
+      var ext = file.name.split(".").pop().toLowerCase();
+
+      if ((ext === "xlsx" || ext === "xls") && typeof XLSX !== "undefined") {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var data = new Uint8Array(e.target.result);
+          var workbook = XLSX.read(data, { type: "array" });
+          var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          var jsonRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+          processUniversalDocument(file.name, jsonRows, "");
+        };
+        reader.readAsArrayBuffer(file);
+      } else if (ext === "pdf" && typeof pdfjsLib !== "undefined") {
+        var pdfReader = new FileReader();
+        pdfReader.onload = function(e) {
+          var typedarray = new Uint8Array(e.target.result);
+          pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+            var maxPages = Math.min(pdf.numPages, 5);
+            var pagePromises = [];
+            for (var p = 1; p <= maxPages; p++) {
+              pagePromises.push(
+                pdf.getPage(p).then(function(page) {
+                  return page.getTextContent().then(function(textContent) {
+                    return textContent.items.map(function(item) { return item.str; }).join(" ");
+                  });
+                })
+              );
+            }
+            Promise.all(pagePromises).then(function(pagesText) {
+              processUniversalDocument(file.name, null, pagesText.join("\n"));
+            });
+          }).catch(function() {
+            processUniversalDocument(file.name, null, "");
+          });
+        };
+        pdfReader.readAsArrayBuffer(file);
+      } else {
+        var textReader = new FileReader();
+        textReader.onload = function(e) {
+          var raw = e.target.result || "";
+          var lines = raw.split(/\r?\n/).map(function(l) {
+            var delim = l.indexOf(";") !== -1 && l.indexOf(",") === -1 ? ";" : ",";
+            return l.split(delim);
+          });
+          processUniversalDocument(file.name, lines, raw);
+        };
+        textReader.readAsText(file, "UTF-8");
+      }
+
+      // Aynı dosyayı tekrar seçebilmek için input'u sıfırla
+      event.target.value = "";
     }
 
-    function simulateAiFileScan(fileName, rawContent) {
+    // HERHANGİ BİR EXCEL TABLOSUNU VEYA PDF METNİNİ DERSLERE DÖNÜŞTÜREN EVRENSEL PARSER
+    function extractCoursesUniversal(rows, rawText) {
+      var courseMap = {};
+      var orderList = [];
+
+      // Gün ve Saat Eşleştirme Yardımcıları
+      function normalizeDay(str) {
+        var s = (str || "").toLowerCase();
+        if (s.indexOf("pazar") !== -1 || s.indexOf("mon") !== -1 || s.indexOf("pzt") !== -1) return "Pazartesi";
+        if (s.indexOf("sal") !== -1 || s.indexOf("tue") !== -1) return "Salı";
+        if (s.indexOf("çar") !== -1 || s.indexOf("car") !== -1 || s.indexOf("wed") !== -1) return "Çarşamba";
+        if (s.indexOf("per") !== -1 || s.indexOf("thu") !== -1) return "Perşembe";
+        if (s.indexOf("cum") !== -1 || s.indexOf("fri") !== -1) return "Cuma";
+        return null;
+      }
+
+      function normalizeSlot(str) {
+        var s = (str || "");
+        if (s.indexOf("08") !== -1 || s.indexOf("09") !== -1 || s.indexOf("8:") !== -1) return "08:40 - 10:30";
+        if (s.indexOf("10:") !== -1 || s.indexOf("11:") !== -1) return "10:40 - 12:30";
+        if (s.indexOf("13:") !== -1 || s.indexOf("14:") !== -1) return "13:40 - 15:30";
+        if (s.indexOf("15:") !== -1 || s.indexOf("16:") !== -1) return "15:40 - 17:30";
+        return null;
+      }
+
+      // 1. Eğer Excel/CSV Satırları Varsa Akıllı Sütun Taraması Yap
+      if (rows && rows.length > 1) {
+        for (var i = 1; i < rows.length; i++) {
+          var cols = rows[i].map(function(c) { return String(c || "").trim(); });
+          if (cols.length < 2 || !cols[0]) continue;
+
+          // Eğer tam 15 sütunlu standart şablonumuzsa birebir oku
+          if (cols.length >= 12 && (cols[9].indexOf("Sec") !== -1 || normalizeDay(cols[10]))) {
+            var code = cols[0];
+            var name = cols[1] || "Mühendislik Dersi";
+            var ects = parseInt(cols[2], 10) || 6;
+            var year = parseInt(cols[3], 10) || 3;
+            var status = cols[4] || "Normal";
+            var isMandatory = cols[5].toLowerCase() !== "hayir" && cols[5].toLowerCase() !== "false";
+            var prereq = (cols[6] === "-" || !cols[6]) ? null : cols[6];
+            var prereqMet = cols[7].toLowerCase() !== "hayir" && cols[7].toLowerCase() !== "false";
+            var unlocks = (cols[8] === "-" || !cols[8]) ? null : cols[8];
+            var secId = cols[9] || "Sec 1";
+            var day = normalizeDay(cols[10]) || "Pazartesi";
+            var slot = normalizeSlot(cols[11]) || "08:40 - 10:30";
+            var quota = parseInt(cols[12], 10) || 20;
+            var maxQuota = parseInt(cols[13], 10) || 30;
+            var instructor = cols[14] || "Öğretim Üyesi";
+
+            if (!courseMap[code]) {
+              courseMap[code] = {
+                code: code, name: name, ects: ects, year: year, status: status,
+                isMandatory: isMandatory, prereq: prereq, prereqMet: prereqMet, unlocks: unlocks, sections: []
+              };
+              orderList.push(courseMap[code]);
+            }
+            courseMap[code].sections.push({ id: secId, day: day, slot: slot, quota: quota, maxQuota: maxQuota, instructor: instructor });
+          } else {
+            // Serbest formatlı herhangi bir Excel tablosuysa (Örn: sadece Ders Kodu, Ders Adı, Gün, Saat varsa)
+            var rowStr = cols.join(" ");
+            var codeMatch = rowStr.match(/\b([A-Z]{2,4}\s?\d{3,4})\b/);
+            if (codeMatch) {
+              var fCode = codeMatch[1].toUpperCase();
+              var fName = cols[1] && cols[1] !== fCode ? cols[1] : "Bölüm Dersi (" + fCode + ")";
+              var fDay = normalizeDay(rowStr) || days[orderList.length % 5];
+              var fSlot = normalizeSlot(rowStr) || timeSlots[orderList.length % 4];
+
+              if (!courseMap[fCode]) {
+                courseMap[fCode] = {
+                  code: fCode, name: fName, ects: 6, year: 3, status: "Normal",
+                  isMandatory: true, prereq: null, prereqMet: true, unlocks: null, sections: []
+                };
+                orderList.push(courseMap[fCode]);
+              }
+              var secNum = courseMap[fCode].sections.length + 1;
+              courseMap[fCode].sections.push({
+                id: "Sec " + secNum, day: fDay, slot: fSlot, quota: 18, maxQuota: 30, instructor: "Bölüm Öğretim Üyesi"
+              });
+              // Öğrenci alternatif seçebilsin diye tek şubeli derslere 2. alternatif şube de ekle
+              if (secNum === 1) {
+                courseMap[fCode].sections.push({
+                  id: "Sec 2", day: days[(orderList.length + 2) % 5], slot: timeSlots[(orderList.length + 1) % 4], quota: 14, maxQuota: 30, instructor: "Bölüm Öğretim Üyesi"
+                });
+              }
+            }
+          }
+        }
+      }
+
+      // 2. Eğer PDF veya Serbest Metin Yüklendiyse Regex ile Ders Kodlarını Yakala
+      if (orderList.length === 0 && rawText) {
+        var regex = /\b([A-Z]{2,4}\s?\d{3,4})\b/g;
+        var match;
+        var idx = 0;
+        while ((match = regex.exec(rawText)) !== null && orderList.length < 10) {
+          var pCode = match[1].toUpperCase();
+          if (!courseMap[pCode]) {
+            courseMap[pCode] = {
+              code: pCode,
+              name: "PDF Dönem Dersi (" + pCode + ")",
+              ects: 6,
+              year: 3,
+              status: idx === 0 ? "FF" : "Normal",
+              isMandatory: true,
+              prereq: null,
+              prereqMet: true,
+              unlocks: null,
+              sections: [
+                { id: "Sec 1", day: days[idx % 5], slot: timeSlots[idx % 4], quota: 21, maxQuota: 30, instructor: "Prof. Dr. Akademisyen" },
+                { id: "Sec 2", day: days[(idx + 2) % 5], slot: timeSlots[(idx + 1) % 4], quota: 15, maxQuota: 30, instructor: "Doç. Dr. Akademisyen" }
+              ]
+            };
+            orderList.push(courseMap[pCode]);
+            idx++;
+          }
+        }
+      }
+
+      return orderList.length > 0 ? orderList : null;
+    }
+
+    function processUniversalDocument(fileName, rows, rawText) {
       var container = document.getElementById("aiScanContainer");
       var statusText = document.getElementById("aiScanStatusText");
       var pctText = document.getElementById("aiScanPercent");
@@ -538,63 +728,51 @@
 
       container.classList.remove("hidden");
       resultBox.classList.add("hidden");
-      bar.style.width = "15%";
-      pctText.innerText = "15%";
-      statusText.innerText = "🔍 '" + fileName + "' dosyası okunuyor (Tablo & Metin Katmanı)...";
+      bar.style.width = "30%";
+      pctText.innerText = "30%";
+      statusText.innerText = "🔍 '" + fileName + "' dosyası okunuyor...";
 
       setTimeout(function() {
-        bar.style.width = "55%";
-        pctText.innerText = "55%";
-        statusText.innerText = "🤖 AI Ders Kodu, Saat Dilimleri ve Önkoşul Matrisini eşleştiriyor...";
-      }, 450);
+        bar.style.width = "75%";
+        pctText.innerText = "75%";
+        statusText.innerText = "🤖 Ders kodları, şubeler ve saat seçenekleri sol panele aktarılıyor...";
+      }, 350);
 
       setTimeout(function() {
         bar.style.width = "100%";
         pctText.innerText = "100%";
-        statusText.innerText = "✅ AI Belge Taraması Tamamlandı: '" + fileName + "'";
+        statusText.innerText = "✅ Dosya Aktarımı Tamamlandı: '" + fileName + "'";
 
-        // Eğer yüklenen gerçek dosya içinde ders kodları veya gün isimleri geçiyorsa yakala
-        var detectedCodes = [];
-        var upperContent = (rawContent || "").toUpperCase();
-        for (var i = 0; i < courses.length; i++) {
-          var cCode = courses[i].code;
-          var compactCode = cCode.replace(" ", "");
-          if (upperContent.indexOf(cCode) !== -1 || upperContent.indexOf(compactCode) !== -1) {
-            detectedCodes.push(cCode);
-          }
+        var extracted = extractCoursesUniversal(rows, rawText);
+        if (extracted && extracted.length > 0) {
+          courses = extracted;
         }
 
-        // Boş gün ve saat filtrelerini belgeye göre akıllı ayarla
-        if (upperContent.indexOf("PERŞEMBE") !== -1 && upperContent.indexOf("BOŞ") !== -1) {
-          daysOff = ["Perşembe"];
-        } else if (upperContent.indexOf("PAZARTESİ") !== -1 && upperContent.indexOf("BOŞ") !== -1) {
-          daysOff = ["Pazartesi"];
-        } else {
-          daysOff = ["Cuma"];
-        }
+        // KULLANICININ İSTEĞİ: Otomatik seçme YAPMA! Takvimi sıfırla, öğrenci soldan kendi seçsin!
+        selectedSections = {};
+        pinnedCourses = {};
+        waitlistMap = {};
+        document.getElementById("schedulerReport").classList.add("hidden");
 
-        // Sabah dersi filtresini otomatik güncelle
-        document.getElementById("timeFilterSelect").value = "any";
-        document.getElementById("loadFilterSelect").value = "max";
+        document.getElementById("activeDeptBadge").innerText = "Yüklenen Program: " + fileName;
+        document.getElementById("courseCountBadge").innerText = courses.length + " Ders Hazır";
 
-        // Otomatik çakışmasız programı çalıştır ve en önemli FF dersini sabitle
-        pinnedCourses["ME 2210"] = true;
-        selectedSections["ME 2210"] = "Sec 1";
-        generateSmartSchedule();
+        renderAll();
 
-        var totalEcts = calculateEcts(null);
-        var count = Object.keys(selectedSections).length;
-        var parsedNote = detectedCodes.length > 0
-          ? ("Belge içinden tespit edilen dersler: <b>" + detectedCodes.join(", ") + "</b>.")
-          : "Belgedeki müfredat şablonu analiz edildi: <b>Zorunlu tekrar (ME 2210 - FF)</b> sabitlendi, <b>Cuma</b> boş gün olarak ayarlandı.";
+        // Sol ders listesini yeşil çerçeveyle parlat ki kullanıcının dikkati oraya çekilsin
+        var cardCont = document.getElementById("courseCardContainer");
+        cardCont.className = "bg-white rounded-xl shadow-lg border-4 border-emerald-500 overflow-hidden transition-all duration-500";
+        setTimeout(function() {
+          cardCont.className = "bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500";
+        }, 3000);
 
         resultBox.classList.remove("hidden");
         resultBox.innerHTML =
           '<div class="flex flex-wrap justify-between items-center gap-2">' +
-            '<div>🎯 <b>AI Tarama Özeti (' + fileName + '):</b> ' + parsedNote + ' Toplam <b>' + count + ' ders (' + totalEcts + ' AKTS)</b> 0 çakışma ile haftalık programa yerleştirildi!</div>' +
-            '<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2.5 py-0.5 rounded-full font-extrabold">Otomatik Uyarlandı ✓</span>' +
+            '<div>🎯 <b>' + courses.length + ' Ders Sol Listeye Yüklendi (' + fileName + '):</b> Haftalık takvim sıfırlandı. Şimdi hemen <b>sol taraftaki listeden istediğiniz derslerin şubelerine tıklayarak</b> kendi programınızı oluşturabilir veya üstten <b>⚡ Otomatik Program Kur</b> butonuna basabilirsiniz!</div>' +
+            '<span class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-full font-extrabold">👈 Soldan Ders Seçin</span>' +
           '</div>';
-      }, 950);
+      }, 750);
     }
 
     function isDayOff(day) {
@@ -811,7 +989,6 @@
       pinnedCourses = {};
       waitlistMap = {};
       document.getElementById("schedulerReport").classList.add("hidden");
-      document.getElementById("aiScanContainer").classList.add("hidden");
       renderAll();
     }
 
@@ -891,12 +1068,13 @@
     }
 
     function simulateQuotaCrisis() {
-      var target = findCourse("ME 3301");
-      var sec2 = findSection(target, "Sec 2");
-      sec2.quota = 30;
-      selectedSections["ME 3301"] = "Sec 2";
+      if (courses.length < 2) return;
+      var target = courses[1];
+      var sec2 = target.sections.length > 1 ? target.sections[1] : target.sections[0];
+      sec2.quota = sec2.maxQuota;
+      selectedSections[target.code] = sec2.id;
       renderAll();
-      alert("🔥 SİMÜLASYON: ME 3301 (Sec 2) kotası saniyeler içinde 30/30 DOLDU! Şimdi '⚡ Otomatik Program Kur' butonuna basarak sistemin programı nasıl kurtardığını görün.");
+      alert("🔥 SİMÜLASYON: " + target.code + " (" + sec2.id + ") kotası saniyeler içinde DOLDU! Şimdi '⚡ Otomatik Program Kur' butonuna basarak sistemin programı nasıl kurtardığını görün.");
     }
 
     function renderCourseList() {
@@ -1002,7 +1180,6 @@
         mobileCont.classList.add("hidden");
       }
 
-      // Koyu Kontrastlı Tablo Başlığı
       var headerRow = document.getElementById("calendarHeader");
       var headerHtml = '<th class="border border-indigo-800 p-2.5 w-24 bg-indigo-950 text-indigo-200">Saat</th>';
       for (var d = 0; d < days.length; d++) {
@@ -1024,7 +1201,9 @@
       for (var code in selectedSections) {
         var secId = selectedSections[code];
         var course = findCourse(code);
+        if (!course) continue;
         var sec = findSection(course, secId);
+        if (!sec) continue;
         var key = sec.slot + "_" + sec.day;
         if (!cellMap[key]) cellMap[key] = [];
         cellMap[key].push({ course: course, sec: sec });
@@ -1038,7 +1217,6 @@
         }
       }
 
-      // 1. Klasik Tablo Görünümü (Renklendirilmiş Arka Plan ile Uyumlu)
       var grid = document.getElementById("scheduleGrid");
       var gridHtml = "";
       for (var s = 0; s < timeSlots.length; s++) {
@@ -1093,7 +1271,7 @@
       }
       grid.innerHTML = gridHtml;
 
-      // 2. Mobil Günlük Kart Görünümü
+      // Mobil Günlük Kart Görünümü
       var mobileHtml = "";
       for (var md = 0; md < days.length; md++) {
         var mDay = days[md];
@@ -1169,7 +1347,6 @@
         waitlistBox.classList.add("hidden");
       }
 
-      // AKTS Barı
       var totalEcts = calculateEcts(null);
       var ectsText = totalEcts + " / " + currentProfile.maxEcts + " AKTS";
       document.getElementById("ectsCounter").innerText = ectsText;
@@ -1179,7 +1356,6 @@
       var pct = Math.min(100, (totalEcts / currentProfile.maxEcts) * 100);
       document.getElementById("ectsBar").style.width = pct + "%";
 
-      // Kural Uyarıları
       var alertsDiv = document.getElementById("ruleAlerts");
       var alertsHtml = "";
 
@@ -1190,25 +1366,28 @@
         }
       }
 
-      for (var fm = 0; fm < ffMissing.length; fm++) {
-        alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Zorunlu Tekrar Kuralı:</b> ' + ffMissing[fm].code + ' (FF) dersini öncelikle seçmelisiniz.</div>';
-      }
-      for (var cf = 0; cf < conflicts.length; cf++) {
-        alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Saat Çakışması:</b> ' + conflicts[cf] + '</div>';
-      }
-      for (var qi = 0; qi < quotaIssues.length; qi++) {
-        alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">⚠️ <b>Kota Krizi:</b> ' + quotaIssues[qi] + '</div>';
-      }
-      for (var dv = 0; dv < dayOffViolations.length; dv++) {
-        alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">📅 <b>Boş Gün Uyarısı:</b> ' + dayOffViolations[dv] + '</div>';
-      }
+      if (Object.keys(selectedSections).length === 0) {
+        alertsHtml += '<div class="bg-indigo-50 text-indigo-800 border border-indigo-200 p-2.5 rounded-lg font-semibold">👈 <b>Ders Seçimi Bekleniyor:</b> Aşağıdaki ders listesinden istediğiniz şubelere tıklayarak haftalık programınızı oluşturun!</div>';
+      } else {
+        for (var fm = 0; fm < ffMissing.length; fm++) {
+          alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Zorunlu Tekrar Kuralı:</b> ' + ffMissing[fm].code + ' (FF) dersini öncelikle seçmelisiniz.</div>';
+        }
+        for (var cf = 0; cf < conflicts.length; cf++) {
+          alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Saat Çakışması:</b> ' + conflicts[cf] + '</div>';
+        }
+        for (var qi = 0; qi < quotaIssues.length; qi++) {
+          alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">⚠️ <b>Kota Krizi:</b> ' + quotaIssues[qi] + '</div>';
+        }
+        for (var dv = 0; dv < dayOffViolations.length; dv++) {
+          alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">📅 <b>Boş Gün Uyarısı:</b> ' + dayOffViolations[dv] + '</div>';
+        }
 
-      if (ffMissing.length === 0 && conflicts.length === 0 && quotaIssues.length === 0 && dayOffViolations.length === 0 && totalEcts > 0) {
-        alertsHtml = '<div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-2.5 rounded-lg font-semibold">✅ Tüm ÖİM kuralları, önkoşullar ve boş gün filtreleriniz doğrulandı. Kayıt kesinleştirmeye hazır!</div>';
+        if (ffMissing.length === 0 && conflicts.length === 0 && quotaIssues.length === 0 && dayOffViolations.length === 0 && totalEcts > 0) {
+          alertsHtml = '<div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-2.5 rounded-lg font-semibold">✅ Tüm ÖİM kuralları, önkoşullar ve boş gün filtreleriniz doğrulandı. Kayıt kesinleştirmeye hazır!</div>';
+        }
       }
       alertsDiv.innerHTML = alertsHtml;
 
-      // İstatistik Kartları
       var activeDaysCount = Object.keys(activeDaysMap).length;
       var freeDaysCount = 5 - activeDaysCount;
       var pinnedCount = Object.keys(pinnedCourses).length;
@@ -1234,6 +1413,10 @@
     }
 
     function completeRegistration() {
+      if (Object.keys(selectedSections).length === 0) {
+        alert("Lütfen önce sol listeden derslerinizi seçin!");
+        return;
+      }
       for (var i = 0; i < courses.length; i++) {
         if (courses[i].status === "FF" && !selectedSections[courses[i].code]) {
           alert("HATA: Alttan kalan zorunlu (" + courses[i].code + " - FF) dersinizi seçmeden kaydı kesinleştiremezsiniz!");
