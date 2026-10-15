@@ -56,22 +56,32 @@
     </div>
   </div>
 
-  <!-- CINEMATIC AI VOICEOVER SUBTITLE BAR -->
+  <!-- CINEMATIC AI VOICEOVER SUBTITLE BAR (ENGLISH AUDIO + TURKISH SUBTITLES + MEDIA CONTROLS) -->
   <div id="aiSubtitleBanner" class="hidden fixed bottom-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
-    <div class="bg-slate-950/95 text-white border-2 border-rose-500 shadow-2xl rounded-2xl px-5 py-4 max-w-4xl w-full flex items-center justify-between gap-4 pointer-events-auto">
-      <div class="flex items-center gap-3.5">
-        <span class="flex h-4 w-4 relative shrink-0">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+    <div class="bg-slate-950/95 text-white border-2 border-rose-500 shadow-2xl rounded-2xl px-5 py-4 max-w-4xl w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pointer-events-auto">
+      <div class="flex items-start sm:items-center gap-3.5">
+        <span class="flex h-4 w-4 relative shrink-0 mt-1 sm:mt-0">
+          <span id="aiPulseDot" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-4 w-4 bg-rose-600"></span>
         </span>
         <div>
-          <div id="aiStepTitle" class="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">Autonomous AI Tour Active</div>
-          <div id="aiSubtitleText" class="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5 leading-relaxed">Initializing English AI voiceover...</div>
+          <div id="aiStepTitle" class="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">Otonom AI Sunumu Aktif (İngilizce Ses • Türkçe Altyazı)</div>
+          <div id="aiSubtitleText" class="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5 leading-relaxed">Sesli anlatım başlatılıyor...</div>
         </div>
       </div>
-      <button type="button" onclick="stopAiPresentation()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shrink-0 cursor-pointer">
-        ⏹️ Stop Tour
-      </button>
+
+      <!-- Media Control Buttons: Pause/Resume, Restart, Stop -->
+      <div class="flex items-center justify-end gap-2 shrink-0">
+        <button id="btnPauseResumeAi" type="button" onclick="togglePauseAiPresentation()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow">
+          ⏸️ Duraklat
+        </button>
+        <button type="button" onclick="restartAiPresentation()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow">
+          ⏮️ Başa Sar
+        </button>
+        <button type="button" onclick="stopAiPresentation()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold px-3 py-2 rounded-xl cursor-pointer transition shadow">
+          ⏹️ Kapat
+        </button>
+      </div>
     </div>
   </div>
 
@@ -125,7 +135,7 @@
     <!-- Error Banner -->
     <div id="errorBanner" class="hidden bg-rose-600 text-white p-3 rounded-xl text-xs font-bold"></div>
 
-    <!-- 2. UNIVERSAL EXCEL & PDF SCHEDULE IMPORTER SECTION -->
+    <!-- 2. UNIVERSAL EXCEL & PDF SCHEDULE IMPORTER SECTION (CLEAN & STREAMLINED) -->
     <section id="excelUploadSection" class="no-print bg-gradient-to-r from-teal-950 via-emerald-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-emerald-700/80">
       <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
         
@@ -139,25 +149,18 @@
             </span>
           </div>
           <h2 class="text-base sm:text-lg font-bold">Upload Any Course Schedule (.xlsx, .xls, .csv, .pdf)</h2>
-          <p class="text-xs text-emerald-100/90">Automatically detects and parses any university schedule file—including multi-sheet weekly timetables, standard Excel tables, and PDF documents. Choose <b>Replace Mode</b> for a fresh start or <b>Merge Mode</b> to combine multiple files.</p>
+          <p class="text-xs text-emerald-100/90">Automatically detects and parses any university schedule file—including multi-sheet weekly timetables, standard Excel tables, and PDF documents. Choose <b>Load as New Curriculum</b> for a fresh start or <b>Merge Mode</b> to combine multiple files.</p>
         </div>
 
-        <!-- Upload Mode + Sample Downloads + File Input -->
-        <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 shrink-0">
-          <select id="uploadModeSelect" class="bg-emerald-950 text-emerald-100 border border-emerald-500 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none cursor-pointer">
+        <!-- Upload Mode + File Input Only -->
+        <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 shrink-0">
+          <select id="uploadModeSelect" class="bg-emerald-950 text-emerald-100 border border-emerald-500 rounded-xl px-3.5 py-2.5 text-xs font-bold focus:outline-none cursor-pointer">
             <option value="replace">📂 Mode: Load as New Curriculum</option>
             <option value="merge">🔗 Mode: Merge with Existing List</option>
           </select>
 
-          <button id="btnSampleComp" type="button" onclick="downloadSampleExcel('comp')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
-            📥 Sample 1: Computer Eng. (.xlsx)
-          </button>
-          <button id="btnSampleEe" type="button" onclick="downloadSampleExcel('ee')" class="bg-sky-400 hover:bg-sky-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
-            📥 Sample 2: Electrical Eng. (.xlsx)
-          </button>
-
-          <label id="lblFileUpload" for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2 px-4 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-emerald-400">
-            <span>📂 Upload Excel / PDF</span>
+          <label id="lblFileUpload" for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2.5 px-5 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer border-2 border-dashed border-emerald-400">
+            <span>📂 Upload Excel / PDF Schedule</span>
             <input id="scheduleFileInput" type="file" accept=".xlsx,.xls,.csv,.pdf,.txt" onchange="handleFileUpload(event)" class="hidden">
           </label>
         </div>
@@ -507,7 +510,11 @@
     var daysOff = ["Friday"];
     var pinnedCourses = {};
     var waitlistMap = {};
+
+    // AI Tour State & Pause/Resume/Restart Controls
     var isAiDemoRunning = false;
+    var isAiDemoPaused = false;
+    var aiTourSessionId = 0;
 
     // Comprehensive Engineering Course Title Dictionary
     var courseTitleDictionary = {
@@ -670,11 +677,10 @@
       ];
     }
 
-    // CLEAN SLATE: Start with an empty course catalog so uploaded Excel files never clash with preloaded ME courses!
+    // CLEAN SLATE: Start with an empty course catalog
     var courses = [];
     var selectedSections = {};
 
-    // Load Demo Catalog on demand (for testing or AI Tour)
     function loadDemoCatalog() {
       courses = getSampleEngineeringCatalog();
       pinnedCourses = {};
@@ -691,7 +697,6 @@
       renderAll();
     }
 
-    // MANUAL INDIVIDUAL COURSE REMOVAL & FULL CATALOG CLEAR
     function removeCourse(courseCode, event) {
       if (event) event.stopPropagation();
       var updated = [];
@@ -780,12 +785,77 @@
     }
 
     // ============================================================================
-    // COHESIVE TOP-TO-BOTTOM 10-STEP ENGLISH AI VOICEOVER & AUTONOMOUS TOUR
+    // COHESIVE TOP-TO-BOTTOM 10-STEP ENGLISH VOICE + TURKISH SUBTITLE AI TOUR
+    // WITH PAUSE / RESUME AND RESTART CONTROLS
     // ============================================================================
-    function speakEnglish(text) {
+    function togglePauseAiPresentation() {
+      if (!isAiDemoRunning) return;
+      var btn = document.getElementById("btnPauseResumeAi");
+      var pulse = document.getElementById("aiPulseDot");
+
+      if (!isAiDemoPaused) {
+        isAiDemoPaused = true;
+        if ("speechSynthesis" in window) window.speechSynthesis.pause();
+        btn.innerText = "▶️ Devam Et";
+        btn.className = "bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow";
+        if (pulse) pulse.classList.remove("animate-ping");
+      } else {
+        isAiDemoPaused = false;
+        if ("speechSynthesis" in window) window.speechSynthesis.resume();
+        btn.innerText = "⏸️ Duraklat";
+        btn.className = "bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow";
+        if (pulse) pulse.classList.add("animate-ping");
+      }
+    }
+
+    function restartAiPresentation() {
+      stopAiPresentation();
+      setTimeout(function() {
+        startAiPresentation();
+      }, 250);
+    }
+
+    function stopAiPresentation() {
+      aiTourSessionId++;
+      isAiDemoRunning = false;
+      isAiDemoPaused = false;
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      document.getElementById("aiCursor").classList.add("hidden");
+      document.getElementById("aiSubtitleBanner").classList.add("hidden");
+      closeMcpModal();
+      closeApprovalModal();
+    }
+
+    // Pausable wait helper
+    function waitMsPausable(ms, sessionId) {
       return new Promise(function(resolve) {
+        var elapsed = 0;
+        var interval = 100;
+        var timer = setInterval(function() {
+          if (!isAiDemoRunning || sessionId !== aiTourSessionId) {
+            clearInterval(timer);
+            resolve();
+            return;
+          }
+          if (!isAiDemoPaused) {
+            elapsed += interval;
+            if (elapsed >= ms) {
+              clearInterval(timer);
+              resolve();
+            }
+          }
+        }, interval);
+      });
+    }
+
+    function speakEnglishPausable(text, sessionId) {
+      return new Promise(function(resolve) {
+        if (!isAiDemoRunning || sessionId !== aiTourSessionId) {
+          resolve();
+          return;
+        }
         if (!("speechSynthesis" in window)) {
-          setTimeout(resolve, 4500);
+          waitMsPausable(4500, sessionId).then(resolve);
           return;
         }
         window.speechSynthesis.cancel();
@@ -802,42 +872,61 @@
           }
         }
 
-        var fallbackTimer = setTimeout(resolve, Math.max(5000, text.length * 80));
-        utter.onend = function() {
-          clearTimeout(fallbackTimer);
-          setTimeout(resolve, 650);
-        };
-        utter.onerror = function() {
-          clearTimeout(fallbackTimer);
-          setTimeout(resolve, 1200);
-        };
-        window.speechSynthesis.speak(utter);
+        var done = false;
+        function finish() {
+          if (done) return;
+          done = true;
+          waitMsPausable(550, sessionId).then(resolve);
+        }
+
+        utter.onend = finish;
+        utter.onerror = finish;
+
+        // If started while paused, wait until unpaused before speaking
+        if (isAiDemoPaused) {
+          var waitUnpause = setInterval(function() {
+            if (!isAiDemoRunning || sessionId !== aiTourSessionId) {
+              clearInterval(waitUnpause);
+              finish();
+            } else if (!isAiDemoPaused) {
+              clearInterval(waitUnpause);
+              window.speechSynthesis.speak(utter);
+            }
+          }, 150);
+        } else {
+          window.speechSynthesis.speak(utter);
+        }
       });
     }
 
-    function waitMs(ms) {
-      return new Promise(function(r) { setTimeout(r, ms); });
-    }
+    async function moveCursorAndClick(selector, stepLabelTr, speechTextEn, subtitleTextTr, customAction, sessionId) {
+      if (!isAiDemoRunning || sessionId !== aiTourSessionId) return;
 
-    async function moveCursorAndClick(selector, stepLabel, speechText, customAction) {
-      if (!isAiDemoRunning) return;
+      // Wait if paused before moving cursor
+      while (isAiDemoPaused && isAiDemoRunning && sessionId === aiTourSessionId) {
+        await waitMsPausable(200, sessionId);
+      }
+      if (!isAiDemoRunning || sessionId !== aiTourSessionId) return;
 
-      document.getElementById("aiStepTitle").innerText = stepLabel;
-      document.getElementById("aiSubtitleText").innerText = speechText;
+      document.getElementById("aiStepTitle").innerText = stepLabelTr;
+      document.getElementById("aiSubtitleText").innerText = subtitleTextTr;
 
       var el = typeof selector === "string" ? document.querySelector(selector) : selector;
       var cursor = document.getElementById("aiCursor");
 
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
-        await waitMs(550);
+        await waitMsPausable(500, sessionId);
+        if (!isAiDemoRunning || sessionId !== aiTourSessionId) return;
+
         var rect = el.getBoundingClientRect();
         var targetX = Math.max(24, Math.min(window.innerWidth - 140, rect.left + rect.width / 2));
         var targetY = Math.max(24, Math.min(window.innerHeight - 60, rect.top + rect.height / 2));
 
         cursor.style.left = targetX + "px";
         cursor.style.top = targetY + "px";
-        await waitMs(1050);
+        await waitMsPausable(1000, sessionId);
+        if (!isAiDemoRunning || sessionId !== aiTourSessionId) return;
 
         var ripple = document.createElement("div");
         ripple.className = "ai-click-ripple";
@@ -854,16 +943,7 @@
       if (customAction) {
         customAction();
       }
-      await speakEnglish(speechText);
-    }
-
-    function stopAiPresentation() {
-      isAiDemoRunning = false;
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-      document.getElementById("aiCursor").classList.add("hidden");
-      document.getElementById("aiSubtitleBanner").classList.add("hidden");
-      closeMcpModal();
-      closeApprovalModal();
+      await speakEnglishPausable(speechTextEn, sessionId);
     }
 
     async function startAiPresentation() {
@@ -871,7 +951,17 @@
         stopAiPresentation();
         return;
       }
+      aiTourSessionId++;
+      var mySession = aiTourSessionId;
       isAiDemoRunning = true;
+      isAiDemoPaused = false;
+
+      var pauseBtn = document.getElementById("btnPauseResumeAi");
+      if (pauseBtn) {
+        pauseBtn.innerText = "⏸️ Duraklat";
+        pauseBtn.className = "bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow";
+      }
+
       closeMcpModal();
       closeApprovalModal();
       clearAllCourses();
@@ -884,93 +974,108 @@
       // STEP 1 (TOP HEADER - LEFT): Chrome MCP Agent Hub
       await moveCursorAndClick(
         "#btnMcpModal",
-        "Step 1 of 10 (Top Bar) • Chrome MCP Agent Hub & Rule Sync",
+        "Adım 1 / 10 (Üst Bar) • Chrome MCP Ajan Merkezi ve Kural Senkronizasyonu",
         "Welcome to OBS Plus Version 2.0. We will explore the entire platform sequentially from top to bottom. Starting at the top navigation bar, our Chrome MCP Agent Hub connects to the university portal to synchronize official ECTS limits, prerequisite chains, and repeat rules.",
-        function() { openMcpModal(); }
+        "OBS+ v2.0 platformuna hoş geldiniz. Sistemi yukarıdan aşağıya doğru sırayla inceleyeceğiz. En üst bardaki Chrome MCP Ajan Merkezimiz; üniversitenin resmi AKTS sınırlarını, önkoşul zincirlerini ve tekrar kurallarını canlı olarak sisteme bağlar.",
+        function() { openMcpModal(); },
+        mySession
       );
-      if (!isAiDemoRunning) return;
-      await waitMs(800);
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
+      await waitMsPausable(700, mySession);
       closeMcpModal();
 
       // STEP 2 (TOP HEADER - RIGHT): Student Status & Academic Probation Safeguard
       await moveCursorAndClick(
         "#profileSelect",
-        "Step 2 of 10 (Top Bar) • Student Status & Probation Safeguard",
+        "Adım 2 / 10 (Üst Bar) • Öğrenci Statüsü ve Sınamalı (Probation) Koruması",
         "Right next to it in the top bar is the Student Status selector. Switching to a Probation Student with a GPA below 1.80 automatically caps the credit limit at 32 ECTS and locks fourth-year courses. Let us switch back to Regular Status.",
+        "Hemen yanında Öğrenci Statüsü seçicisi yer alır. GANO'su 1.80'in altındaki Sınamalı (Probation) öğrenci seçildiğinde, sistem AKTS tavanını otomatik olarak 32'ye düşürür ve 4. sınıf derslerini kilitler.",
         function() {
           document.getElementById("profileSelect").value = "probation";
           changeProfile();
           setTimeout(function() {
-            if (isAiDemoRunning) {
+            if (isAiDemoRunning && mySession === aiTourSessionId) {
               document.getElementById("profileSelect").value = "normal";
               changeProfile();
             }
           }, 3200);
-        }
+        },
+        mySession
       );
-      if (!isAiDemoRunning) return;
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
 
       // STEP 3 (SECOND SECTION - GREEN BANNER): Universal Excel & PDF Schedule Importer
       await moveCursorAndClick(
         "#lblFileUpload",
-        "Step 3 of 10 (Upper Panel) • Universal Excel & PDF Schedule Importer",
+        "Adım 3 / 10 (Üst Panel) • Evrensel Excel ve PDF Ders Programı Yükleyici",
         "Moving one section down, notice that OBS Plus starts with a clean, empty catalog so preloaded courses never clash with your file. When we upload a department schedule, the AI parser extracts all courses and sections directly into the left workspace.",
+        "Bir alt bölüme indiğimizde; sistemin yeni yüklenen dosyalarla çakışmaması için tamamen boş bir katalogla başladığını görüyorsunuz. Herhangi bir bölümün Excel veya PDF ders programı yüklendiğinde yapay zeka tüm dersleri sol panele aktarır.",
         function() {
           loadDemoCatalog();
           var sec = document.getElementById("excelUploadSection");
           sec.classList.add("ring-4", "ring-emerald-400");
           setTimeout(function() { sec.classList.remove("ring-4", "ring-emerald-400"); }, 2500);
-        }
+        },
+        mySession
       );
-      if (!isAiDemoRunning) return;
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
 
       // STEP 4 (THIRD SECTION - INDIGO FILTER PANEL): Day-Off & Time Preferences
       await moveCursorAndClick(
         "#dayOffContainer",
-        "Step 4 of 10 (Filter Panel) • Day-Off & Time Slot Preferences",
+        "Adım 4 / 10 (Filtre Paneli) • Boş Gün (Day-Off) ve Saat Tercihleri",
         "Continuing downward to the Smart Auto-Scheduler panel, we configure our personal schedule preferences. Here, we keep Friday selected as our protected Day-Off, and we can also filter out early morning classes.",
-        function() { daysOff = ["Friday"]; renderAll(); }
+        "Aşağıya, Akıllı Otomatik Programlayıcı paneline indiğimizde kişisel tercihlerimizi seçiyoruz. Burada Cuma gününü boş gün (Day-Off) olarak koruma altına alıyor ve sabah erken dersleri filtreleyebiliyoruz.",
+        function() { daysOff = ["Friday"]; renderAll(); },
+        mySession
       );
-      if (!isAiDemoRunning) return;
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
 
       // STEP 5 (LEFT WORKSPACE - TOP CARD): ECTS Credit Load & Live Conflict Alerts
       await moveCursorAndClick(
         "#ectsRuleCard",
-        "Step 5 of 10 (Left Workspace) • Live ECTS Load & Rule Alerts",
+        "Adım 5 / 10 (Sol Çalışma Alanı) • Canlı AKTS Yükü ve Kural Uyarıları",
         "Looking directly below at the left workspace panel, our Rule Engine highlights why optimization is needed: we currently have a Monday morning time conflict between Thermodynamics I and Fluid Mechanics, plus a Friday Day-Off violation.",
-        null
+        "Hemen altındaki sol çalışma paneline baktığımızda; Kural Motorumuz Pazartesi sabahı Termodinamik I ile Akışkanlar Mekaniği arasındaki saat çakışmasını ve Cuma boş gün ihlalini anında tespit ederek bizi uyarıyor.",
+        null,
+        mySession
       );
-      if (!isAiDemoRunning) return;
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
 
       // STEP 6 (LEFT WORKSPACE - COURSE CATALOG): Pinning & Individual Course Removal
       await moveCursorAndClick(
         "#pin-btn-0",
-        "Step 6 of 10 (Course Catalog) • Pinning Sections & Manual Course Removal",
+        "Adım 6 / 10 (Ders Kataloğu) • Şube Sabitleme (Pin) ve Manuel Ders Silme",
         "In the Available Courses catalog below, students can manually add courses, delete any unwanted course using the red trash icon, or click Pin on a favorite section like Thermodynamics I so the algorithm never moves it.",
-        function() { pinnedCourses["ME 2210"] = true; renderAll(); }
+        "Sol katalogda öğrenciler manuel ders ekleyebilir, kırmızı çöp kutusu ikonuyla istediği dersi silebilir veya sevdiği bir hocanın şubesini (örneğin Termodinamik I - Şube 1) 📌 Pin butonuyla sabitleyerek algoritmanın o şubeye dokunmamasını sağlayabilir.",
+        function() { pinnedCourses["ME 2210"] = true; renderAll(); },
+        mySession
       );
-      if (!isAiDemoRunning) return;
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
 
       // STEP 7 (CONNECTING FILTER TO CATALOG): Running Auto-Scheduler
       await moveCursorAndClick(
         "#btnAutoSchedule",
-        "Step 7 of 10 (Optimization) • Executing the Backtracking Auto-Scheduler",
+        "Adım 7 / 10 (Optimizasyon) • Backtracking Otomatik Program Kurucunun Çalıştırılması",
         "Now, clicking Build Optimal Schedule connects our filters to the catalog. In milliseconds, the backtracking engine resolves all conflicts, preserves our pinned section, keeps Friday completely free, and places 6 courses totaling 37 ECTS!",
-        function() { generateSmartSchedule(); }
+        "Şimdi 'Build Optimal Schedule' butonuna tıklayarak filtrelerimizle kataloğu birleştiriyoruz. Saniyeler içinde tüm çakışmalar çözülüyor, sabitlenen şubemiz korunuyor, Cuma günü tamamen boş bırakılıyor ve 6 ders (37 AKTS) sıfır hatayla yerleştiriliyor!",
+        function() { generateSmartSchedule(); },
+        mySession
       );
-      if (!isAiDemoRunning) return;
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
 
       // STEP 8 (LEFT WORKSPACE - QUOTA CRISIS & WAITLIST): Waitlist & Plan-B Auto-Swap
       await moveCursorAndClick(
         "#sec-btn-ME_3340-0",
-        "Step 8 of 10 (Catalog Quota) • Smart Waitlist & Plan-B Auto-Swap",
+        "Adım 8 / 10 (Katalog Kotası) • Akıllı Bekleme Listesi (Waitlist) ve B Planı Auto-Swap",
         "What if a desired section in the catalog is full, such as Machine Elements Section 1? Clicking a full section places the student first on the Waitlist while holding Section 2 as a safe Plan-B backup. When a seat opens, Auto-Swap upgrades them automatically!",
+        "Peki öğrencinin istediği şube (örneğin Makine Elemanları Şube 1) 30/30 doluysa ne olur? Dolu şubeye tıklandığında sistem öğrenciyi 1. sıradan Bekleme Listesine alır ve açık olan 2. şubeyi B Planı olarak yedekler. Kontenjan açıldığı anda ise otomatik geçiş (Auto-Swap) yapar!",
         function() {
           selectedSections["ME 3340"] = "Sec 2";
           waitlistMap["ME 3340"] = { targetSec: "Sec 1", targetSlot: "Tuesday 10:40 - 12:30", backupSec: "Sec 2" };
           renderAll();
           setTimeout(function() {
-            if (isAiDemoRunning) {
+            if (isAiDemoRunning && mySession === aiTourSessionId) {
               var c = findCourse("ME 3340");
               if (c) c.sections[0].quota = 29;
               selectedSections["ME 3340"] = "Sec 1";
@@ -978,34 +1083,41 @@
               generateSmartSchedule();
             }
           }, 3400);
-        }
+        },
+        mySession
       );
-      if (!isAiDemoRunning) return;
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
 
       // STEP 9 (RIGHT WORKSPACE - LIVE WEEKLY TIMETABLE & MOBILE CARDS): Timetable Views
       await moveCursorAndClick(
         "#btnViewMobile",
-        "Step 9 of 10 (Right Workspace) • Live Weekly Matrix & Mobile Daily Cards",
+        "Adım 9 / 10 (Sağ Çalışma Alanı) • Canlı Haftalık Matris ve Mobil Günlük Kartlar",
         "Moving across to the right workspace panel, our Live Weekly Class Schedule displays all placed courses, pinned badges, and green Day-Off columns. Students on smartphones can also toggle between the classic Grid View and Mobile Daily Cards.",
+        "Sağ taraftaki Canlı Haftalık Ders Programı tablosuna geçtiğimizde; yerleşen tüm dersleri, sabitlenen rozetleri ve yeşil boş gün sütunlarını görüyoruz. Ayrıca mobil cihazlar için tek tıkla Günlük Kart görünümüne geçiş yapılabiliyor.",
         function() {
           setViewMode("mobile");
           setTimeout(function() {
-            if (isAiDemoRunning) setViewMode("table");
+            if (isAiDemoRunning && mySession === aiTourSessionId) setViewMode("table");
           }, 2600);
-        }
+        },
+        mySession
       );
-      if (!isAiDemoRunning) return;
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
 
       // STEP 10 (RIGHT WORKSPACE - FINALIZATION): Official Advisor Approval Slip
       await moveCursorAndClick(
         "#btnSubmitReg",
-        "Step 10 of 10 (Completion) • Finalizing Registration & Advisor Slip",
+        "Adım 10 / 10 (Tamamlama) • Kaydı Kesinleştirme ve Resmi Danışman Onay Fişi",
         "Finally, at the top right of the timetable, clicking Finalize Registration verifies all university rules and generates the official Advisor Approval Slip ready for PDF export and Chrome MCP auto-fill. Thank you for watching!",
-        function() { completeRegistration(); }
+        "Son olarak sağ üstteki 'Finalize Registration' butonuna tıkladığımızda; tüm üniversite kuralları onaylanarak PDF çıktısına ve Chrome MCP aktarımına hazır Resmi Danışman Onay Fişi üretilir. Dinlediğiniz için teşekkürler!",
+        function() { completeRegistration(); },
+        mySession
       );
 
-      await waitMs(2200);
-      stopAiPresentation();
+      await waitMsPausable(2200, mySession);
+      if (mySession === aiTourSessionId) {
+        stopAiPresentation();
+      }
     }
 
     function openQuickAddModal() {
@@ -1044,60 +1156,6 @@
       document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
       closeQuickAddModal();
       renderAll();
-    }
-
-    function downloadSampleExcel(type) {
-      var rows = [];
-      var fileName = "";
-
-      if (type === "ee") {
-        fileName = "Electrical_Electronics_Eng_Schedule.xlsx";
-        rows = [
-          ["Course Code", "Course Title", "ECTS", "Year", "Status", "Mandatory", "Prerequisite", "Prereq Met", "Unlocks", "Section", "Day", "Time Slot", "Quota", "Max Quota", "Instructor"],
-          ["EE 2201", "Circuit Analysis I", 6, 2, "FF", "Yes", "-", "Yes", "EE 3312 (Electronics II)", "Sec 1", "Monday", "08:40 - 10:30", 27, 30, "Prof. Dr. M. Seçkin"],
-          ["EE 2201", "Circuit Analysis I", 6, 2, "FF", "Yes", "-", "Yes", "EE 3312 (Electronics II)", "Sec 2", "Wednesday", "13:40 - 15:30", 16, 30, "Assoc. Prof. A. Korkmaz"],
-          ["EE 3302", "Signals and Systems", 6, 3, "Normal", "Yes", "-", "Yes", "EE 4410 (Digital Signal Proc.)", "Sec 1", "Monday", "08:40 - 10:30", 24, 30, "Prof. Dr. H. Yavuz"],
-          ["EE 3302", "Signals and Systems", 6, 3, "Normal", "Yes", "-", "Yes", "EE 4410 (Digital Signal Proc.)", "Sec 2", "Tuesday", "10:40 - 12:30", 19, 30, "Prof. Dr. H. Yavuz"],
-          ["EE 3310", "Electromagnetic Theory", 7, 3, "Normal", "Yes", "-", "Yes", "EE 4420 (Antennas & Prop.)", "Sec 1", "Tuesday", "13:40 - 15:30", 30, 30, "Prof. Dr. C. Güler"],
-          ["EE 3310", "Electromagnetic Theory", 7, 3, "Normal", "Yes", "-", "Yes", "EE 4420 (Antennas & Prop.)", "Sec 2", "Thursday", "10:40 - 12:30", 20, 30, "Prof. Dr. C. Güler"],
-          ["EE 3340", "Microprocessors & Embedded Systems", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 1", "Wednesday", "10:40 - 12:30", 22, 30, "Assoc. Prof. S. Tekin"],
-          ["EE 3340", "Microprocessors & Embedded Systems", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 2", "Friday", "13:40 - 15:30", 14, 30, "Assoc. Prof. S. Tekin"],
-          ["EE 3380", "Power Systems Analysis", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 1", "Monday", "10:40 - 12:30", 18, 30, "Asst. Prof. B. Kurt"],
-          ["EE 3380", "Power Systems Analysis", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 2", "Thursday", "13:40 - 15:30", 15, 30, "Asst. Prof. B. Kurt"],
-          ["EE 3312", "Analog Electronics II", 6, 3, "Normal", "Yes", "EE 2201 (Circuit Analysis I)", "No", "-", "Sec 1", "Thursday", "08:40 - 10:30", 12, 30, "Prof. Dr. M. Seçkin"],
-          ["EE 4430", "VLSI Design & Robotics (Elective)", 6, 4, "Upper", "No", "-", "Yes", "-", "Sec 1", "Friday", "08:40 - 10:30", 11, 25, "Assoc. Prof. E. Polat"],
-          ["EE 4430", "VLSI Design & Robotics (Elective)", 6, 4, "Upper", "No", "-", "Yes", "-", "Sec 2", "Monday", "15:40 - 17:30", 17, 25, "Assoc. Prof. E. Polat"]
-        ];
-      } else {
-        fileName = "Computer_Software_Eng_Schedule.xlsx";
-        rows = [
-          ["Course Code", "Course Title", "ECTS", "Year", "Status", "Mandatory", "Prerequisite", "Prereq Met", "Unlocks", "Section", "Day", "Time Slot", "Quota", "Max Quota", "Instructor"],
-          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Yes", "-", "Yes", "COMP 3312 (Operating Systems)", "Sec 1", "Monday", "08:40 - 10:30", 28, 30, "Prof. Dr. D. Kılınç"],
-          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Yes", "-", "Yes", "COMP 3312 (Operating Systems)", "Sec 2", "Wednesday", "13:40 - 15:30", 18, 30, "Assoc. Prof. K. Çetin"],
-          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Yes", "-", "Yes", "COMP 3312 (Operating Systems)", "Sec 3", "Tuesday", "10:40 - 12:30", 15, 30, "Assoc. Prof. K. Çetin"],
-          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4420 (Big Data Analytics)", "Sec 1", "Monday", "08:40 - 10:30", 25, 30, "Prof. Dr. M. Ünal"],
-          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4420 (Big Data Analytics)", "Sec 2", "Tuesday", "13:40 - 15:30", 20, 30, "Prof. Dr. M. Ünal"],
-          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4420 (Big Data Analytics)", "Sec 3", "Friday", "10:40 - 12:30", 12, 30, "Asst. Prof. A. Demir"],
-          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Yes", "-", "Yes", "SE 4410 (Cloud Engineering)", "Sec 1", "Tuesday", "10:40 - 12:30", 30, 30, "Assoc. Prof. B. Yılmaz"],
-          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Yes", "-", "Yes", "SE 4410 (Cloud Engineering)", "Sec 2", "Thursday", "10:40 - 12:30", 21, 30, "Assoc. Prof. B. Yılmaz"],
-          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Yes", "-", "Yes", "SE 4410 (Cloud Engineering)", "Sec 3", "Monday", "15:40 - 17:30", 16, 30, "Asst. Prof. E. Kaya"],
-          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 1", "Wednesday", "10:40 - 12:30", 24, 30, "Prof. Dr. C. Şahin"],
-          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 2", "Thursday", "13:40 - 15:30", 19, 30, "Prof. Dr. C. Şahin"],
-          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 3", "Friday", "13:40 - 15:30", 11, 30, "Asst. Prof. S. Aksoy"],
-          ["COMP 3380", "Computer Networks & Security", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4480 (Cyber Security)", "Sec 1", "Monday", "10:40 - 12:30", 22, 30, "Assoc. Prof. T. Erdem"],
-          ["COMP 3380", "Computer Networks & Security", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4480 (Cyber Security)", "Sec 2", "Wednesday", "08:40 - 10:30", 14, 30, "Assoc. Prof. T. Erdem"],
-          ["COMP 3312", "Operating Systems", 6, 3, "Normal", "Yes", "COMP 2210 (Data Structures)", "No", "COMP 4415 (Distributed Systems)", "Sec 1", "Thursday", "08:40 - 10:30", 15, 30, "Prof. Dr. D. Kılınç"],
-          ["COMP 4410", "Deep Learning & Neural Networks (Elective)", 6, 4, "Upper", "No", "-", "Yes", "-", "Sec 1", "Friday", "08:40 - 10:30", 14, 25, "Assoc. Prof. V. Özkan"],
-          ["COMP 4410", "Deep Learning & Neural Networks (Elective)", 6, 4, "Upper", "No", "-", "Yes", "-", "Sec 2", "Thursday", "15:40 - 17:30", 18, 25, "Assoc. Prof. V. Özkan"]
-        ];
-      }
-
-      if (typeof XLSX !== "undefined") {
-        var ws = XLSX.utils.aoa_to_sheet(rows);
-        var wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Schedule");
-        XLSX.writeFile(wb, fileName);
-      }
     }
 
     // ============================================================================
@@ -1446,7 +1504,7 @@
         resultBox.classList.remove("hidden");
         resultBox.innerHTML =
           '<div class="flex flex-wrap justify-between items-center gap-2">' +
-            '<div>🎯 Successfully loaded <b>' + addedCount + ' courses</b> from <b>' + fileName + '</b> with zero preloaded conflicts! Use the <b>Year 1–4</b> tabs on the left to select your courses or click <b>🗑️</b> on any course you wish to remove.</div>' +
+            '<div>🎯 Successfully loaded <b>' + addedCount + ' courses</b> from <b>' + fileName + '</b>! Use the <b>Year 1–4</b> tabs on the left to select your courses or click <b>🗑️</b> on any course you wish to remove.</div>' +
             '<span class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-full font-extrabold">👈 Select Courses on Left</span>' +
           '</div>';
       }, 750);
@@ -1816,7 +1874,6 @@
           pinBtnHtml = '<button id="pin-btn-' + i + '" type="button" onclick="togglePinCourse(\'' + course.code + '\')" class="text-[11px] px-2 py-0.5 rounded border transition cursor-pointer ' + pinCls + '">' + pinText + '</button>';
         }
 
-        // Individual Course Delete Button
         var deleteBtnHtml = '<button type="button" onclick="removeCourse(\'' + course.code + '\', event)" title="Remove this course from catalog" class="text-[11px] px-2 py-0.5 rounded border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition cursor-pointer font-bold">🗑️</button>';
 
         var chainInfo = course.unlocks
