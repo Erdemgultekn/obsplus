@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>OBS+ V6.0 | AI Course Registration & Multi-Sheet Matrix Parser</title>
+  <title>OBS+ v2.0 | Smart Course Registration & Schedule Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SheetJS for Real Excel (.xlsx / .xls / .csv) Multi-Sheet Parsing -->
+  <!-- SheetJS for Universal Excel (.xlsx / .xls / .csv) Parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- PDF.js for Real PDF Parsing -->
+  <!-- PDF.js for Universal PDF Parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     * { -webkit-tap-highlight-color: transparent; }
@@ -22,7 +22,7 @@
       left: 50%;
       z-index: 999999;
       pointer-events: none;
-      transition: top 1.1s cubic-bezier(0.22, 1, 0.36, 1), left 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s ease;
+      transition: top 1.05s cubic-bezier(0.22, 1, 0.36, 1), left 1.05s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s ease;
     }
     .ai-click-ripple {
       position: fixed;
@@ -75,7 +75,7 @@
     </div>
   </div>
 
-  <!-- TOP NAVIGATION BAR -->
+  <!-- 1. TOP NAVIGATION BAR -->
   <header class="bg-indigo-950 text-white shadow-lg sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5">
       
@@ -85,9 +85,9 @@
           <div>
             <div class="flex items-center gap-1.5">
               <h1 class="font-bold text-sm sm:text-lg leading-tight">Smart Course Registration & Schedule Engine</h1>
-              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v6.0 English</span>
+              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v2.0</span>
             </div>
-            <p class="text-[11px] text-indigo-200 hidden sm:block">Yaşar University Rules • Multi-Sheet Matrix Excel Parser • Day-Off Filter • Auto-Swap Waitlist</p>
+            <p class="text-[11px] text-indigo-200 hidden sm:block">University Registration Rules • Universal Excel & PDF Parser • Day-Off Filter • Auto-Swap Waitlist</p>
           </div>
         </div>
 
@@ -99,14 +99,14 @@
       <div class="flex flex-wrap items-center gap-2">
         <!-- FULL ENGLISH AI VOICEOVER & AUTONOMOUS DEMO BUTTON -->
         <button id="btnStartAiDemo" type="button" onclick="startAiPresentation()" class="bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shadow-lg transition flex items-center gap-1.5 cursor-pointer border border-white/20 animate-pulse">
-          <span>🎬 Start Full AI Voice Demo (10-Step Tour)</span>
+          <span>🎬 Start Full AI Voice Demo</span>
         </button>
 
         <button id="btnMcpModal" type="button" onclick="openMcpModal()" class="hidden sm:flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 border border-indigo-600 text-xs font-bold px-3 py-2 rounded-lg transition items-center gap-1.5 cursor-pointer">
           <span>🌐 Chrome MCP & Rules</span>
         </button>
 
-        <div class="flex items-center justify-between w-full sm:w-auto gap-2 bg-indigo-900/90 p-1.5 rounded-lg border border-indigo-700">
+        <div id="statusBoxContainer" class="flex items-center justify-between w-full sm:w-auto gap-2 bg-indigo-900/90 p-1.5 rounded-lg border border-indigo-700">
           <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-200 pl-1 shrink-0">Status:</span>
           <select id="profileSelect" onchange="changeProfile()" class="w-full sm:w-auto bg-white text-slate-900 text-xs font-bold rounded px-2 py-1.5 focus:outline-none cursor-pointer">
             <option value="normal">Regular Student (GPA: 2.75 | Max: 40 ECTS)</option>
@@ -125,31 +125,31 @@
     <!-- Error Banner -->
     <div id="errorBanner" class="hidden bg-rose-600 text-white p-3 rounded-xl text-xs font-bold"></div>
 
-    <!-- UNIVERSAL MULTI-SHEET MATRIX EXCEL & PDF PARSER SECTION -->
+    <!-- 2. UNIVERSAL EXCEL & PDF SCHEDULE IMPORTER SECTION -->
     <section id="excelUploadSection" class="no-print bg-gradient-to-r from-teal-950 via-emerald-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-emerald-700/80">
       <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
         
         <div class="space-y-1.5">
           <div class="flex flex-wrap items-center gap-2">
             <span class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-              🤖 MULTI-SHEET MATRIX & TABLE AI PARSER
+              🤖 UNIVERSAL AI SCHEDULE PARSER
             </span>
             <span id="activeDeptBadge" class="bg-slate-900/80 border border-emerald-500/40 text-amber-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
               Active Curriculum: Mechanical Engineering (ME)
             </span>
             <button id="btnRestoreMe" type="button" onclick="restoreDefaultMeCourses()" class="bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full transition cursor-pointer shadow">
-              🔄 Reset to Default ME Curriculum
+              🔄 Reset to Default Curriculum
             </button>
           </div>
-          <h2 class="text-base sm:text-lg font-bold">Upload Any University Schedule Excel (.xlsx, .csv) or PDF — Supports Multi-Sheet Weekly Grids!</h2>
-          <p class="text-xs text-emerald-100/90">Supports both Yaşar University's official multi-sheet weekly grid files (e.g., <b>26-27-Guz-Ders-Programi_ME.xlsx</b> with sheets <i>1. sınıf, ME 2, ME 3, ME 4</i>) and standard tables. Choose <b>Merge Mode</b> to add uploaded courses directly into your current department list!</p>
+          <h2 class="text-base sm:text-lg font-bold">Upload Any Course Schedule (.xlsx, .xls, .csv, .pdf)</h2>
+          <p class="text-xs text-emerald-100/90">Automatically detects and parses any university schedule file—including multi-sheet weekly timetables, standard Excel tables, and PDF documents. Choose <b>Merge Mode</b> to add uploaded courses to your current list, or <b>Replace Mode</b> to switch curricula.</p>
         </div>
 
         <!-- Upload Mode + Sample Downloads + File Input -->
         <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 shrink-0">
           <select id="uploadModeSelect" class="bg-emerald-950 text-emerald-100 border border-emerald-500 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none cursor-pointer">
-            <option value="merge">🔗 Mode: Merge / Add to Current Department</option>
-            <option value="replace">📂 Mode: Replace with Uploaded Curriculum Only</option>
+            <option value="merge">🔗 Mode: Merge with Current Courses</option>
+            <option value="replace">📂 Mode: Replace Current Curriculum</option>
           </select>
 
           <button id="btnSampleComp" type="button" onclick="downloadSampleExcel('comp')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
@@ -180,7 +180,7 @@
       </div>
     </section>
 
-    <!-- SMART AUTO-SCHEDULER & FILTER PANEL -->
+    <!-- 3. SMART AUTO-SCHEDULER & FILTER PANEL -->
     <section id="schedulerFilterSection" class="no-print bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-indigo-700">
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4">
         <div>
@@ -239,15 +239,15 @@
       <div id="schedulerReport" class="hidden mt-3 bg-indigo-950/90 border border-indigo-500/50 rounded-xl p-3 text-xs text-indigo-100"></div>
     </section>
 
-    <!-- MAIN WORKSPACE GRID: LEFT COURSE CATALOG & RIGHT COLORED TIMETABLE -->
+    <!-- 4. MAIN WORKSPACE GRID: LEFT COURSE CATALOG & RIGHT COLORED TIMETABLE -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-      <!-- LEFT PANEL: COURSE & SECTION SELECTION -->
+      <!-- LEFT PANEL: ECTS LOAD, ALERTS & COURSE CATALOG -->
       <section id="leftCoursePanel" class="no-print lg:col-span-5 space-y-4">
         
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <div id="ectsRuleCard" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-bold text-slate-700">ECTS Credit Load</span>
+            <span class="text-sm font-bold text-slate-700">ECTS Credit Load & Rule Status</span>
             <span id="ectsCounter" class="text-sm font-extrabold text-indigo-700">18 / 40 ECTS</span>
           </div>
           <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
@@ -280,13 +280,13 @@
               </div>
             </div>
 
-            <!-- Year Filter Tabs (Ideal when uploading 4-sheet Excel files like 26-27-Guz-Ders-Programi_ME.xlsx) -->
+            <!-- Year Filter Tabs -->
             <div class="flex flex-wrap gap-1 pt-1" id="yearFilterContainer">
               <button type="button" onclick="setYearFilter('all')" id="yr-btn-all" class="px-2.5 py-1 rounded text-[11px] font-bold bg-indigo-600 text-white cursor-pointer">All Years</button>
               <button type="button" onclick="setYearFilter(1)" id="yr-btn-1" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 1</button>
-              <button type="button" onclick="setYearFilter(2)" id="yr-btn-2" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 2 (ME 2)</button>
-              <button type="button" onclick="setYearFilter(3)" id="yr-btn-3" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 3 (ME 3)</button>
-              <button type="button" onclick="setYearFilter(4)" id="yr-btn-4" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 4 (ME 4)</button>
+              <button type="button" onclick="setYearFilter(2)" id="yr-btn-2" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 2</button>
+              <button type="button" onclick="setYearFilter(3)" id="yr-btn-3" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 3</button>
+              <button type="button" onclick="setYearFilter(4)" id="yr-btn-4" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 4</button>
             </div>
           </div>
 
@@ -422,7 +422,7 @@
     <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start gap-2">
         <div>
-          <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-full">Chrome MCP & Multi-Sheet Matrix Engine</span>
+          <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-full">Chrome MCP & Universal Schedule Engine</span>
           <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-1">University Regulations & Universal Document Parser</h3>
         </div>
         <button type="button" onclick="closeMcpModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 cursor-pointer">✕</button>
@@ -432,14 +432,14 @@
         <div>[Chrome-MCP] Connected: https://oim.yasar.edu.tr/ders-kayitlari/</div>
         <div>[Chrome-MCP] Regulation Art. 22: Regular=40 ECTS, Probation(GPA&lt;1.80)=32 ECTS, DoubleMajor=42 ECTS</div>
         <div>[Chrome-MCP] Mandatory Priority: Failed courses (FF/FD/W/U) must be registered first.</div>
-        <div>[Matrix-Grid-Parser] Multi-Sheet 2D Timetable Recognition (1. sınıf, ME 2, ME 3, ME 4) Ready ✓</div>
-        <div>[AI-Voice-Agent] 10-Step Autonomous English Narrator &amp; Virtual Cursor Active ✓</div>
+        <div>[Universal-Parser] Multi-Sheet 2D Matrix &amp; Standard Excel/PDF Recognition Ready ✓</div>
+        <div>[AI-Voice-Agent] Top-to-Bottom Cohesive English Narrator (OBS+ v2.0) Active ✓</div>
       </div>
 
       <div class="space-y-2 text-xs text-slate-700">
         <div class="font-bold text-slate-900">Active Official Registration Safeguards:</div>
         <ul class="list-disc pl-5 space-y-1">
-          <li><b>2D Matrix Excel Recognition:</b> Automatically parses multi-sheet weekly timetable grids (such as <i>26-27-Guz-Ders-Programi_ME.xlsx</i>) by intersecting merged day headers and time rows across all sheets.</li>
+          <li><b>Universal Excel &amp; PDF Recognition:</b> Automatically parses both multi-sheet weekly timetable grids and standard course tables across any department.</li>
           <li><b>Mandatory Repeat Priority:</b> Prevents finalizing registration unless failed (<b>FF</b>) courses are selected.</li>
           <li><b>Probation Student Safeguard:</b> Caps ECTS at 32 and locks 4th-year courses when GPA is below 1.80.</li>
           <li><b>Auto-Swap Quota Waitlist:</b> Places students on a waitlist for full sections while securing an open section as a "Plan B" backup.</li>
@@ -460,7 +460,7 @@
           <div class="bg-emerald-100 text-emerald-700 font-extrabold p-2.5 rounded-xl text-lg">✓</div>
           <div>
             <h3 class="text-base sm:text-lg font-bold text-slate-900">Registration Finalized & Sent for Advisor Approval</h3>
-            <p class="text-xs text-slate-500">Official Rule Engine Verification Report</p>
+            <p class="text-xs text-slate-500">OBS+ v2.0 Official Rule Engine Verification Report</p>
           </div>
         </div>
         <button type="button" onclick="closeApprovalModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 cursor-pointer">✕</button>
@@ -503,7 +503,7 @@
     var waitlistMap = {};
     var isAiDemoRunning = false;
 
-    // Official Course Title Dictionary for Yaşar University ME & Engineering Codes
+    // Comprehensive Engineering Course Title Dictionary
     var courseTitleDictionary = {
       "SE 1105": "Programming & Algorithms I",
       "MATH 1131": "Calculus I",
@@ -688,7 +688,7 @@
     }
 
     // ============================================================================
-    // LONG, DETAILED 10-STEP ENGLISH AI VOICEOVER & AUTONOMOUS AGENT PRESENTATION
+    // COHESIVE TOP-TO-BOTTOM 10-STEP ENGLISH AI VOICEOVER & AUTONOMOUS TOUR
     // ============================================================================
     function speakEnglish(text) {
       return new Promise(function(resolve) {
@@ -699,7 +699,7 @@
         window.speechSynthesis.cancel();
         var utter = new SpeechSynthesisUtterance(text);
         utter.lang = "en-US";
-        utter.rate = 0.96; // Clear, deliberate academic presentation pace
+        utter.rate = 0.96;
         utter.pitch = 1.0;
 
         var voices = window.speechSynthesis.getVoices();
@@ -710,7 +710,7 @@
           }
         }
 
-        var fallbackTimer = setTimeout(resolve, Math.max(4800, text.length * 80));
+        var fallbackTimer = setTimeout(resolve, Math.max(5000, text.length * 80));
         utter.onend = function() {
           clearTimeout(fallbackTimer);
           setTimeout(resolve, 650);
@@ -745,7 +745,7 @@
 
         cursor.style.left = targetX + "px";
         cursor.style.top = targetY + "px";
-        await waitMs(1100);
+        await waitMs(1050);
 
         var ripple = document.createElement("div");
         ripple.className = "ai-click-ripple";
@@ -789,150 +789,129 @@
       cursor.classList.remove("hidden");
       banner.classList.remove("hidden");
 
-      // Step 1: Welcome & Chrome MCP Rule Engine
+      // STEP 1 (TOP HEADER - LEFT): Chrome MCP & Rules Modal
       await moveCursorAndClick(
         "#btnMcpModal",
-        "Step 1 of 10 • Chrome MCP & University Regulation Engine",
-        "Welcome to OBS Plus Version 6.0. I am your autonomous AI testing agent. First, let us inspect our Chrome MCP integration, which synchronizes official Yaşar University ECTS limits, prerequisite chains, and mandatory repeat rules.",
+        "Step 1 of 10 (Top Bar) • Chrome MCP & Official Rules",
+        "Welcome to OBS Plus Version 2.0. We will explore the platform sequentially from top to bottom. Starting at the top navigation bar, our Chrome MCP module synchronizes official university ECTS limits, prerequisite chains, and repeat rules.",
         function() { openMcpModal(); }
       );
       if (!isAiDemoRunning) return;
-      await waitMs(900);
+      await waitMs(800);
       closeMcpModal();
 
-      // Step 2: Inspecting Initial Conflicts & Prerequisite Locks
+      // STEP 2 (TOP HEADER - RIGHT): Student Status & Academic Probation Safeguard
       await moveCursorAndClick(
-        "#ruleAlerts",
-        "Step 2 of 10 • Real-Time Conflict & Prerequisite Detection",
-        "Notice how our live rule engine immediately detects a Monday morning time conflict between Thermodynamics I and Fluid Mechanics, while locking Heat Transfer because its prerequisite has not been passed yet.",
-        null
+        "#profileSelect",
+        "Step 2 of 10 (Top Bar) • Student Status & Probation Safeguard",
+        "Right next to it in the top bar is the Student Status selector. If we switch to a Probation Student with a GPA below 1.80, the system immediately caps the credit limit at 32 ECTS and locks fourth-year courses. Let us switch back to Regular Status for our main tour.",
+        function() {
+          document.getElementById("profileSelect").value = "probation";
+          changeProfile();
+          setTimeout(function() {
+            if (isAiDemoRunning) {
+              document.getElementById("profileSelect").value = "normal";
+              changeProfile();
+            }
+          }, 3200);
+        }
       );
       if (!isAiDemoRunning) return;
 
-      // Step 3: Pinning / Locking a Favorite Section
+      // STEP 3 (SECOND SECTION - GREEN BANNER): Universal Excel & PDF Importer
       await moveCursorAndClick(
-        "#pin-btn-0",
-        "Step 3 of 10 • Section Pinning (Pin Lock)",
-        "Suppose a student wants to keep Section 1 of Thermodynamics I with Professor Yılmaz. By clicking the Pin button, we lock this section so the optimization algorithm will never move it.",
-        function() { pinnedCourses["ME 2210"] = true; renderAll(); }
+        "#lblFileUpload",
+        "Step 3 of 10 (Upper Panel) • Universal Excel & PDF Schedule Importer",
+        "Moving one section down, we reach the Universal AI Schedule Parser. Students can upload any multi-sheet weekly timetable Excel or PDF file from any department, and either merge those courses into their current list or replace the catalog entirely.",
+        function() {
+          var sec = document.getElementById("excelUploadSection");
+          sec.classList.add("ring-4", "ring-emerald-400");
+          setTimeout(function() { sec.classList.remove("ring-4", "ring-emerald-400"); }, 2500);
+        }
       );
       if (!isAiDemoRunning) return;
 
-      // Step 4: Day-Off & Time Filter Configuration
+      // STEP 4 (THIRD SECTION - INDIGO FILTER PANEL): Day-Off & Time Preferences
       await moveCursorAndClick(
         "#dayOffContainer",
-        "Step 4 of 10 • Day-Off & Morning Class Filters",
-        "Next, we configure our personal preferences. We keep Friday completely free as our Day-Off, and we can also filter out early morning eight-forty classes.",
+        "Step 4 of 10 (Filter Panel) • Day-Off & Time Slot Preferences",
+        "Continuing downward to the Smart Auto-Scheduler panel, we configure our personal schedule preferences. Here, we keep Friday selected as our protected Day-Off, and we can also filter out early morning or late afternoon classes.",
         function() { daysOff = ["Friday"]; renderAll(); }
       );
       if (!isAiDemoRunning) return;
 
-      // Step 5: Running the Backtracking Auto-Scheduler
+      // STEP 5 (LEFT WORKSPACE - TOP CARD): ECTS Credit Load & Live Conflict Alerts
+      await moveCursorAndClick(
+        "#ectsRuleCard",
+        "Step 5 of 10 (Left Workspace) • Live ECTS Load & Rule Alerts",
+        "Now, looking directly below at the left workspace panel, the Rule Engine shows why we need optimization: we currently have a Monday morning time conflict between Thermodynamics I and Fluid Mechanics, plus a Friday Day-Off violation.",
+        null
+      );
+      if (!isAiDemoRunning) return;
+
+      // STEP 6 (LEFT WORKSPACE - COURSE CATALOG): Section Pinning (Pin Lock)
+      await moveCursorAndClick(
+        "#pin-btn-0",
+        "Step 6 of 10 (Course Catalog) • Pinning a Favorite Section",
+        "Scrolling slightly down into the Available Courses catalog, suppose we want to keep Section 1 of our mandatory repeat course, Thermodynamics I. By clicking Pin, we lock this section so the algorithm will build the rest of the schedule around it.",
+        function() { pinnedCourses["ME 2210"] = true; renderAll(); }
+      );
+      if (!isAiDemoRunning) return;
+
+      // STEP 7 (CONNECTING FILTER TO CATALOG): Running Auto-Scheduler
       await moveCursorAndClick(
         "#btnAutoSchedule",
-        "Step 5 of 10 • Backtracking Auto-Scheduler Execution",
-        "Now, with a single click on Build Optimal Schedule, our constraint satisfaction algorithm evaluates all section combinations. It preserves our pinned course, keeps Friday 100 percent free, and places 6 courses totaling 37 ECTS with zero conflicts!",
+        "Step 7 of 10 (Optimization) • Executing the Backtracking Auto-Scheduler",
+        "With our section pinned and Friday set as our Day-Off, we click Build Optimal Schedule. In milliseconds, the backtracking engine resolves all conflicts, preserves our pinned section, keeps Friday completely free, and registers 6 courses totaling 37 ECTS!",
         function() { generateSmartSchedule(); }
       );
       if (!isAiDemoRunning) return;
 
-      // Step 6: Simulating a Sudden Quota Crisis & Auto-Recovery
-      await moveCursorAndClick(
-        "#btnQuotaCrisis",
-        "Step 6 of 10 • Sudden Quota Crisis Simulation",
-        "What happens on registration morning if a section suddenly fills up to 30 out of 30? Let us trigger a live Quota Crisis on Fluid Mechanics Section 2.",
-        function() {
-          var target = courses[1];
-          var sec2 = target.sections[1];
-          sec2.quota = sec2.maxQuota;
-          selectedSections[target.code] = sec2.id;
-          renderAll();
-        }
-      );
-      if (!isAiDemoRunning) return;
-
-      await moveCursorAndClick(
-        "#btnResolveConflicts",
-        "Step 6 of 10 • Instant Plan-B Quota Recovery",
-        "Instead of panicking, the student simply clicks Auto-Resolve Conflicts, and the engine immediately shifts the course to an open alternative section without breaking the rest of the timetable.",
-        function() { generateSmartSchedule(); }
-      );
-      if (!isAiDemoRunning) return;
-
-      // Step 7: Smart Auto-Swap Waitlist Demonstration
+      // STEP 8 (LEFT WORKSPACE - QUOTA CRISIS & WAITLIST): Waitlist & Plan-B Auto-Swap
       await moveCursorAndClick(
         "#sec-btn-ME_3340-0",
-        "Step 7 of 10 • Smart Waitlist & Plan-B Protection",
-        "If a student clicks directly on a full section, such as Machine Elements Section 1, OBS Plus places them first on the Waitlist while automatically keeping Section 2 as a safe Plan-B backup.",
+        "Step 8 of 10 (Catalog Quota) • Smart Waitlist & Plan-B Auto-Swap",
+        "What if a desired section in the catalog is completely full, such as Machine Elements Section 1? Clicking a full section places the student first on the Waitlist while holding Section 2 as a safe Plan-B backup. When a seat opens, Auto-Swap upgrades them automatically!",
         function() {
           selectedSections["ME 3340"] = "Sec 2";
           waitlistMap["ME 3340"] = { targetSec: "Sec 1", targetSlot: "Tuesday 10:40 - 12:30", backupSec: "Sec 2" };
           renderAll();
-        }
-      );
-      if (!isAiDemoRunning) return;
-
-      await moveCursorAndClick(
-        "#waitlistBox",
-        "Step 7 of 10 • Automatic Seat Swap (Auto-Swap)",
-        "The moment a seat opens up in Section 1, our Auto-Swap engine automatically upgrades the student from Plan-B into their desired section.",
-        function() {
-          var c = findCourse("ME 3340");
-          if (c) c.sections[0].quota = 29;
-          selectedSections["ME 3340"] = "Sec 1";
-          delete waitlistMap["ME 3340"];
-          renderAll();
-        }
-      );
-      if (!isAiDemoRunning) return;
-
-      // Step 8: Probation Student Safeguard (32 ECTS & Upper-Year Lock)
-      await moveCursorAndClick(
-        "#profileSelect",
-        "Step 8 of 10 • Academic Probation Safeguard (GPA < 1.80)",
-        "When we switch the student status to Probation with a GPA of 1.62, the system automatically lowers the credit cap to 32 ECTS and locks all fourth-year elective courses in compliance with university regulations.",
-        function() {
-          document.getElementById("profileSelect").value = "probation";
-          changeProfile();
-        }
-      );
-      if (!isAiDemoRunning) return;
-
-      await waitMs(800);
-      document.getElementById("profileSelect").value = "normal";
-      changeProfile();
-      generateSmartSchedule();
-
-      // Step 9: Multi-Sheet Weekly Matrix Excel Parser & Department Merge
-      await moveCursorAndClick(
-        "#lblFileUpload",
-        "Step 9 of 10 • Multi-Sheet Matrix Excel & PDF Parser",
-        "Students can also upload any official multi-sheet university Excel schedule, such as the 4-sheet Mechanical Engineering Fall timetable, or merge courses from Computer and Electrical Engineering.",
-        function() {
-          var cardCont = document.getElementById("courseCardContainer");
-          cardCont.className = "bg-white rounded-xl shadow-lg border-4 border-emerald-500 overflow-hidden transition-all duration-500";
           setTimeout(function() {
-            cardCont.className = "bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500";
-          }, 2500);
+            if (isAiDemoRunning) {
+              var c = findCourse("ME 3340");
+              if (c) c.sections[0].quota = 29;
+              selectedSections["ME 3340"] = "Sec 1";
+              delete waitlistMap["ME 3340"];
+              generateSmartSchedule();
+            }
+          }, 3400);
         }
       );
       if (!isAiDemoRunning) return;
 
-      // Step 10: Mobile Daily Card View & Final Advisor Approval Slip
+      // STEP 9 (RIGHT WORKSPACE - LIVE WEEKLY TIMETABLE & MOBILE CARDS): Timetable Views
       await moveCursorAndClick(
         "#btnViewMobile",
-        "Step 10 of 10 • Mobile Daily Cards & Final Registration Slip",
-        "Our responsive layout includes a dedicated Mobile Daily Card view for smartphones. Finally, clicking Finalize Registration generates the official Advisor Approval Slip ready for PDF export. Thank you for watching our presentation!",
+        "Step 9 of 10 (Right Workspace) • Live Weekly Matrix & Mobile Daily Cards",
+        "Moving across to the right workspace panel, our Live Weekly Class Schedule displays all placed courses, pinned badges, and green Day-Off columns. Students on smartphones can also toggle between the classic Grid View and Mobile Daily Cards.",
         function() {
           setViewMode("mobile");
           setTimeout(function() {
-            setViewMode("table");
-            completeRegistration();
-          }, 1800);
+            if (isAiDemoRunning) setViewMode("table");
+          }, 2600);
         }
       );
+      if (!isAiDemoRunning) return;
 
-      await waitMs(2000);
+      // STEP 10 (RIGHT WORKSPACE - FINALIZATION): Official Advisor Approval Slip
+      await moveCursorAndClick(
+        "#btnSubmitReg",
+        "Step 10 of 10 (Completion) • Finalizing Registration & Advisor Slip",
+        "Finally, at the top right of the timetable, clicking Finalize Registration verifies all university rules and generates the official Advisor Approval Slip ready for PDF export. Thank you for watching the OBS Plus Version 2.0 tour!",
+        function() { completeRegistration(); }
+      );
+
+      await waitMs(2200);
       stopAiPresentation();
     }
 
@@ -1046,7 +1025,7 @@
     }
 
     // ============================================================================
-    // SPECIALIZED 2D MULTI-SHEET WEEKLY MATRIX PARSER (e.g., 26-27-Guz-Ders-Programi_ME.xlsx)
+    // UNIVERSAL MULTI-SHEET 2D MATRIX & TABLE PARSER ENGINE
     // ============================================================================
     function normalizeDayName(str) {
       var s = String(str || "").toLowerCase();
@@ -1077,14 +1056,12 @@
         var rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
         if (!rows || rows.length < 2) continue;
 
-        // Detect year from sheet name (e.g. "1. sınıf" -> 1, "ME 2" -> 2, "ME 3" -> 3, "ME 4" -> 4)
-        var detectedYear = sIdx + 1;
-        var yrMatch = sheetName.match(/(\d)/);
+        var detectedYear = Math.min(4, sIdx + 1);
+        var yrMatch = sheetName.match(/([1-4])/);
         if (yrMatch) detectedYear = parseInt(yrMatch[1], 10);
 
-        // Check if row 0 or row 1 has day headers (Pazartesi, Salı, Monday, Tuesday...)
         var headerRowIdx = -1;
-        for (var rCheck = 0; rCheck < Math.min(4, rows.length); rCheck++) {
+        for (var rCheck = 0; rCheck < Math.min(5, rows.length); rCheck++) {
           var rowJoined = rows[rCheck].join(" ");
           if (normalizeDayName(rowJoined)) {
             headerRowIdx = rCheck;
@@ -1092,7 +1069,6 @@
           }
         }
 
-        // If this sheet is a 2D Weekly Matrix Grid (like 26-27-Guz-Ders-Programi_ME.xlsx)
         if (headerRowIdx !== -1 && /\d{2}:\d{2}/.test(String(rows[headerRowIdx + 1] && rows[headerRowIdx + 1][0]))) {
           var colToDay = {};
           var currentDay = "Monday";
@@ -1111,31 +1087,32 @@
               var cellVal = String(rows[r][col] || "").trim();
               if (!cellVal) continue;
 
-              // Match patterns like: "SE 1105.1 \nM109", "MATH1132 S1", "ME 3320.2 M534", "ESE-ME 4910 M534"
               var cleanCell = cellVal.replace(/\r?\n/g, " ");
-              var match = cleanCell.match(/([A-Z]{2,5}(?:-[A-Z]{2,4})?\s*\d{4})(?:[\.\s]+(S?\d+))?/);
+              var match = cleanCell.match(/([A-Z]{2,5}(?:-[A-Z]{2,4})?\s*\d{3,4})(?:[\.\s]+(S?\d+))?/);
               if (match) {
                 var rawCode = match[1].replace(/\s+/g, " ").trim();
-                rawCode = rawCode.replace(/^([A-Z]+)(\d{4})$/, "$1 $2");
+                rawCode = rawCode.replace(/^([A-Z]+)(\d{3,4})$/, "$1 $2");
 
                 var secToken = match[2] || "1";
                 var secNum = secToken.replace(/\D/g, "") || "1";
                 var secId = "Sec " + secNum;
                 var day = colToDay[col] || "Monday";
 
-                // Extract classroom if present (e.g. M534, Y314, Z22)
                 var roomMatch = cleanCell.match(/\b([MYZX]\d{2,3})\b/);
-                var roomStr = roomMatch ? "Room " + roomMatch[1] : "Main Building";
+                var roomStr = roomMatch ? "Room " + roomMatch[1] : "Main Campus";
+
+                var codeYearMatch = rawCode.match(/\b[A-Z-]+\s*(\d)/);
+                var courseYear = codeYearMatch ? Math.min(4, Math.max(1, parseInt(codeYearMatch[1], 10))) : detectedYear;
 
                 if (!courseMap[rawCode]) {
-                  var title = courseTitleDictionary[rawCode] || (sheetName + " Engineering Course (" + rawCode + ")");
+                  var title = courseTitleDictionary[rawCode] || ("Engineering Course (" + rawCode + ")");
                   courseMap[rawCode] = {
                     code: rawCode,
                     name: title,
-                    ects: detectedYear === 4 ? 5 : 6,
-                    year: detectedYear,
-                    status: rawCode === "ME 2210" ? "FF" : (detectedYear === 4 ? "Upper" : "Normal"),
-                    isMandatory: detectedYear < 4,
+                    ects: courseYear === 4 ? 5 : 6,
+                    year: courseYear,
+                    status: rawCode === "ME 2210" ? "FF" : (courseYear === 4 ? "Upper" : "Normal"),
+                    isMandatory: courseYear < 4,
                     prereq: null,
                     prereqMet: true,
                     unlocks: null,
@@ -1144,7 +1121,6 @@
                   orderList.push(courseMap[rawCode]);
                 }
 
-                // Avoid duplicate section IDs on the same course; update or add
                 var existingSec = null;
                 for (var s = 0; s < courseMap[rawCode].sections.length; s++) {
                   if (courseMap[rawCode].sections[s].id === secId) {
@@ -1168,7 +1144,6 @@
         }
       }
 
-      // Ensure single-section courses from the grid also have an alternative section option if needed
       return orderList.length > 0 ? orderList : null;
     }
 
@@ -1184,7 +1159,6 @@
           var data = new Uint8Array(e.target.result);
           var workbook = XLSX.read(data, { type: "array" });
 
-          // First check if it is a Multi-Sheet 2D Matrix Grid (like 26-27-Guz-Ders-Programi_ME.xlsx)
           var matrixCourses = parseMultiSheetMatrixWorkbook(workbook);
           if (matrixCourses && matrixCourses.length > 0) {
             processUniversalDocument(file.name, null, "", matrixCourses);
@@ -1337,25 +1311,24 @@
       resultBox.classList.add("hidden");
       bar.style.width = "30%";
       pctText.innerText = "30%";
-      statusText.innerText = "🔍 Scanning '" + fileName + "' (Multi-Sheet Grid & Table Detector)...";
+      statusText.innerText = "🔍 Scanning '" + fileName + "' (Universal Schedule Detector)...";
 
       setTimeout(function() {
         bar.style.width = "75%";
         pctText.innerText = "75%";
-        statusText.innerText = "🤖 Mapping course codes, sections, rooms, and time slots to catalog...";
+        statusText.innerText = "🤖 Extracting course codes, sections, rooms, and time slots...";
       }, 350);
 
       setTimeout(function() {
         bar.style.width = "100%";
         pctText.innerText = "100%";
-        statusText.innerText = "✅ Document Import Complete: '" + fileName + "'";
+        statusText.innerText = "✅ Schedule Import Complete: '" + fileName + "'";
 
         var extracted = preParsedMatrixCourses || extractCoursesUniversal(rows, rawText);
         var addedCount = 0;
 
         if (extracted && extracted.length > 0) {
           if (uploadMode === "merge") {
-            // Merge into existing department courses (or update sections if same code)
             for (var i = 0; i < extracted.length; i++) {
               var newC = extracted[i];
               var existing = findCourse(newC.code);
@@ -1364,7 +1337,6 @@
                 courses.push(newC);
                 addedCount++;
               } else {
-                // Merge any new sections into existing course
                 for (var s = 0; s < newC.sections.length; s++) {
                   if (!findSection(existing, newC.sections[s].id)) {
                     existing.sections.push(newC.sections[s]);
@@ -1373,7 +1345,7 @@
                 addedCount++;
               }
             }
-            document.getElementById("activeDeptBadge").innerText = "Merged Curriculum (ME + " + fileName + ")";
+            document.getElementById("activeDeptBadge").innerText = "Merged Curriculum (" + fileName + ")";
           } else {
             courses = extracted;
             addedCount = extracted.length;
@@ -1396,13 +1368,13 @@
         }, 3000);
 
         var modeDesc = uploadMode === "merge"
-          ? ("Successfully parsed <b>" + addedCount + " courses</b> from <b>" + fileName + "</b> and merged them into your department catalog!")
-          : ("Successfully extracted <b>" + addedCount + " courses</b> across all sheets from <b>" + fileName + "</b>!");
+          ? ("Successfully parsed <b>" + addedCount + " courses</b> from <b>" + fileName + "</b> and merged them into your catalog!")
+          : ("Successfully extracted <b>" + addedCount + " courses</b> from <b>" + fileName + "</b>!");
 
         resultBox.classList.remove("hidden");
         resultBox.innerHTML =
           '<div class="flex flex-wrap justify-between items-center gap-2">' +
-            '<div>🎯 ' + modeDesc + ' Use the <b>Year 1 / ME 2 / ME 3 / ME 4</b> filter tabs on the left to browse and select your sections, or click <b>⚡ Build Optimal Schedule</b>!</div>' +
+            '<div>🎯 ' + modeDesc + ' Use the <b>Year 1–4</b> filter tabs on the left to browse and select your sections, or click <b>⚡ Build Optimal Schedule</b>!</div>' +
             '<span class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-full font-extrabold">👈 Select Courses on Left</span>' +
           '</div>';
       }, 750);
