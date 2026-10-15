@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>OBS+ V4.0 | Evrensel Excel & PDF Okuyuculu Akıllı Ders Kayıt Motoru</title>
+  <title>OBS+ V4.5 | Evrensel Excel/PDF & ÇAP Birleştiricili Ders Kayıt Motoru</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Gerçek Excel (.xlsx / .xls / .csv) Okuma Kütüphanesi (SheetJS) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -29,9 +29,9 @@
           <div>
             <div class="flex items-center gap-1.5">
               <h1 class="font-bold text-sm sm:text-lg leading-tight">Akıllı Ders Kayıt & Program Motoru</h1>
-              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v4.0 Universal AI</span>
+              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v4.5 Pro</span>
             </div>
-            <p class="text-[11px] text-indigo-200 hidden sm:block">Evrensel Excel (.xlsx/.csv) & PDF Okuyucu • ÖİM Kuralları • Boş Gün Filtresi • Auto-Swap Waitlist</p>
+            <p class="text-[11px] text-indigo-200 hidden sm:block">Evrensel Excel/PDF Okuyucu • ÇAP Ders Birleştirici • Canlı Ders Ekleme • Auto-Swap Waitlist</p>
           </div>
         </div>
 
@@ -64,30 +64,42 @@
     <!-- Hata Gösterge Kutusu -->
     <div id="errorBanner" class="hidden bg-rose-600 text-white p-3 rounded-xl text-xs font-bold"></div>
 
-    <!-- EVRENSEL EXCEL / CSV / PDF DERS PROGRAMI YÜKLEYİCİ -->
+    <!-- EVRENSEL EXCEL / CSV / PDF DERS PROGRAMI YÜKLEYİCİ & ÇAP BİRLEŞTİRİCİ -->
     <section class="no-print bg-gradient-to-r from-teal-950 via-emerald-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-emerald-700/80">
       <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
         
-        <div class="space-y-1">
-          <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-            <span>🤖 EVRENSEL AI BELGE OKUYUCU</span>
-            <span>•</span>
-            <span id="activeDeptBadge">Aktif Müfredat: Makine Mühendisliği (ME)</span>
+        <div class="space-y-1.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+              🤖 EVRENSEL AI BELGE OKUYUCU
+            </span>
+            <span id="activeDeptBadge" class="bg-slate-900/80 border border-emerald-500/40 text-amber-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
+              Aktif Müfredat: Makine Mühendisliği (ME)
+            </span>
+            <button type="button" onclick="restoreDefaultMeCourses()" class="bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full transition cursor-pointer shadow" title="Varsayılan Makine Mühendisliği derslerine tek tıkla geri döner">
+              🔄 Makine Müh. (ME) Derslerine Dön
+            </button>
           </div>
-          <h2 class="text-base sm:text-lg font-bold">Kendi Ders Programını Yükle (.xlsx, .xls, .csv, .pdf) — Soldan Kendin Seç!</h2>
-          <p class="text-xs text-emerald-100/90">Herhangi bir bölümün Excel veya PDF ders programını yükleyin; sistem sayfayı yenilemeden dersleri ve şubeleri anında <b>sol panele</b> dizer. Ardından soldan istediğiniz dersleri kendiniz seçip ayarlayabilirsiniz!</p>
+          <h2 class="text-base sm:text-lg font-bold">Kendi Ders Programını Yükle (.xlsx, .csv, .pdf) — İster Değiştir, İster Mevcut Derslerle Birleştir!</h2>
+          <p class="text-xs text-emerald-100/90">Farklı bir bölümün Excel/PDF programını yüklerken <b>"Mevcut Derslerle Birleştir"</b> seçeneğini seçerseniz Makine dersleriniz silinmez; yeni dersler seçmeli/ÇAP olarak listenin altına eklenir.</p>
         </div>
 
-        <!-- Dosya Yükleme ve Örnek İndirme Butonları -->
-        <div class="flex flex-wrap items-center gap-2 shrink-0">
-          <button type="button" onclick="downloadSampleExcel('comp')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow" title="Bilgisayar Mühendisliği örnek Excel dosyasını indirir">
-            📥 Örnek 1: Bilgisayar Müh. (.xlsx)
+        <!-- Yükleme Modu + Örnek İndirme + Dosya Seçme -->
+        <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 shrink-0">
+          <!-- Yükleme Modu Seçici -->
+          <select id="uploadModeSelect" class="bg-emerald-950 text-emerald-100 border border-emerald-500 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none cursor-pointer">
+            <option value="replace">📂 Mod: Sadece Yüklenen Bölümü Göster</option>
+            <option value="merge">🔗 Mod: Mevcut Derslerle Birleştir (ÇAP/Seçmeli)</option>
+          </select>
+
+          <button type="button" onclick="downloadSampleExcel('comp')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
+            📥 Örnek 1: Bilgisayar (.xlsx)
           </button>
-          <button type="button" onclick="downloadSampleExcel('ee')" class="bg-sky-400 hover:bg-sky-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow" title="Elektrik-Elektronik Mühendisliği örnek Excel dosyasını indirir">
-            📥 Örnek 2: Elektrik-Elektronik (.xlsx)
+          <button type="button" onclick="downloadSampleExcel('ee')" class="bg-sky-400 hover:bg-sky-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
+            📥 Örnek 2: Elektrik (.xlsx)
           </button>
 
-          <label for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2.5 px-4 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer border-2 border-dashed border-emerald-400">
+          <label for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2 px-4 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-emerald-400">
             <span>📂 Excel / PDF Yükle</span>
             <input id="scheduleFileInput" type="file" accept=".xlsx,.xls,.csv,.pdf,.txt" onchange="handleFileUpload(event)" class="hidden">
           </label>
@@ -194,12 +206,17 @@
         </div>
 
         <div id="courseCardContainer" class="bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500">
-          <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+          <div class="bg-slate-50 px-3.5 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
             <div>
-              <h2 class="font-bold text-sm text-slate-800">Açılan Dersler & Şubeler (Tıkla & Seç)</h2>
-              <p class="text-[11px] text-slate-500">Programa eklemek istediğiniz şubenin üzerine tıklayın</p>
+              <h2 class="font-bold text-sm text-slate-800">Açılan Dersler & Şubeler</h2>
+              <p class="text-[11px] text-slate-500">Şubeye tıklayıp seçin • İsterseniz canlı ders ekleyin</p>
             </div>
-            <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full">8 Ders</span>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="openQuickAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm transition cursor-pointer">
+                ➕ Hızlı Ders Ekle
+              </button>
+              <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">8 Ders</span>
+            </div>
           </div>
           <div id="courseList" class="divide-y divide-slate-200 lg:max-h-[640px] lg:overflow-y-auto"></div>
         </div>
@@ -277,7 +294,58 @@
     </div>
   </div>
 
-  <!-- MODAL 1: CHROME MCP & ÖİM RESMİ YÖNERGE DENETÇİSİ -->
+  <!-- MODAL 1: HIZLI MANUEL DERS EKLEME (SPONTANE JÜRİ İSTEKLERİ İÇİN) -->
+  <div id="quickAddModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-slate-900">➕ Sisteme Hızlı Ders & Şube Ekle</h3>
+        <button type="button" onclick="closeQuickAddModal()" class="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Ders Kodu:</label>
+            <input id="qaCode" type="text" value="ME 4999" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-bold">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">AKTS:</label>
+            <input id="qaEcts" type="number" value="6" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-bold">
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Ders Adı:</label>
+          <input id="qaName" type="text" value="Capstone Graduation Project" class="w-full border border-slate-300 rounded-lg px-2.5 py-2">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">1. Şube Günü:</label>
+            <select id="qaDay" class="w-full border border-slate-300 rounded-lg px-2 py-2">
+              <option value="Pazartesi">Pazartesi</option>
+              <option value="Salı">Salı</option>
+              <option value="Çarşamba">Çarşamba</option>
+              <option value="Perşembe">Perşembe</option>
+              <option value="Cuma">Cuma</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">1. Şube Saati:</label>
+            <select id="qaSlot" class="w-full border border-slate-300 rounded-lg px-2 py-2">
+              <option value="08:40 - 10:30">08:40 - 10:30</option>
+              <option value="10:40 - 12:30">10:40 - 12:30</option>
+              <option value="13:40 - 15:30">13:40 - 15:30</option>
+              <option value="15:40 - 17:30">15:40 - 17:30</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+        <button type="button" onclick="closeQuickAddModal()" class="bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">İptal</button>
+        <button type="button" onclick="saveQuickCourse()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">✓ Listeye Ekle & Seç</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CHROME MCP & ÖİM RESMİ YÖNERGE DENETÇİSİ -->
   <div id="mcpModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start gap-2">
@@ -292,6 +360,7 @@
         <div>[Chrome-MCP] Connected: https://oim.yasar.edu.tr/ders-kayitlari/</div>
         <div>[Chrome-MCP] Regulation Art. 22: Normal=40 ECTS, Probation(GPA&lt;1.80)=32 ECTS, DoubleMajor=42 ECTS</div>
         <div>[SheetJS + PDF.js] Universal Excel (.xlsx/.xls/.csv) &amp; PDF Course Extractor Active ✓</div>
+        <div>[Merge-Engine] Cross-Department Course Merging (Double Major / Elective) Ready ✓</div>
       </div>
 
       <div class="flex justify-end">
@@ -300,7 +369,7 @@
     </div>
   </div>
 
-  <!-- MODAL 2: DANIŞMAN ONAYI & RESMİ KAYIT FİŞİ -->
+  <!-- MODAL 3: DANIŞMAN ONAYI & RESMİ KAYIT FİŞİ -->
   <div id="approvalModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start gap-2">
@@ -349,133 +418,137 @@
     var pinnedCourses = {};
     var waitlistMap = {};
 
-    // Varsayılan Müfredat (Makine Mühendisliği)
-    var courses = [
-      {
-        code: "ME 2210",
-        name: "Thermodynamics I",
-        ects: 6,
-        year: 2,
-        status: "FF",
-        isMandatory: true,
-        prereq: null,
-        prereqMet: true,
-        unlocks: "ME 3312 (Heat Transfer)",
-        sections: [
-          { id: "Sec 1", day: "Pazartesi", slot: "08:40 - 10:30", quota: 28, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz" },
-          { id: "Sec 2", day: "Çarşamba", slot: "13:40 - 15:30", quota: 19, maxQuota: 30, instructor: "Doç. Dr. K. Demir" },
-          { id: "Sec 3", day: "Salı", slot: "10:40 - 12:30", quota: 14, maxQuota: 30, instructor: "Doç. Dr. K. Demir" }
-        ]
-      },
-      {
-        code: "ME 3301",
-        name: "Fluid Mechanics",
-        ects: 6,
-        year: 3,
-        status: "Normal",
-        isMandatory: true,
-        prereq: null,
-        prereqMet: true,
-        unlocks: "ME 4420 (CFD)",
-        sections: [
-          { id: "Sec 1", day: "Pazartesi", slot: "08:40 - 10:30", quota: 25, maxQuota: 30, instructor: "Prof. Dr. S. Kaya" },
-          { id: "Sec 2", day: "Salı", slot: "13:40 - 15:30", quota: 22, maxQuota: 30, instructor: "Prof. Dr. S. Kaya" },
-          { id: "Sec 3", day: "Cuma", slot: "10:40 - 12:30", quota: 10, maxQuota: 30, instructor: "Dr. Öğr. Üyesi M. Ak" }
-        ]
-      },
-      {
-        code: "ME 3340",
-        name: "Machine Elements I",
-        ects: 7,
-        year: 3,
-        status: "Normal",
-        isMandatory: true,
-        prereq: null,
-        prereqMet: true,
-        unlocks: "ME 3342 (Machine Elements II)",
-        sections: [
-          { id: "Sec 1", day: "Salı", slot: "10:40 - 12:30", quota: 30, maxQuota: 30, instructor: "Prof. Dr. E. Çelik" },
-          { id: "Sec 2", day: "Perşembe", slot: "10:40 - 12:30", quota: 21, maxQuota: 30, instructor: "Prof. Dr. E. Çelik" },
-          { id: "Sec 3", day: "Pazartesi", slot: "15:40 - 17:30", quota: 17, maxQuota: 30, instructor: "Doç. Dr. B. Aydın" }
-        ]
-      },
-      {
-        code: "ME 3360",
-        name: "Numerical Methods for Engineers",
-        ects: 6,
-        year: 3,
-        status: "Normal",
-        isMandatory: true,
-        prereq: null,
-        prereqMet: true,
-        unlocks: null,
-        sections: [
-          { id: "Sec 1", day: "Çarşamba", slot: "10:40 - 12:30", quota: 24, maxQuota: 30, instructor: "Doç. Dr. T. Özkan" },
-          { id: "Sec 2", day: "Perşembe", slot: "13:40 - 15:30", quota: 18, maxQuota: 30, instructor: "Doç. Dr. T. Özkan" },
-          { id: "Sec 3", day: "Cuma", slot: "13:40 - 15:30", quota: 12, maxQuota: 30, instructor: "Dr. Öğr. Üyesi C. Koç" }
-        ]
-      },
-      {
-        code: "ME 3380",
-        name: "System Dynamics & Control",
-        ects: 6,
-        year: 3,
-        status: "Normal",
-        isMandatory: true,
-        prereq: null,
-        prereqMet: true,
-        unlocks: "ME 4480 (Automatic Control)",
-        sections: [
-          { id: "Sec 1", day: "Pazartesi", slot: "10:40 - 12:30", quota: 20, maxQuota: 30, instructor: "Prof. Dr. H. Arslan" },
-          { id: "Sec 2", day: "Çarşamba", slot: "08:40 - 10:30", quota: 16, maxQuota: 30, instructor: "Prof. Dr. H. Arslan" }
-        ]
-      },
-      {
-        code: "ME 3312",
-        name: "Heat Transfer",
-        ects: 6,
-        year: 3,
-        status: "Normal",
-        isMandatory: true,
-        prereq: "ME 2210 (Thermodynamics I)",
-        prereqMet: false,
-        unlocks: "ME 4415 (Thermal System Design)",
-        sections: [
-          { id: "Sec 1", day: "Perşembe", slot: "08:40 - 10:30", quota: 15, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz" }
-        ]
-      },
-      {
-        code: "ME 4410",
-        name: "Power Plant Engineering (Üst Sınıf Seçmeli)",
-        ects: 6,
-        year: 4,
-        status: "Upper",
-        isMandatory: false,
-        prereq: null,
-        prereqMet: true,
-        unlocks: null,
-        sections: [
-          { id: "Sec 1", day: "Cuma", slot: "08:40 - 10:30", quota: 12, maxQuota: 25, instructor: "Doç. Dr. V. Şahin" },
-          { id: "Sec 2", day: "Perşembe", slot: "15:40 - 17:30", quota: 19, maxQuota: 25, instructor: "Doç. Dr. V. Şahin" },
-          { id: "Sec 3", day: "Pazartesi", slot: "13:40 - 15:30", quota: 14, maxQuota: 25, instructor: "Doç. Dr. V. Şahin" }
-        ]
-      },
-      {
-        code: "ME 4450",
-        name: "Renewable Energy Systems (Teknik Seçmeli)",
-        ects: 5,
-        year: 4,
-        status: "Upper",
-        isMandatory: false,
-        prereq: null,
-        prereqMet: true,
-        unlocks: null,
-        sections: [
-          { id: "Sec 1", day: "Salı", slot: "15:40 - 17:30", quota: 14, maxQuota: 25, instructor: "Dr. Öğr. Üyesi N. Erdem" },
-          { id: "Sec 2", day: "Çarşamba", slot: "15:40 - 17:30", quota: 11, maxQuota: 25, instructor: "Dr. Öğr. Üyesi N. Erdem" }
-        ]
-      }
-    ];
+    // VARSAYILAN MAKİNE MÜHENDİSLİĞİ YEDEK KOPYASI (Tek tıkla geri dönmek için)
+    function getDefaultMeCourses() {
+      return [
+        {
+          code: "ME 2210",
+          name: "Thermodynamics I",
+          ects: 6,
+          year: 2,
+          status: "FF",
+          isMandatory: true,
+          prereq: null,
+          prereqMet: true,
+          unlocks: "ME 3312 (Heat Transfer)",
+          sections: [
+            { id: "Sec 1", day: "Pazartesi", slot: "08:40 - 10:30", quota: 28, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz" },
+            { id: "Sec 2", day: "Çarşamba", slot: "13:40 - 15:30", quota: 19, maxQuota: 30, instructor: "Doç. Dr. K. Demir" },
+            { id: "Sec 3", day: "Salı", slot: "10:40 - 12:30", quota: 14, maxQuota: 30, instructor: "Doç. Dr. K. Demir" }
+          ]
+        },
+        {
+          code: "ME 3301",
+          name: "Fluid Mechanics",
+          ects: 6,
+          year: 3,
+          status: "Normal",
+          isMandatory: true,
+          prereq: null,
+          prereqMet: true,
+          unlocks: "ME 4420 (CFD)",
+          sections: [
+            { id: "Sec 1", day: "Pazartesi", slot: "08:40 - 10:30", quota: 25, maxQuota: 30, instructor: "Prof. Dr. S. Kaya" },
+            { id: "Sec 2", day: "Salı", slot: "13:40 - 15:30", quota: 22, maxQuota: 30, instructor: "Prof. Dr. S. Kaya" },
+            { id: "Sec 3", day: "Cuma", slot: "10:40 - 12:30", quota: 10, maxQuota: 30, instructor: "Dr. Öğr. Üyesi M. Ak" }
+          ]
+        },
+        {
+          code: "ME 3340",
+          name: "Machine Elements I",
+          ects: 7,
+          year: 3,
+          status: "Normal",
+          isMandatory: true,
+          prereq: null,
+          prereqMet: true,
+          unlocks: "ME 3342 (Machine Elements II)",
+          sections: [
+            { id: "Sec 1", day: "Salı", slot: "10:40 - 12:30", quota: 30, maxQuota: 30, instructor: "Prof. Dr. E. Çelik" },
+            { id: "Sec 2", day: "Perşembe", slot: "10:40 - 12:30", quota: 21, maxQuota: 30, instructor: "Prof. Dr. E. Çelik" },
+            { id: "Sec 3", day: "Pazartesi", slot: "15:40 - 17:30", quota: 17, maxQuota: 30, instructor: "Doç. Dr. B. Aydın" }
+          ]
+        },
+        {
+          code: "ME 3360",
+          name: "Numerical Methods for Engineers",
+          ects: 6,
+          year: 3,
+          status: "Normal",
+          isMandatory: true,
+          prereq: null,
+          prereqMet: true,
+          unlocks: null,
+          sections: [
+            { id: "Sec 1", day: "Çarşamba", slot: "10:40 - 12:30", quota: 24, maxQuota: 30, instructor: "Doç. Dr. T. Özkan" },
+            { id: "Sec 2", day: "Perşembe", slot: "13:40 - 15:30", quota: 18, maxQuota: 30, instructor: "Doç. Dr. T. Özkan" },
+            { id: "Sec 3", day: "Cuma", slot: "13:40 - 15:30", quota: 12, maxQuota: 30, instructor: "Dr. Öğr. Üyesi C. Koç" }
+          ]
+        },
+        {
+          code: "ME 3380",
+          name: "System Dynamics & Control",
+          ects: 6,
+          year: 3,
+          status: "Normal",
+          isMandatory: true,
+          prereq: null,
+          prereqMet: true,
+          unlocks: "ME 4480 (Automatic Control)",
+          sections: [
+            { id: "Sec 1", day: "Pazartesi", slot: "10:40 - 12:30", quota: 20, maxQuota: 30, instructor: "Prof. Dr. H. Arslan" },
+            { id: "Sec 2", day: "Çarşamba", slot: "08:40 - 10:30", quota: 16, maxQuota: 30, instructor: "Prof. Dr. H. Arslan" }
+          ]
+        },
+        {
+          code: "ME 3312",
+          name: "Heat Transfer",
+          ects: 6,
+          year: 3,
+          status: "Normal",
+          isMandatory: true,
+          prereq: "ME 2210 (Thermodynamics I)",
+          prereqMet: false,
+          unlocks: "ME 4415 (Thermal System Design)",
+          sections: [
+            { id: "Sec 1", day: "Perşembe", slot: "08:40 - 10:30", quota: 15, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz" }
+          ]
+        },
+        {
+          code: "ME 4410",
+          name: "Power Plant Engineering (Üst Sınıf Seçmeli)",
+          ects: 6,
+          year: 4,
+          status: "Upper",
+          isMandatory: false,
+          prereq: null,
+          prereqMet: true,
+          unlocks: null,
+          sections: [
+            { id: "Sec 1", day: "Cuma", slot: "08:40 - 10:30", quota: 12, maxQuota: 25, instructor: "Doç. Dr. V. Şahin" },
+            { id: "Sec 2", day: "Perşembe", slot: "15:40 - 17:30", quota: 19, maxQuota: 25, instructor: "Doç. Dr. V. Şahin" },
+            { id: "Sec 3", day: "Pazartesi", slot: "13:40 - 15:30", quota: 14, maxQuota: 25, instructor: "Doç. Dr. V. Şahin" }
+          ]
+        },
+        {
+          code: "ME 4450",
+          name: "Renewable Energy Systems (Teknik Seçmeli)",
+          ects: 5,
+          year: 4,
+          status: "Upper",
+          isMandatory: false,
+          prereq: null,
+          prereqMet: true,
+          unlocks: null,
+          sections: [
+            { id: "Sec 1", day: "Salı", slot: "15:40 - 17:30", quota: 14, maxQuota: 25, instructor: "Dr. Öğr. Üyesi N. Erdem" },
+            { id: "Sec 2", day: "Çarşamba", slot: "15:40 - 17:30", quota: 11, maxQuota: 25, instructor: "Dr. Öğr. Üyesi N. Erdem" }
+          ]
+        }
+      ];
+    }
+
+    var courses = getDefaultMeCourses();
 
     var selectedSections = {
       "ME 2210": "Sec 1",
@@ -483,7 +556,62 @@
       "ME 3360": "Sec 3"
     };
 
-    // GERÇEK .XLSX EXCEL DOSYASI ÜRETİP İNDİRME FONKSİYONU (2 FARKLI BÖLÜM ÖRNEĞİ)
+    // TEK TIKLA MAKİNE MÜHENDİSLİĞİ DERSLERİNE GERİ DÖNME
+    function restoreDefaultMeCourses() {
+      courses = getDefaultMeCourses();
+      pinnedCourses = {};
+      waitlistMap = {};
+      selectedSections = {
+        "ME 2210": "Sec 1",
+        "ME 3301": "Sec 1",
+        "ME 3360": "Sec 3"
+      };
+      document.getElementById("activeDeptBadge").innerText = "Aktif Müfredat: Makine Mühendisliği (ME)";
+      document.getElementById("courseCountBadge").innerText = courses.length + " Ders";
+      document.getElementById("aiScanContainer").classList.add("hidden");
+      document.getElementById("schedulerReport").classList.add("hidden");
+      renderAll();
+    }
+
+    // HIZLI MANUEL DERS EKLEME FONKSİYONLARI
+    function openQuickAddModal() {
+      document.getElementById("quickAddModal").classList.remove("hidden");
+    }
+    function closeQuickAddModal() {
+      document.getElementById("quickAddModal").classList.add("hidden");
+    }
+    function saveQuickCourse() {
+      var code = document.getElementById("qaCode").value.trim().toUpperCase() || "ME 4999";
+      var name = document.getElementById("qaName").value.trim() || "Özel Mühendislik Dersi";
+      var ects = parseInt(document.getElementById("qaEcts").value, 10) || 6;
+      var day = document.getElementById("qaDay").value;
+      var slot = document.getElementById("qaSlot").value;
+
+      var altDay = days[(days.indexOf(day) + 2) % 5];
+      var newCourse = {
+        code: code,
+        name: name,
+        ects: ects,
+        year: 3,
+        status: "Normal",
+        isMandatory: true,
+        prereq: null,
+        prereqMet: true,
+        unlocks: null,
+        sections: [
+          { id: "Sec 1", day: day, slot: slot, quota: 12, maxQuota: 30, instructor: "Prof. Dr. Bölüm Koordinatörü" },
+          { id: "Sec 2", day: altDay, slot: "10:40 - 12:30", quota: 10, maxQuota: 30, instructor: "Prof. Dr. Bölüm Koordinatörü" }
+        ]
+      };
+
+      courses.unshift(newCourse);
+      selectedSections[code] = "Sec 1";
+      document.getElementById("courseCountBadge").innerText = courses.length + " Ders";
+      closeQuickAddModal();
+      renderAll();
+    }
+
+    // GERÇEK .XLSX EXCEL DOSYASI ÜRETİP İNDİRME FONKSİYONU
     function downloadSampleExcel(type) {
       var rows = [];
       var fileName = "";
@@ -540,7 +668,7 @@
       }
     }
 
-    // EVRENSEL DOSYA YÜKLEYİCİ (.XLSX, .XLS, .CSV, .PDF, .TXT)
+    // EVRENSEL DOSYA YÜKLEYİCİ
     function handleFileUpload(event) {
       var file = event.target.files[0];
       if (!file) return;
@@ -594,16 +722,13 @@
         textReader.readAsText(file, "UTF-8");
       }
 
-      // Aynı dosyayı tekrar seçebilmek için input'u sıfırla
       event.target.value = "";
     }
 
-    // HERHANGİ BİR EXCEL TABLOSUNU VEYA PDF METNİNİ DERSLERE DÖNÜŞTÜREN EVRENSEL PARSER
     function extractCoursesUniversal(rows, rawText) {
       var courseMap = {};
       var orderList = [];
 
-      // Gün ve Saat Eşleştirme Yardımcıları
       function normalizeDay(str) {
         var s = (str || "").toLowerCase();
         if (s.indexOf("pazar") !== -1 || s.indexOf("mon") !== -1 || s.indexOf("pzt") !== -1) return "Pazartesi";
@@ -623,13 +748,11 @@
         return null;
       }
 
-      // 1. Eğer Excel/CSV Satırları Varsa Akıllı Sütun Taraması Yap
       if (rows && rows.length > 1) {
         for (var i = 1; i < rows.length; i++) {
           var cols = rows[i].map(function(c) { return String(c || "").trim(); });
           if (cols.length < 2 || !cols[0]) continue;
 
-          // Eğer tam 15 sütunlu standart şablonumuzsa birebir oku
           if (cols.length >= 12 && (cols[9].indexOf("Sec") !== -1 || normalizeDay(cols[10]))) {
             var code = cols[0];
             var name = cols[1] || "Mühendislik Dersi";
@@ -656,7 +779,6 @@
             }
             courseMap[code].sections.push({ id: secId, day: day, slot: slot, quota: quota, maxQuota: maxQuota, instructor: instructor });
           } else {
-            // Serbest formatlı herhangi bir Excel tablosuysa (Örn: sadece Ders Kodu, Ders Adı, Gün, Saat varsa)
             var rowStr = cols.join(" ");
             var codeMatch = rowStr.match(/\b([A-Z]{2,4}\s?\d{3,4})\b/);
             if (codeMatch) {
@@ -676,7 +798,6 @@
               courseMap[fCode].sections.push({
                 id: "Sec " + secNum, day: fDay, slot: fSlot, quota: 18, maxQuota: 30, instructor: "Bölüm Öğretim Üyesi"
               });
-              // Öğrenci alternatif seçebilsin diye tek şubeli derslere 2. alternatif şube de ekle
               if (secNum === 1) {
                 courseMap[fCode].sections.push({
                   id: "Sec 2", day: days[(orderList.length + 2) % 5], slot: timeSlots[(orderList.length + 1) % 4], quota: 14, maxQuota: 30, instructor: "Bölüm Öğretim Üyesi"
@@ -687,7 +808,6 @@
         }
       }
 
-      // 2. Eğer PDF veya Serbest Metin Yüklendiyse Regex ile Ders Kodlarını Yakala
       if (orderList.length === 0 && rawText) {
         var regex = /\b([A-Z]{2,4}\s?\d{3,4})\b/g;
         var match;
@@ -725,6 +845,7 @@
       var pctText = document.getElementById("aiScanPercent");
       var bar = document.getElementById("aiScanProgressBar");
       var resultBox = document.getElementById("aiScanResultBox");
+      var uploadMode = document.getElementById("uploadModeSelect").value;
 
       container.classList.remove("hidden");
       resultBox.classList.add("hidden");
@@ -745,31 +866,46 @@
 
         var extracted = extractCoursesUniversal(rows, rawText);
         if (extracted && extracted.length > 0) {
-          courses = extracted;
+          if (uploadMode === "merge") {
+            // MEVCUT DERSLERLE BİRLEŞTİR (Makine dersleri kalır, yeni dersler altına eklenir)
+            for (var i = 0; i < extracted.length; i++) {
+              var newC = extracted[i];
+              if (!findCourse(newC.code)) {
+                // Birleştirme modunda eklenen diğer bölüm derslerinin FF zorunluluğunu Normal yap ki çakışma çıkarmasın
+                if (newC.status === "FF") newC.status = "Normal";
+                courses.push(newC);
+              }
+            }
+            document.getElementById("activeDeptBadge").innerText = "Birleştirilmiş Müfredat (ME + " + fileName + ")";
+          } else {
+            // SADECE YÜKLENEN BÖLÜMÜ GÖSTER
+            courses = extracted;
+            selectedSections = {};
+            pinnedCourses = {};
+            waitlistMap = {};
+            document.getElementById("activeDeptBadge").innerText = "Aktif Müfredat: " + fileName;
+          }
         }
 
-        // KULLANICININ İSTEĞİ: Otomatik seçme YAPMA! Takvimi sıfırla, öğrenci soldan kendi seçsin!
-        selectedSections = {};
-        pinnedCourses = {};
-        waitlistMap = {};
         document.getElementById("schedulerReport").classList.add("hidden");
-
-        document.getElementById("activeDeptBadge").innerText = "Yüklenen Program: " + fileName;
         document.getElementById("courseCountBadge").innerText = courses.length + " Ders Hazır";
 
         renderAll();
 
-        // Sol ders listesini yeşil çerçeveyle parlat ki kullanıcının dikkati oraya çekilsin
         var cardCont = document.getElementById("courseCardContainer");
         cardCont.className = "bg-white rounded-xl shadow-lg border-4 border-emerald-500 overflow-hidden transition-all duration-500";
         setTimeout(function() {
           cardCont.className = "bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500";
         }, 3000);
 
+        var modeDesc = uploadMode === "merge"
+          ? "Mevcut Makine Mühendisliği dersleriniz korundu ve yeni dersler listenin altına eklendi!"
+          : "Haftalık takvim sıfırlandı ve yeni bölüm dersleri sol listeye dizildi.";
+
         resultBox.classList.remove("hidden");
         resultBox.innerHTML =
           '<div class="flex flex-wrap justify-between items-center gap-2">' +
-            '<div>🎯 <b>' + courses.length + ' Ders Sol Listeye Yüklendi (' + fileName + '):</b> Haftalık takvim sıfırlandı. Şimdi hemen <b>sol taraftaki listeden istediğiniz derslerin şubelerine tıklayarak</b> kendi programınızı oluşturabilir veya üstten <b>⚡ Otomatik Program Kur</b> butonuna basabilirsiniz!</div>' +
+            '<div>🎯 <b>Toplam ' + courses.length + ' Ders Sol Listede Hazır (' + fileName + '):</b> ' + modeDesc + ' Şimdi <b>sol taraftaki listeden istediğiniz şubelere tıklayarak</b> kendi programınızı oluşturabilir veya <b>🔄 Makine Müh. Derslerine Dön</b> butonunu kullanabilirsiniz!</div>' +
             '<span class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-full font-extrabold">👈 Soldan Ders Seçin</span>' +
           '</div>';
       }, 750);
@@ -1326,7 +1462,6 @@
       }
       mobileCont.innerHTML = mobileHtml;
 
-      // Waitlist Kutusu
       var waitlistBox = document.getElementById("waitlistBox");
       var waitKeys = Object.keys(waitlistMap);
       if (waitKeys.length > 0) {
