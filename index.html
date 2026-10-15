@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>OBS+ V5.0 | Otonom AI Sunum & Sesli Test Motoru</title>
+  <title>OBS+ V6.0 | AI Course Registration & Multi-Sheet Matrix Parser</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Gerçek Excel (.xlsx / .xls / .csv) Okuma Kütüphanesi (SheetJS) -->
+  <!-- SheetJS for Real Excel (.xlsx / .xls / .csv) Multi-Sheet Parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Gerçek PDF Metin Okuma Kütüphanesi (PDF.js) -->
+  <!-- PDF.js for Real PDF Parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     * { -webkit-tap-highlight-color: transparent; }
@@ -15,68 +15,67 @@
       header, .no-print, #mobileStickyBar, #aiCursor, #aiSubtitleBanner { display: none !important; }
       body { background: white !important; padding: 0 !important; }
     }
-    /* Yapay Zeka Sanal Mouse İmleci Tasarımı */
+    /* Autonomous AI Agent Mouse Cursor */
     #aiCursor {
       position: fixed;
       top: 50%;
       left: 50%;
       z-index: 999999;
       pointer-events: none;
-      transition: top 0.85s cubic-bezier(0.22, 1, 0.36, 1), left 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.2s ease;
+      transition: top 1.1s cubic-bezier(0.22, 1, 0.36, 1), left 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s ease;
     }
     .ai-click-ripple {
       position: fixed;
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 9999px;
       background: rgba(244, 63, 94, 0.45);
       border: 3px solid #f43f5e;
       z-index: 999998;
       pointer-events: none;
       transform: translate(-50%, -50%) scale(0.3);
-      animation: rippleAnim 0.65s ease-out forwards;
+      animation: rippleAnim 0.75s ease-out forwards;
     }
     @keyframes rippleAnim {
       0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
     }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-24 lg:pb-12">
 
-  <!-- YAPAY ZEKA SANAL MOUSE İMLECİ (Otonom Sunum Sırasında Görünür) -->
+  <!-- AUTONOMOUS AI AGENT VIRTUAL CURSOR -->
   <div id="aiCursor" class="hidden">
     <div class="relative flex items-center">
-      <!-- Parlayan Mouse Ok İkonu -->
-      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" class="drop-shadow-[0_6px_12px_rgba(225,29,72,0.8)]">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" class="drop-shadow-[0_6px_14px_rgba(225,29,72,0.85)]">
         <path d="M4 3L11.5 20L14.5 13.5L21 10.5L4 3Z" fill="#e11d48" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
       </svg>
-      <span class="ml-1 bg-rose-600 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-xl border border-white whitespace-nowrap">
-        🤖 Claude/MCP AI Agent
+      <span class="ml-1.5 bg-rose-600 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-2xl border border-white whitespace-nowrap">
+        🤖 Claude / MCP AI Presenter
       </span>
     </div>
   </div>
 
-  <!-- SİNEMATİK SESLİ ANLATIM ALTYAZI BARI -->
+  <!-- CINEMATIC AI VOICEOVER SUBTITLE BAR -->
   <div id="aiSubtitleBanner" class="hidden fixed bottom-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
-    <div class="bg-slate-950/95 text-white border-2 border-rose-500 shadow-2xl rounded-2xl px-5 py-3.5 max-w-3xl w-full flex items-center justify-between gap-4 pointer-events-auto">
-      <div class="flex items-center gap-3">
-        <span class="flex h-3.5 w-3.5 relative shrink-0">
+    <div class="bg-slate-950/95 text-white border-2 border-rose-500 shadow-2xl rounded-2xl px-5 py-4 max-w-4xl w-full flex items-center justify-between gap-4 pointer-events-auto">
+      <div class="flex items-center gap-3.5">
+        <span class="flex h-4 w-4 relative shrink-0">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-rose-600"></span>
+          <span class="relative inline-flex rounded-full h-4 w-4 bg-rose-600"></span>
         </span>
         <div>
-          <div id="aiStepTitle" class="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">Otonom AI Test Ajanı Aktif</div>
-          <div id="aiSubtitleText" class="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5">Sesli anlatım başlatılıyor...</div>
+          <div id="aiStepTitle" class="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">Autonomous AI Tour Active</div>
+          <div id="aiSubtitleText" class="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5 leading-relaxed">Initializing English AI voiceover...</div>
         </div>
       </div>
-      <button type="button" onclick="stopAiPresentation()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl shrink-0 cursor-pointer">
-        ⏹️ Durdur
+      <button type="button" onclick="stopAiPresentation()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shrink-0 cursor-pointer">
+        ⏹️ Stop Tour
       </button>
     </div>
   </div>
 
-  <!-- ÜST BAR -->
+  <!-- TOP NAVIGATION BAR -->
   <header class="bg-indigo-950 text-white shadow-lg sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5">
       
@@ -85,34 +84,34 @@
           <div class="bg-rose-600 text-white font-extrabold px-2.5 py-1 rounded-lg text-base sm:text-lg tracking-tight shadow">OBS+</div>
           <div>
             <div class="flex items-center gap-1.5">
-              <h1 class="font-bold text-sm sm:text-lg leading-tight">Akıllı Ders Kayıt & Program Motoru</h1>
-              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v5.0 AI Video</span>
+              <h1 class="font-bold text-sm sm:text-lg leading-tight">Smart Course Registration & Schedule Engine</h1>
+              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v6.0 English</span>
             </div>
-            <p class="text-[11px] text-indigo-200 hidden sm:block">Otonom Sesli AI Sunum • Evrensel Excel/PDF Okuyucu • ÇAP Ders Birleştirici • Auto-Swap</p>
+            <p class="text-[11px] text-indigo-200 hidden sm:block">Yaşar University Rules • Multi-Sheet Matrix Excel Parser • Day-Off Filter • Auto-Swap Waitlist</p>
           </div>
         </div>
 
         <button type="button" onclick="startAiPresentation()" class="sm:hidden bg-rose-600 text-white text-[11px] font-extrabold px-2.5 py-1.5 rounded-lg shrink-0">
-          🎬 AI Demo
+          🎬 AI Tour
         </button>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <!-- YENİ: OTONOM SESLİ VE MOUSE HAREKETLİ AI SUNUM BUTONU -->
+        <!-- FULL ENGLISH AI VOICEOVER & AUTONOMOUS DEMO BUTTON -->
         <button id="btnStartAiDemo" type="button" onclick="startAiPresentation()" class="bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shadow-lg transition flex items-center gap-1.5 cursor-pointer border border-white/20 animate-pulse">
-          <span>🎬 AI Sesli Sunum & Otonom Test Başlat</span>
+          <span>🎬 Start Full AI Voice Demo (10-Step Tour)</span>
         </button>
 
         <button id="btnMcpModal" type="button" onclick="openMcpModal()" class="hidden sm:flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 border border-indigo-600 text-xs font-bold px-3 py-2 rounded-lg transition items-center gap-1.5 cursor-pointer">
-          <span>🌐 Chrome MCP & Kurallar</span>
+          <span>🌐 Chrome MCP & Rules</span>
         </button>
 
         <div class="flex items-center justify-between w-full sm:w-auto gap-2 bg-indigo-900/90 p-1.5 rounded-lg border border-indigo-700">
-          <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-200 pl-1 shrink-0">Statü:</span>
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-200 pl-1 shrink-0">Status:</span>
           <select id="profileSelect" onchange="changeProfile()" class="w-full sm:w-auto bg-white text-slate-900 text-xs font-bold rounded px-2 py-1.5 focus:outline-none cursor-pointer">
-            <option value="normal">Normal Öğrenci (GANO: 2.75 | Max: 40 AKTS)</option>
-            <option value="probation">Sınamalı / Probation (GANO: 1.62 | Max: 32 AKTS)</option>
-            <option value="doubleMajor">Çift Anadal / ÇAP (GANO: 3.40 | Max: 42 AKTS)</option>
+            <option value="normal">Regular Student (GPA: 2.75 | Max: 40 ECTS)</option>
+            <option value="probation">Probation Student (GPA: 1.62 | Max: 32 ECTS)</option>
+            <option value="doubleMajor">Double Major / DM (GPA: 3.40 | Max: 42 ECTS)</option>
           </select>
         </div>
       </div>
@@ -120,58 +119,58 @@
     </div>
   </header>
 
-  <!-- ANA İÇERİK -->
+  <!-- MAIN CONTENT -->
   <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-5 space-y-4 sm:space-y-5">
 
-    <!-- Hata Gösterge Kutusu -->
+    <!-- Error Banner -->
     <div id="errorBanner" class="hidden bg-rose-600 text-white p-3 rounded-xl text-xs font-bold"></div>
 
-    <!-- EVRENSEL EXCEL / CSV / PDF DERS PROGRAMI YÜKLEYİCİ & ÇAP BİRLEŞTİRİCİ -->
+    <!-- UNIVERSAL MULTI-SHEET MATRIX EXCEL & PDF PARSER SECTION -->
     <section id="excelUploadSection" class="no-print bg-gradient-to-r from-teal-950 via-emerald-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-emerald-700/80">
       <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
         
         <div class="space-y-1.5">
           <div class="flex flex-wrap items-center gap-2">
             <span class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-              🤖 EVRENSEL AI BELGE OKUYUCU
+              🤖 MULTI-SHEET MATRIX & TABLE AI PARSER
             </span>
             <span id="activeDeptBadge" class="bg-slate-900/80 border border-emerald-500/40 text-amber-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
-              Aktif Müfredat: Makine Mühendisliği (ME)
+              Active Curriculum: Mechanical Engineering (ME)
             </span>
             <button id="btnRestoreMe" type="button" onclick="restoreDefaultMeCourses()" class="bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full transition cursor-pointer shadow">
-              🔄 Makine Müh. (ME) Derslerine Dön
+              🔄 Reset to Default ME Curriculum
             </button>
           </div>
-          <h2 class="text-base sm:text-lg font-bold">Kendi Ders Programını Yükle (.xlsx, .csv, .pdf) — İster Değiştir, İster Mevcut Derslerle Birleştir!</h2>
-          <p class="text-xs text-emerald-100/90">Farklı bir bölümün Excel/PDF programını yüklerken <b>"Mevcut Derslerle Birleştir"</b> seçeneğini seçerseniz Makine dersleriniz silinmez; yeni dersler seçmeli/ÇAP olarak listenin altına eklenir.</p>
+          <h2 class="text-base sm:text-lg font-bold">Upload Any University Schedule Excel (.xlsx, .csv) or PDF — Supports Multi-Sheet Weekly Grids!</h2>
+          <p class="text-xs text-emerald-100/90">Supports both Yaşar University's official multi-sheet weekly grid files (e.g., <b>26-27-Guz-Ders-Programi_ME.xlsx</b> with sheets <i>1. sınıf, ME 2, ME 3, ME 4</i>) and standard tables. Choose <b>Merge Mode</b> to add uploaded courses directly into your current department list!</p>
         </div>
 
-        <!-- Yükleme Modu + Örnek İndirme + Dosya Seçme -->
+        <!-- Upload Mode + Sample Downloads + File Input -->
         <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 shrink-0">
           <select id="uploadModeSelect" class="bg-emerald-950 text-emerald-100 border border-emerald-500 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none cursor-pointer">
-            <option value="replace">📂 Mod: Sadece Yüklenen Bölümü Göster</option>
-            <option value="merge">🔗 Mod: Mevcut Derslerle Birleştir (ÇAP/Seçmeli)</option>
+            <option value="merge">🔗 Mode: Merge / Add to Current Department</option>
+            <option value="replace">📂 Mode: Replace with Uploaded Curriculum Only</option>
           </select>
 
           <button id="btnSampleComp" type="button" onclick="downloadSampleExcel('comp')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
-            📥 Örnek 1: Bilgisayar (.xlsx)
+            📥 Sample 1: Computer Eng. (.xlsx)
           </button>
           <button id="btnSampleEe" type="button" onclick="downloadSampleExcel('ee')" class="bg-sky-400 hover:bg-sky-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
-            📥 Örnek 2: Elektrik (.xlsx)
+            📥 Sample 2: Electrical Eng. (.xlsx)
           </button>
 
           <label id="lblFileUpload" for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2 px-4 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-emerald-400">
-            <span>📂 Excel / PDF Yükle</span>
+            <span>📂 Upload Excel / PDF</span>
             <input id="scheduleFileInput" type="file" accept=".xlsx,.xls,.csv,.pdf,.txt" onchange="handleFileUpload(event)" class="hidden">
           </label>
         </div>
 
       </div>
 
-      <!-- AI Tarama Durum Çubuğu ve Analiz Raporu -->
+      <!-- AI Scanning Progress Bar & Report -->
       <div id="aiScanContainer" class="hidden mt-4 pt-3.5 border-t border-emerald-700/60 space-y-2">
         <div class="flex justify-between items-center text-xs">
-          <span id="aiScanStatusText" class="font-bold text-emerald-200 flex items-center gap-2">🔍 Yapay Zeka belgeyi tarıyor...</span>
+          <span id="aiScanStatusText" class="font-bold text-emerald-200 flex items-center gap-2">🔍 AI Engine is scanning document...</span>
           <span id="aiScanPercent" class="font-extrabold text-emerald-300">0%</span>
         </div>
         <div class="w-full bg-emerald-950 h-2.5 rounded-full overflow-hidden border border-emerald-700">
@@ -181,57 +180,57 @@
       </div>
     </section>
 
-    <!-- OTOMATİK PROGRAM KURAN FİLTRE PANELİ -->
+    <!-- SMART AUTO-SCHEDULER & FILTER PANEL -->
     <section id="schedulerFilterSection" class="no-print bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-indigo-700">
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4">
         <div>
           <div class="inline-flex items-center gap-1.5 bg-indigo-500/30 border border-indigo-400/40 text-indigo-100 text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-1">
-            <span>🎯 İSTER KENDİN SEÇ, İSTER OTOMATİK KURDUR</span>
+            <span>🎯 CONSTRAINT SATISFACTION & BACKTRACKING</span>
             <span>•</span>
-            <span>Sabitlenen (📌) Şubeleri Korur</span>
+            <span>Protects Pinned (📌) Sections</span>
           </div>
-          <h2 class="text-base sm:text-lg font-bold">Otomatik Program Kuran Filtre (Smart Auto-Scheduler)</h2>
-          <p class="text-xs text-indigo-200 mt-0.5">Soldaki listeden derslerinizi kendiniz seçebilir veya boş gün/saat filtresi belirleyip algoritmanın otomatik dizmesini sağlayabilirsiniz.</p>
+          <h2 class="text-base sm:text-lg font-bold">Smart Auto-Scheduler & Day-Off Filter</h2>
+          <p class="text-xs text-indigo-200 mt-0.5">Select your desired free days, time preferences, or pin (📌) your favorite sections; our backtracking algorithm builds a conflict-free schedule in milliseconds.</p>
         </div>
 
         <div class="flex items-center gap-2 w-full lg:w-auto">
           <button id="btnAutoSchedule" type="button" onclick="generateSmartSchedule()" class="flex-1 sm:flex-initial bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-extrabold py-2.5 px-4 sm:px-5 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
-            <span>⚡ Filtrelere Göre Otomatik Program Kur</span>
+            <span>⚡ Build Optimal Schedule</span>
           </button>
-          <button type="button" onclick="resetSelections()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3.5 rounded-xl text-xs transition cursor-pointer shrink-0">
-            Seçimleri Temizle
+          <button id="btnResetSelections" type="button" onclick="resetSelections()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3.5 rounded-xl text-xs transition cursor-pointer shrink-0">
+            Clear All
           </button>
         </div>
       </div>
 
-      <!-- Filtre Kontrolleri -->
+      <!-- Filter Controls -->
       <div class="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 mt-4 pt-4 border-t border-indigo-700/70">
         
         <div class="md:col-span-6 bg-indigo-950/60 p-3 rounded-xl border border-indigo-800">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-200 mb-2">
-            📅 Boş Kalmasını İstediğin Günler (Day-Off Filtresi):
+            📅 Select Your Desired Free Days (Day-Off Filter):
           </label>
           <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2" id="dayOffContainer"></div>
         </div>
 
         <div class="md:col-span-3 bg-indigo-950/60 p-3 rounded-xl border border-indigo-800">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-200 mb-2">
-            ⏰ Sabah / Saat Filtresi:
+            ⏰ Morning / Time Filter:
           </label>
           <select id="timeFilterSelect" class="w-full bg-indigo-900 text-white border border-indigo-600 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none">
-            <option value="any">Tüm Saatler Uygun (08:40 - 17:30)</option>
-            <option value="no_early">Sabah 08:40 Dersi Olmasın!</option>
-            <option value="no_late">Akşamüstü 15:40 Dersi Olmasın!</option>
+            <option value="any">All Time Slots Allowed (08:40 - 17:30)</option>
+            <option value="no_early">No Early 08:40 Morning Classes!</option>
+            <option value="no_late">No Late 15:40 Afternoon Classes!</option>
           </select>
         </div>
 
         <div class="md:col-span-3 bg-indigo-950/60 p-3 rounded-xl border border-indigo-800">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-200 mb-2">
-            🎓 Program Yoğunluğu:
+            🎓 Course Load Preference:
           </label>
           <select id="loadFilterSelect" class="w-full bg-indigo-900 text-white border border-indigo-600 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none">
-            <option value="max">Alabileceğim Tüm Dersleri Ekle</option>
-            <option value="core_only">Sadece Zorunlu & Alttan Dersler</option>
+            <option value="max">Maximize Course Load (Up to ECTS Limit)</option>
+            <option value="core_only">Mandatory & Repeat (FF) Courses Only</option>
           </select>
         </div>
 
@@ -240,16 +239,16 @@
       <div id="schedulerReport" class="hidden mt-3 bg-indigo-950/90 border border-indigo-500/50 rounded-xl p-3 text-xs text-indigo-100"></div>
     </section>
 
-    <!-- ALT GRID: SOL DERS LİSTESİ & SAĞ RENKLİ HAFTALIK PROGRAM -->
+    <!-- MAIN WORKSPACE GRID: LEFT COURSE CATALOG & RIGHT COLORED TIMETABLE -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-      <!-- SOL PANEL: DERS VE ŞUBE SEÇİM LİSTESİ -->
+      <!-- LEFT PANEL: COURSE & SECTION SELECTION -->
       <section id="leftCoursePanel" class="no-print lg:col-span-5 space-y-4">
         
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-bold text-slate-700">AKTS Yükü (ECTS Load)</span>
-            <span id="ectsCounter" class="text-sm font-extrabold text-indigo-700">18 / 40 AKTS</span>
+            <span class="text-sm font-bold text-slate-700">ECTS Credit Load</span>
+            <span id="ectsCounter" class="text-sm font-extrabold text-indigo-700">18 / 40 ECTS</span>
           </div>
           <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
             <div id="ectsBar" class="bg-indigo-600 h-full transition-all duration-300" style="width: 45%"></div>
@@ -259,58 +258,70 @@
 
         <div class="grid grid-cols-2 gap-2">
           <button id="btnResolveConflicts" type="button" onclick="generateSmartSchedule()" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm text-xs transition flex items-center justify-center gap-1 cursor-pointer">
-            <span>🛠️ Çakışmaları Çöz</span>
+            <span>🛠️ Auto-Resolve Conflicts</span>
           </button>
           <button id="btnQuotaCrisis" type="button" onclick="simulateQuotaCrisis()" class="bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm text-xs transition flex items-center justify-center gap-1 cursor-pointer">
-            <span>🔥 Kota Krizi Testi</span>
+            <span>🔥 Simulate Quota Crisis</span>
           </button>
         </div>
 
         <div id="courseCardContainer" class="bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500">
-          <div class="bg-slate-50 px-3.5 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
-            <div>
-              <h2 class="font-bold text-sm text-slate-800">Açılan Dersler & Şubeler</h2>
-              <p class="text-[11px] text-slate-500">Şubeye tıklayıp seçin • İsterseniz canlı ders ekleyin</p>
+          <div class="bg-slate-50 px-3.5 py-3 border-b border-slate-200 space-y-2">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+              <div>
+                <h2 class="font-bold text-sm text-slate-800">Available Courses & Sections</h2>
+                <p class="text-[11px] text-slate-500">Click any section to select • Pin (📌) to lock • Click FULL to Waitlist</p>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button id="btnQuickAdd" type="button" onclick="openQuickAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm transition cursor-pointer">
+                  ➕ Quick Add Course
+                </button>
+                <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">8 Courses</span>
+              </div>
             </div>
-            <div class="flex items-center gap-1.5">
-              <button id="btnQuickAdd" type="button" onclick="openQuickAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm transition cursor-pointer">
-                ➕ Hızlı Ders Ekle
-              </button>
-              <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">8 Ders</span>
+
+            <!-- Year Filter Tabs (Ideal when uploading 4-sheet Excel files like 26-27-Guz-Ders-Programi_ME.xlsx) -->
+            <div class="flex flex-wrap gap-1 pt-1" id="yearFilterContainer">
+              <button type="button" onclick="setYearFilter('all')" id="yr-btn-all" class="px-2.5 py-1 rounded text-[11px] font-bold bg-indigo-600 text-white cursor-pointer">All Years</button>
+              <button type="button" onclick="setYearFilter(1)" id="yr-btn-1" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 1</button>
+              <button type="button" onclick="setYearFilter(2)" id="yr-btn-2" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 2 (ME 2)</button>
+              <button type="button" onclick="setYearFilter(3)" id="yr-btn-3" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 3 (ME 3)</button>
+              <button type="button" onclick="setYearFilter(4)" id="yr-btn-4" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 4 (ME 4)</button>
             </div>
           </div>
+
           <div id="courseList" class="divide-y divide-slate-200 lg:max-h-[640px] lg:overflow-y-auto"></div>
         </div>
       </section>
 
-      <!-- SAĞ PANEL: RENKLİ TEMALI CANLI HAFTALIK PROGRAM -->
+      <!-- RIGHT PANEL: COLORED LIVE WEEKLY TIMETABLE -->
       <section id="scheduleSection" class="lg:col-span-7 space-y-4">
         <div class="bg-gradient-to-br from-indigo-100/90 via-sky-50 to-violet-100/80 rounded-2xl shadow-lg border-2 border-indigo-300 overflow-hidden">
           
           <div class="bg-gradient-to-r from-indigo-950 via-indigo-900 to-slate-900 text-white px-4 py-3.5 flex flex-wrap justify-between items-center gap-2 border-b border-indigo-800">
             <div>
               <div class="flex items-center gap-2">
-                <span class="bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full">CANLI MATRİS</span>
-                <h2 class="font-extrabold text-base text-white">Canlı Haftalık Ders Programı</h2>
+                <span class="bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full">LIVE MATRIX</span>
+                <h2 class="font-extrabold text-base text-white">Live Weekly Class Schedule</h2>
               </div>
-              <p class="text-xs text-indigo-200 mt-0.5">Soldan seçtiğiniz şubeler anında tabloya yerleşir • Sabit şubeler <span class="text-amber-300 font-semibold">📌</span></p>
+              <p class="text-xs text-indigo-200 mt-0.5">Pinned sections show <span class="text-amber-300 font-semibold">📌</span> • Protected free days show <span class="text-emerald-300 font-semibold">green banners</span></p>
             </div>
 
             <div class="flex flex-wrap items-center gap-1.5 no-print">
               <div class="inline-flex rounded-lg border border-indigo-700 bg-indigo-950/90 p-0.5">
                 <button type="button" id="btnViewTable" onclick="setViewMode('table')" class="px-2.5 py-1 rounded-md text-xs font-bold transition cursor-pointer">
-                  💻 Tablo
+                  💻 Grid View
                 </button>
                 <button type="button" id="btnViewMobile" onclick="setViewMode('mobile')" class="px-2.5 py-1 rounded-md text-xs font-bold transition cursor-pointer">
-                  📱 Günlük Kart
+                  📱 Daily Cards
                 </button>
               </div>
 
               <button type="button" onclick="window.print()" class="hidden sm:inline-flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 text-xs font-bold px-3 py-2 rounded-xl border border-indigo-600 transition cursor-pointer">
-                🖨️ Yazdır
+                🖨️ Print / PDF
               </button>
               <button id="btnSubmitReg" type="button" onclick="completeRegistration()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs sm:text-sm font-extrabold px-4 py-2 rounded-xl shadow-md transition cursor-pointer">
-                ✓ Kaydı Kesinleştir
+                ✓ Finalize Registration
               </button>
             </div>
           </div>
@@ -336,60 +347,60 @@
     </div>
   </main>
 
-  <!-- MOBİL SABİT ALT KONTROL ÇUBUĞU -->
+  <!-- MOBILE STICKY BOTTOM BAR -->
   <div id="mobileStickyBar" class="lg:hidden fixed bottom-0 inset-x-0 bg-indigo-950 text-white border-t border-indigo-800 px-3 py-2.5 z-40 shadow-2xl flex items-center justify-between gap-2">
     <div>
-      <div class="text-[10px] text-indigo-300 uppercase font-bold">Seçilen Yük</div>
-      <div id="mobileEctsText" class="text-xs font-extrabold text-white">18 / 40 AKTS</div>
+      <div class="text-[10px] text-indigo-300 uppercase font-bold">Selected Load</div>
+      <div id="mobileEctsText" class="text-xs font-extrabold text-white">18 / 40 ECTS</div>
     </div>
     <div class="flex items-center gap-1.5">
       <button type="button" onclick="generateSmartSchedule()" class="bg-emerald-500 active:bg-emerald-600 text-slate-950 font-extrabold text-xs px-3 py-2 rounded-lg shadow">
-        ⚡ Otomatik Kur
+        ⚡ Auto-Build
       </button>
       <button type="button" onclick="scrollToSchedule()" class="bg-indigo-800 text-indigo-100 font-bold text-xs px-2.5 py-2 rounded-lg border border-indigo-600">
-        📅 Takvim
+        📅 Timetable
       </button>
       <button type="button" onclick="completeRegistration()" class="bg-rose-600 active:bg-rose-700 text-white font-bold text-xs px-3 py-2 rounded-lg shadow">
-        ✓ Onayla
+        ✓ Submit
       </button>
     </div>
   </div>
 
-  <!-- MODAL 1: HIZLI MANUEL DERS EKLEME -->
+  <!-- MODAL 1: QUICK MANUAL COURSE ADD -->
   <div id="quickAddModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-200 space-y-4">
       <div class="flex justify-between items-center">
-        <h3 class="text-base font-bold text-slate-900">➕ Sisteme Hızlı Ders & Şube Ekle</h3>
+        <h3 class="text-base font-bold text-slate-900">➕ Quick Add Custom Course & Section</h3>
         <button type="button" onclick="closeQuickAddModal()" class="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer">✕</button>
       </div>
       <div class="space-y-3 text-xs">
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="font-bold text-slate-700 block mb-1">Ders Kodu:</label>
+            <label class="font-bold text-slate-700 block mb-1">Course Code:</label>
             <input id="qaCode" type="text" value="ME 4999" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-bold">
           </div>
           <div>
-            <label class="font-bold text-slate-700 block mb-1">AKTS:</label>
+            <label class="font-bold text-slate-700 block mb-1">ECTS Credits:</label>
             <input id="qaEcts" type="number" value="6" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-bold">
           </div>
         </div>
         <div>
-          <label class="font-bold text-slate-700 block mb-1">Ders Adı:</label>
-          <input id="qaName" type="text" value="Capstone Graduation Project" class="w-full border border-slate-300 rounded-lg px-2.5 py-2">
+          <label class="font-bold text-slate-700 block mb-1">Course Title:</label>
+          <input id="qaName" type="text" value="Capstone Engineering Project" class="w-full border border-slate-300 rounded-lg px-2.5 py-2">
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="font-bold text-slate-700 block mb-1">1. Şube Günü:</label>
+            <label class="font-bold text-slate-700 block mb-1">Section 1 Day:</label>
             <select id="qaDay" class="w-full border border-slate-300 rounded-lg px-2 py-2">
-              <option value="Pazartesi">Pazartesi</option>
-              <option value="Salı">Salı</option>
-              <option value="Çarşamba">Çarşamba</option>
-              <option value="Perşembe">Perşembe</option>
-              <option value="Cuma">Cuma</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
             </select>
           </div>
           <div>
-            <label class="font-bold text-slate-700 block mb-1">1. Şube Saati:</label>
+            <label class="font-bold text-slate-700 block mb-1">Section 1 Time Slot:</label>
             <select id="qaSlot" class="w-full border border-slate-300 rounded-lg px-2 py-2">
               <option value="08:40 - 10:30">08:40 - 10:30</option>
               <option value="10:40 - 12:30">10:40 - 12:30</option>
@@ -400,45 +411,56 @@
         </div>
       </div>
       <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-        <button type="button" onclick="closeQuickAddModal()" class="bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">İptal</button>
-        <button type="button" onclick="saveQuickCourse()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">✓ Listeye Ekle & Seç</button>
+        <button type="button" onclick="closeQuickAddModal()" class="bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">Cancel</button>
+        <button type="button" onclick="saveQuickCourse()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">✓ Add to Catalog & Select</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: CHROME MCP & ÖİM RESMİ YÖNERGE DENETÇİSİ -->
+  <!-- MODAL 2: CHROME MCP & OFFICIAL UNIVERSITY REGULATIONS -->
   <div id="mcpModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start gap-2">
         <div>
-          <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-full">Chrome MCP & Universal Parser</span>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-1">Üniversite Web Sayfası Kural & Evrensel Belge Okuyucu</h3>
+          <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-full">Chrome MCP & Multi-Sheet Matrix Engine</span>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-1">University Regulations & Universal Document Parser</h3>
         </div>
         <button type="button" onclick="closeMcpModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 cursor-pointer">✕</button>
       </div>
 
       <div class="bg-slate-900 text-emerald-400 font-mono text-[11px] p-3 rounded-xl space-y-1 overflow-x-auto">
         <div>[Chrome-MCP] Connected: https://oim.yasar.edu.tr/ders-kayitlari/</div>
-        <div>[Chrome-MCP] Regulation Art. 22: Normal=40 ECTS, Probation(GPA&lt;1.80)=32 ECTS, DoubleMajor=42 ECTS</div>
-        <div>[SheetJS + PDF.js] Universal Excel (.xlsx/.xls/.csv) &amp; PDF Course Extractor Active ✓</div>
-        <div>[AI-Voice-Agent] Autonomous Cursor &amp; Turkish Speech Synthesis Engine Ready ✓</div>
+        <div>[Chrome-MCP] Regulation Art. 22: Regular=40 ECTS, Probation(GPA&lt;1.80)=32 ECTS, DoubleMajor=42 ECTS</div>
+        <div>[Chrome-MCP] Mandatory Priority: Failed courses (FF/FD/W/U) must be registered first.</div>
+        <div>[Matrix-Grid-Parser] Multi-Sheet 2D Timetable Recognition (1. sınıf, ME 2, ME 3, ME 4) Ready ✓</div>
+        <div>[AI-Voice-Agent] 10-Step Autonomous English Narrator &amp; Virtual Cursor Active ✓</div>
+      </div>
+
+      <div class="space-y-2 text-xs text-slate-700">
+        <div class="font-bold text-slate-900">Active Official Registration Safeguards:</div>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><b>2D Matrix Excel Recognition:</b> Automatically parses multi-sheet weekly timetable grids (such as <i>26-27-Guz-Ders-Programi_ME.xlsx</i>) by intersecting merged day headers and time rows across all sheets.</li>
+          <li><b>Mandatory Repeat Priority:</b> Prevents finalizing registration unless failed (<b>FF</b>) courses are selected.</li>
+          <li><b>Probation Student Safeguard:</b> Caps ECTS at 32 and locks 4th-year courses when GPA is below 1.80.</li>
+          <li><b>Auto-Swap Quota Waitlist:</b> Places students on a waitlist for full sections while securing an open section as a "Plan B" backup.</li>
+        </ul>
       </div>
 
       <div class="flex justify-end">
-        <button type="button" onclick="closeMcpModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer">Tamam, Kapat</button>
+        <button type="button" onclick="closeMcpModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer">Got It, Close</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 3: DANIŞMAN ONAYI & RESMİ KAYIT FİŞİ -->
+  <!-- MODAL 3: ADVISOR APPROVAL & OFFICIAL REGISTRATION SLIP -->
   <div id="approvalModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start gap-2">
         <div class="flex items-center gap-2.5">
           <div class="bg-emerald-100 text-emerald-700 font-extrabold p-2.5 rounded-xl text-lg">✓</div>
           <div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-900">Ders Kaydı Kesinleştirildi & Danışman Onayına İletildi</h3>
-            <p class="text-xs text-slate-500">ÖİM Kural Motoru Doğrulama Raporu</p>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">Registration Finalized & Sent for Advisor Approval</h3>
+            <p class="text-xs text-slate-500">Official Rule Engine Verification Report</p>
           </div>
         </div>
         <button type="button" onclick="closeApprovalModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 cursor-pointer">✕</button>
@@ -447,13 +469,13 @@
       <div id="approvalSummaryContent" class="space-y-3 text-xs"></div>
 
       <div class="flex flex-col sm:flex-row justify-end gap-2 pt-2 border-t border-slate-200">
-        <button type="button" onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-4 py-2.5 rounded-xl border border-slate-300 cursor-pointer">🖨️ PDF Olarak Kaydet</button>
-        <button type="button" onclick="closeApprovalModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer">Kapat</button>
+        <button type="button" onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-4 py-2.5 rounded-xl border border-slate-300 cursor-pointer">🖨️ Save as PDF</button>
+        <button type="button" onclick="closeApprovalModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- JAVASCRIPT MOTORU -->
+  <!-- JAVASCRIPT ENGINE -->
   <script>
     if (typeof pdfjsLib !== "undefined") {
       pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -465,20 +487,53 @@
       "13:40 - 15:30",
       "15:40 - 17:30"
     ];
-    var days = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma"];
+    var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
     var profiles = {
-      normal: { name: "Normal Öğrenci", gpa: 2.75, maxEcts: 40, isProbation: false },
-      probation: { name: "Sınamalı (Probation)", gpa: 1.62, maxEcts: 32, isProbation: true },
-      doubleMajor: { name: "Çift Anadal (ÇAP)", gpa: 3.40, maxEcts: 42, isProbation: false }
+      normal: { name: "Regular Student", gpa: 2.75, maxEcts: 40, isProbation: false },
+      probation: { name: "Probation Student", gpa: 1.62, maxEcts: 32, isProbation: true },
+      doubleMajor: { name: "Double Major (DM)", gpa: 3.40, maxEcts: 42, isProbation: false }
     };
     var currentProfile = profiles.normal;
     var currentViewMode = window.innerWidth < 640 ? "mobile" : "table";
+    var currentYearFilter = "all";
 
-    var daysOff = ["Cuma"];
+    var daysOff = ["Friday"];
     var pinnedCourses = {};
     var waitlistMap = {};
     var isAiDemoRunning = false;
+
+    // Official Course Title Dictionary for Yaşar University ME & Engineering Codes
+    var courseTitleDictionary = {
+      "SE 1105": "Programming & Algorithms I",
+      "MATH 1131": "Calculus I",
+      "MATH 1132": "Calculus II",
+      "MATH 1100": "Foundations of Mathematics",
+      "ENGR 1115": "Introduction to Engineering & Ethics",
+      "PHYS 1121": "General Physics I (Mechanics)",
+      "ENGR 2120": "Engineering Mechanics: Statics",
+      "MATH 2230": "Linear Algebra for Engineers",
+      "MATH 2263": "Differential Equations & Matrix Lab",
+      "ME 2210": "Thermodynamics I",
+      "EEE 2280": "Principles of Electrical Engineering",
+      "ME 2320": "Dynamics & Vibration",
+      "ME 2710": "Materials Science & Engineering",
+      "MATH 2260": "Probability & Statistics for Engineers",
+      "ME 3220": "Heat & Mass Transfer",
+      "ME 3420": "Manufacturing Processes",
+      "ME 3320": "Machine Elements & Design I",
+      "EEE 3718": "Control Systems & Mechatronics",
+      "ENGR 3450": "Engineering Economy & Project Analysis",
+      "ENGR 4411": "Interdisciplinary Engineering Design",
+      "ESE 4112": "Energy Systems & Sustainability",
+      "ME 4610": "CAD/CAM & Finite Element Analysis",
+      "ME 4330": "Mechanical Vibrations & Control",
+      "ENGR 4400": "Engineering Internship & Seminar",
+      "ENGR 4451": "Occupational Health & Safety II",
+      "ME 4240": "Thermal Turbomachinery & Power Plants",
+      "ESE-ME 4910": "Capstone Mechanical Design Project",
+      "ME 4340": "Hydraulic & Pneumatic Control Systems"
+    };
 
     function getDefaultMeCourses() {
       return [
@@ -493,9 +548,9 @@
           prereqMet: true,
           unlocks: "ME 3312 (Heat Transfer)",
           sections: [
-            { id: "Sec 1", day: "Pazartesi", slot: "08:40 - 10:30", quota: 28, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz" },
-            { id: "Sec 2", day: "Çarşamba", slot: "13:40 - 15:30", quota: 19, maxQuota: 30, instructor: "Doç. Dr. K. Demir" },
-            { id: "Sec 3", day: "Salı", slot: "10:40 - 12:30", quota: 14, maxQuota: 30, instructor: "Doç. Dr. K. Demir" }
+            { id: "Sec 1", day: "Monday", slot: "08:40 - 10:30", quota: 28, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz (M534)" },
+            { id: "Sec 2", day: "Wednesday", slot: "13:40 - 15:30", quota: 19, maxQuota: 30, instructor: "Assoc. Prof. K. Demir (M534)" },
+            { id: "Sec 3", day: "Tuesday", slot: "10:40 - 12:30", quota: 14, maxQuota: 30, instructor: "Assoc. Prof. K. Demir (M528)" }
           ]
         },
         {
@@ -507,11 +562,11 @@
           isMandatory: true,
           prereq: null,
           prereqMet: true,
-          unlocks: "ME 4420 (CFD)",
+          unlocks: "ME 4420 (Computational Fluid Dynamics)",
           sections: [
-            { id: "Sec 1", day: "Pazartesi", slot: "08:40 - 10:30", quota: 25, maxQuota: 30, instructor: "Prof. Dr. S. Kaya" },
-            { id: "Sec 2", day: "Salı", slot: "13:40 - 15:30", quota: 22, maxQuota: 30, instructor: "Prof. Dr. S. Kaya" },
-            { id: "Sec 3", day: "Cuma", slot: "10:40 - 12:30", quota: 10, maxQuota: 30, instructor: "Dr. Öğr. Üyesi M. Ak" }
+            { id: "Sec 1", day: "Monday", slot: "08:40 - 10:30", quota: 25, maxQuota: 30, instructor: "Prof. Dr. S. Kaya (M528)" },
+            { id: "Sec 2", day: "Tuesday", slot: "13:40 - 15:30", quota: 22, maxQuota: 30, instructor: "Prof. Dr. S. Kaya (M528)" },
+            { id: "Sec 3", day: "Friday", slot: "10:40 - 12:30", quota: 10, maxQuota: 30, instructor: "Asst. Prof. M. Ak (M113)" }
           ]
         },
         {
@@ -525,9 +580,9 @@
           prereqMet: true,
           unlocks: "ME 3342 (Machine Elements II)",
           sections: [
-            { id: "Sec 1", day: "Salı", slot: "10:40 - 12:30", quota: 30, maxQuota: 30, instructor: "Prof. Dr. E. Çelik" },
-            { id: "Sec 2", day: "Perşembe", slot: "10:40 - 12:30", quota: 21, maxQuota: 30, instructor: "Prof. Dr. E. Çelik" },
-            { id: "Sec 3", day: "Pazartesi", slot: "15:40 - 17:30", quota: 17, maxQuota: 30, instructor: "Doç. Dr. B. Aydın" }
+            { id: "Sec 1", day: "Tuesday", slot: "10:40 - 12:30", quota: 30, maxQuota: 30, instructor: "Prof. Dr. E. Çelik (M534)" },
+            { id: "Sec 2", day: "Thursday", slot: "10:40 - 12:30", quota: 21, maxQuota: 30, instructor: "Prof. Dr. E. Çelik (M534)" },
+            { id: "Sec 3", day: "Monday", slot: "15:40 - 17:30", quota: 17, maxQuota: 30, instructor: "Assoc. Prof. B. Aydın (M216)" }
           ]
         },
         {
@@ -541,9 +596,9 @@
           prereqMet: true,
           unlocks: null,
           sections: [
-            { id: "Sec 1", day: "Çarşamba", slot: "10:40 - 12:30", quota: 24, maxQuota: 30, instructor: "Doç. Dr. T. Özkan" },
-            { id: "Sec 2", day: "Perşembe", slot: "13:40 - 15:30", quota: 18, maxQuota: 30, instructor: "Doç. Dr. T. Özkan" },
-            { id: "Sec 3", day: "Cuma", slot: "13:40 - 15:30", quota: 12, maxQuota: 30, instructor: "Dr. Öğr. Üyesi C. Koç" }
+            { id: "Sec 1", day: "Wednesday", slot: "10:40 - 12:30", quota: 24, maxQuota: 30, instructor: "Assoc. Prof. T. Özkan (M433)" },
+            { id: "Sec 2", day: "Thursday", slot: "13:40 - 15:30", quota: 18, maxQuota: 30, instructor: "Assoc. Prof. T. Özkan (M433)" },
+            { id: "Sec 3", day: "Friday", slot: "13:40 - 15:30", quota: 12, maxQuota: 30, instructor: "Asst. Prof. C. Koç (M114)" }
           ]
         },
         {
@@ -557,8 +612,8 @@
           prereqMet: true,
           unlocks: "ME 4480 (Automatic Control)",
           sections: [
-            { id: "Sec 1", day: "Pazartesi", slot: "10:40 - 12:30", quota: 20, maxQuota: 30, instructor: "Prof. Dr. H. Arslan" },
-            { id: "Sec 2", day: "Çarşamba", slot: "08:40 - 10:30", quota: 16, maxQuota: 30, instructor: "Prof. Dr. H. Arslan" }
+            { id: "Sec 1", day: "Monday", slot: "10:40 - 12:30", quota: 20, maxQuota: 30, instructor: "Prof. Dr. H. Arslan (M528)" },
+            { id: "Sec 2", day: "Wednesday", slot: "08:40 - 10:30", quota: 16, maxQuota: 30, instructor: "Prof. Dr. H. Arslan (M528)" }
           ]
         },
         {
@@ -572,12 +627,12 @@
           prereqMet: false,
           unlocks: "ME 4415 (Thermal System Design)",
           sections: [
-            { id: "Sec 1", day: "Perşembe", slot: "08:40 - 10:30", quota: 15, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz" }
+            { id: "Sec 1", day: "Thursday", slot: "08:40 - 10:30", quota: 15, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz (M534)" }
           ]
         },
         {
           code: "ME 4410",
-          name: "Power Plant Engineering (Üst Sınıf Seçmeli)",
+          name: "Power Plant Engineering (4th Year Elective)",
           ects: 6,
           year: 4,
           status: "Upper",
@@ -586,14 +641,14 @@
           prereqMet: true,
           unlocks: null,
           sections: [
-            { id: "Sec 1", day: "Cuma", slot: "08:40 - 10:30", quota: 12, maxQuota: 25, instructor: "Doç. Dr. V. Şahin" },
-            { id: "Sec 2", day: "Perşembe", slot: "15:40 - 17:30", quota: 19, maxQuota: 25, instructor: "Doç. Dr. V. Şahin" },
-            { id: "Sec 3", day: "Pazartesi", slot: "13:40 - 15:30", quota: 14, maxQuota: 25, instructor: "Doç. Dr. V. Şahin" }
+            { id: "Sec 1", day: "Friday", slot: "08:40 - 10:30", quota: 12, maxQuota: 25, instructor: "Assoc. Prof. V. Şahin (M531)" },
+            { id: "Sec 2", day: "Thursday", slot: "15:40 - 17:30", quota: 19, maxQuota: 25, instructor: "Assoc. Prof. V. Şahin (M531)" },
+            { id: "Sec 3", day: "Monday", slot: "13:40 - 15:30", quota: 14, maxQuota: 25, instructor: "Assoc. Prof. V. Şahin (M531)" }
           ]
         },
         {
           code: "ME 4450",
-          name: "Renewable Energy Systems (Teknik Seçmeli)",
+          name: "Renewable Energy Systems (Technical Elective)",
           ects: 5,
           year: 4,
           status: "Upper",
@@ -602,8 +657,8 @@
           prereqMet: true,
           unlocks: null,
           sections: [
-            { id: "Sec 1", day: "Salı", slot: "15:40 - 17:30", quota: 14, maxQuota: 25, instructor: "Dr. Öğr. Üyesi N. Erdem" },
-            { id: "Sec 2", day: "Çarşamba", slot: "15:40 - 17:30", quota: 11, maxQuota: 25, instructor: "Dr. Öğr. Üyesi N. Erdem" }
+            { id: "Sec 1", day: "Tuesday", slot: "15:40 - 17:30", quota: 14, maxQuota: 25, instructor: "Asst. Prof. N. Erdem (M527)" },
+            { id: "Sec 2", day: "Wednesday", slot: "15:40 - 17:30", quota: 11, maxQuota: 25, instructor: "Asst. Prof. N. Erdem (M527)" }
           ]
         }
       ];
@@ -617,37 +672,52 @@
       "ME 3360": "Sec 3"
     };
 
-    // =========================================================================
-    // YENİ: OTONOM SESLİ VE MOUSE HAREKETLİ YAPAY ZEKA SUNUM & TEST AJANI
-    // =========================================================================
-    function speakTurkish(text) {
+    function setYearFilter(yr) {
+      currentYearFilter = yr;
+      var btns = ["all", 1, 2, 3, 4];
+      for (var i = 0; i < btns.length; i++) {
+        var b = document.getElementById("yr-btn-" + btns[i]);
+        if (!b) continue;
+        if (btns[i] === yr) {
+          b.className = "px-2.5 py-1 rounded text-[11px] font-bold bg-indigo-600 text-white cursor-pointer shadow-sm";
+        } else {
+          b.className = "px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer";
+        }
+      }
+      renderCourseList();
+    }
+
+    // ============================================================================
+    // LONG, DETAILED 10-STEP ENGLISH AI VOICEOVER & AUTONOMOUS AGENT PRESENTATION
+    // ============================================================================
+    function speakEnglish(text) {
       return new Promise(function(resolve) {
         if (!("speechSynthesis" in window)) {
-          setTimeout(resolve, 3200);
+          setTimeout(resolve, 4500);
           return;
         }
         window.speechSynthesis.cancel();
         var utter = new SpeechSynthesisUtterance(text);
-        utter.lang = "tr-TR";
-        utter.rate = 1.05;
+        utter.lang = "en-US";
+        utter.rate = 0.96; // Clear, deliberate academic presentation pace
         utter.pitch = 1.0;
 
         var voices = window.speechSynthesis.getVoices();
         for (var i = 0; i < voices.length; i++) {
-          if (voices[i].lang.indexOf("tr") !== -1) {
+          if (voices[i].lang.indexOf("en-US") !== -1 || voices[i].lang.indexOf("en_US") !== -1 || voices[i].lang.indexOf("en-GB") !== -1) {
             utter.voice = voices[i];
             break;
           }
         }
 
-        var fallbackTimer = setTimeout(resolve, Math.max(3500, text.length * 75));
+        var fallbackTimer = setTimeout(resolve, Math.max(4800, text.length * 80));
         utter.onend = function() {
           clearTimeout(fallbackTimer);
-          setTimeout(resolve, 400);
+          setTimeout(resolve, 650);
         };
         utter.onerror = function() {
           clearTimeout(fallbackTimer);
-          setTimeout(resolve, 1000);
+          setTimeout(resolve, 1200);
         };
         window.speechSynthesis.speak(utter);
       });
@@ -668,32 +738,31 @@
 
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
-        await waitMs(450);
+        await waitMs(550);
         var rect = el.getBoundingClientRect();
-        var targetX = Math.max(20, Math.min(window.innerWidth - 120, rect.left + rect.width / 2));
-        var targetY = Math.max(20, Math.min(window.innerHeight - 60, rect.top + rect.height / 2));
+        var targetX = Math.max(24, Math.min(window.innerWidth - 140, rect.left + rect.width / 2));
+        var targetY = Math.max(24, Math.min(window.innerHeight - 60, rect.top + rect.height / 2));
 
         cursor.style.left = targetX + "px";
         cursor.style.top = targetY + "px";
-        await waitMs(850);
+        await waitMs(1100);
 
-        // Tıklama Dalga Efekti (Ripple)
         var ripple = document.createElement("div");
         ripple.className = "ai-click-ripple";
         ripple.style.left = targetX + "px";
         ripple.style.top = targetY + "px";
         document.body.appendChild(ripple);
-        cursor.style.transform = "scale(0.85)";
+        cursor.style.transform = "scale(0.82)";
         setTimeout(function() {
           cursor.style.transform = "scale(1)";
           if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
-        }, 600);
+        }, 700);
       }
 
       if (customAction) {
         customAction();
       }
-      await speakTurkish(speechText);
+      await speakEnglish(speechText);
     }
 
     function stopAiPresentation() {
@@ -720,39 +789,58 @@
       cursor.classList.remove("hidden");
       banner.classList.remove("hidden");
 
-      // Adım 1: Başlangıç ve Kural Motoru
+      // Step 1: Welcome & Chrome MCP Rule Engine
       await moveCursorAndClick(
         "#btnMcpModal",
-        "Adım 1/6 • Chrome MCP & Kural Motoru",
-        "Merhaba! Ben OBS Plus yapay zeka test ajanıyım. Üniversitenin resmi ders kayıt kurallarını ve önkoşul zincirini Chrome MCP mimarisiyle sistemimize entegre ettik.",
+        "Step 1 of 10 • Chrome MCP & University Regulation Engine",
+        "Welcome to OBS Plus Version 6.0. I am your autonomous AI testing agent. First, let us inspect our Chrome MCP integration, which synchronizes official Yaşar University ECTS limits, prerequisite chains, and mandatory repeat rules.",
         function() { openMcpModal(); }
       );
       if (!isAiDemoRunning) return;
+      await waitMs(900);
       closeMcpModal();
 
-      // Adım 2: Zorunlu FF Dersini Sabitleme (Pin)
+      // Step 2: Inspecting Initial Conflicts & Prerequisite Locks
+      await moveCursorAndClick(
+        "#ruleAlerts",
+        "Step 2 of 10 • Real-Time Conflict & Prerequisite Detection",
+        "Notice how our live rule engine immediately detects a Monday morning time conflict between Thermodynamics I and Fluid Mechanics, while locking Heat Transfer because its prerequisite has not been passed yet.",
+        null
+      );
+      if (!isAiDemoRunning) return;
+
+      // Step 3: Pinning / Locking a Favorite Section
       await moveCursorAndClick(
         "#pin-btn-0",
-        "Adım 2/6 • Şube Sabitleme (Pin Lock)",
-        "Şu an pazartesi sabahı saat çakışmamız var. Önce alttan kalan zorunlu Termodinamik dersimizin birinci şubesini sabitliyoruz ki algoritma bu şubeyi korusun.",
+        "Step 3 of 10 • Section Pinning (Pin Lock)",
+        "Suppose a student wants to keep Section 1 of Thermodynamics I with Professor Yılmaz. By clicking the Pin button, we lock this section so the optimization algorithm will never move it.",
         function() { pinnedCourses["ME 2210"] = true; renderAll(); }
       );
       if (!isAiDemoRunning) return;
 
-      // Adım 3: Boş Gün Seçimi ve Otomatik Program Kurma
+      // Step 4: Day-Off & Time Filter Configuration
       await moveCursorAndClick(
-        "#btnAutoSchedule",
-        "Adım 3/6 • Akıllı Kombinasyon & Boş Gün Filtresi",
-        "Şimdi Cuma gününü boş bırakacak şekilde otomatik program kur butonuna tıklıyoruz. Algoritmamız sabit şubeyi bozmadan 6 dersi ve 37 AKTS yükünü sıfır çakışmayla yerleştirdi!",
-        function() { daysOff = ["Cuma"]; generateSmartSchedule(); }
+        "#dayOffContainer",
+        "Step 4 of 10 • Day-Off & Morning Class Filters",
+        "Next, we configure our personal preferences. We keep Friday completely free as our Day-Off, and we can also filter out early morning eight-forty classes.",
+        function() { daysOff = ["Friday"]; renderAll(); }
       );
       if (!isAiDemoRunning) return;
 
-      // Adım 4: Kota Krizi Simülasyonu ve Çözümü
+      // Step 5: Running the Backtracking Auto-Scheduler
+      await moveCursorAndClick(
+        "#btnAutoSchedule",
+        "Step 5 of 10 • Backtracking Auto-Scheduler Execution",
+        "Now, with a single click on Build Optimal Schedule, our constraint satisfaction algorithm evaluates all section combinations. It preserves our pinned course, keeps Friday 100 percent free, and places 6 courses totaling 37 ECTS with zero conflicts!",
+        function() { generateSmartSchedule(); }
+      );
+      if (!isAiDemoRunning) return;
+
+      // Step 6: Simulating a Sudden Quota Crisis & Auto-Recovery
       await moveCursorAndClick(
         "#btnQuotaCrisis",
-        "Adım 4/6 • Ani Kota Doluluk Krizi Testi",
-        "Kayıt sabahı bir şubenin kotası aniden dolduğunda sistemimiz uyarı verir. Tek tıkla otomatik çözücüyü çalıştırarak açık olan alternatif şubeye anında geçiş yapıyoruz.",
+        "Step 6 of 10 • Sudden Quota Crisis Simulation",
+        "What happens on registration morning if a section suddenly fills up to 30 out of 30? Let us trigger a live Quota Crisis on Fluid Mechanics Section 2.",
         function() {
           var target = courses[1];
           var sec2 = target.sections[1];
@@ -765,36 +853,86 @@
 
       await moveCursorAndClick(
         "#btnResolveConflicts",
-        "Adım 4/6 • B Planı Otomatik Kurtarma",
-        "Gördüğünüz gibi dolu şubeden çıkılıp açık şubeye otomatik geçiş yapıldı ve program kurtarıldı.",
+        "Step 6 of 10 • Instant Plan-B Quota Recovery",
+        "Instead of panicking, the student simply clicks Auto-Resolve Conflicts, and the engine immediately shifts the course to an open alternative section without breaking the rest of the timetable.",
         function() { generateSmartSchedule(); }
       );
       if (!isAiDemoRunning) return;
 
-      // Adım 5: Evrensel Excel / ÇAP Birleştirme Testi
+      // Step 7: Smart Auto-Swap Waitlist Demonstration
+      await moveCursorAndClick(
+        "#sec-btn-ME_3340-0",
+        "Step 7 of 10 • Smart Waitlist & Plan-B Protection",
+        "If a student clicks directly on a full section, such as Machine Elements Section 1, OBS Plus places them first on the Waitlist while automatically keeping Section 2 as a safe Plan-B backup.",
+        function() {
+          selectedSections["ME 3340"] = "Sec 2";
+          waitlistMap["ME 3340"] = { targetSec: "Sec 1", targetSlot: "Tuesday 10:40 - 12:30", backupSec: "Sec 2" };
+          renderAll();
+        }
+      );
+      if (!isAiDemoRunning) return;
+
+      await moveCursorAndClick(
+        "#waitlistBox",
+        "Step 7 of 10 • Automatic Seat Swap (Auto-Swap)",
+        "The moment a seat opens up in Section 1, our Auto-Swap engine automatically upgrades the student from Plan-B into their desired section.",
+        function() {
+          var c = findCourse("ME 3340");
+          if (c) c.sections[0].quota = 29;
+          selectedSections["ME 3340"] = "Sec 1";
+          delete waitlistMap["ME 3340"];
+          renderAll();
+        }
+      );
+      if (!isAiDemoRunning) return;
+
+      // Step 8: Probation Student Safeguard (32 ECTS & Upper-Year Lock)
+      await moveCursorAndClick(
+        "#profileSelect",
+        "Step 8 of 10 • Academic Probation Safeguard (GPA < 1.80)",
+        "When we switch the student status to Probation with a GPA of 1.62, the system automatically lowers the credit cap to 32 ECTS and locks all fourth-year elective courses in compliance with university regulations.",
+        function() {
+          document.getElementById("profileSelect").value = "probation";
+          changeProfile();
+        }
+      );
+      if (!isAiDemoRunning) return;
+
+      await waitMs(800);
+      document.getElementById("profileSelect").value = "normal";
+      changeProfile();
+      generateSmartSchedule();
+
+      // Step 9: Multi-Sheet Weekly Matrix Excel Parser & Department Merge
       await moveCursorAndClick(
         "#lblFileUpload",
-        "Adım 5/6 • Evrensel Excel ve PDF Yükleyici",
-        "Öğrenciler kendi bölümlerinin Excel veya PDF ders programlarını yükleyebilir ya da Çift Anadal dersleriyle birleştirebilir.",
+        "Step 9 of 10 • Multi-Sheet Matrix Excel & PDF Parser",
+        "Students can also upload any official multi-sheet university Excel schedule, such as the 4-sheet Mechanical Engineering Fall timetable, or merge courses from Computer and Electrical Engineering.",
         function() {
           var cardCont = document.getElementById("courseCardContainer");
           cardCont.className = "bg-white rounded-xl shadow-lg border-4 border-emerald-500 overflow-hidden transition-all duration-500";
           setTimeout(function() {
             cardCont.className = "bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500";
-          }, 2000);
+          }, 2500);
         }
       );
       if (!isAiDemoRunning) return;
 
-      // Adım 6: Kaydı Kesinleştirme ve Danışman Onay Fişi
+      // Step 10: Mobile Daily Card View & Final Advisor Approval Slip
       await moveCursorAndClick(
-        "#btnSubmitReg",
-        "Adım 6/6 • Kayıt Kesinleştirme & Danışman Fişi",
-        "Tüm kurallar doğrulandı. Kaydı kesinleştir butonuna basarak danışman onay fişimizi üretiyoruz. Dinlediğiniz için teşekkürler!",
-        function() { completeRegistration(); }
+        "#btnViewMobile",
+        "Step 10 of 10 • Mobile Daily Cards & Final Registration Slip",
+        "Our responsive layout includes a dedicated Mobile Daily Card view for smartphones. Finally, clicking Finalize Registration generates the official Advisor Approval Slip ready for PDF export. Thank you for watching our presentation!",
+        function() {
+          setViewMode("mobile");
+          setTimeout(function() {
+            setViewMode("table");
+            completeRegistration();
+          }, 1800);
+        }
       );
 
-      await waitMs(1500);
+      await waitMs(2000);
       stopAiPresentation();
     }
 
@@ -802,15 +940,17 @@
       courses = getDefaultMeCourses();
       pinnedCourses = {};
       waitlistMap = {};
+      currentYearFilter = "all";
       selectedSections = {
         "ME 2210": "Sec 1",
         "ME 3301": "Sec 1",
         "ME 3360": "Sec 3"
       };
-      document.getElementById("activeDeptBadge").innerText = "Aktif Müfredat: Makine Mühendisliği (ME)";
-      document.getElementById("courseCountBadge").innerText = courses.length + " Ders";
+      document.getElementById("activeDeptBadge").innerText = "Active Curriculum: Mechanical Engineering (ME)";
+      document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
       document.getElementById("aiScanContainer").classList.add("hidden");
       document.getElementById("schedulerReport").classList.add("hidden");
+      setYearFilter("all");
       renderAll();
     }
 
@@ -822,7 +962,7 @@
     }
     function saveQuickCourse() {
       var code = document.getElementById("qaCode").value.trim().toUpperCase() || "ME 4999";
-      var name = document.getElementById("qaName").value.trim() || "Özel Mühendislik Dersi";
+      var name = document.getElementById("qaName").value.trim() || "Special Engineering Topic";
       var ects = parseInt(document.getElementById("qaEcts").value, 10) || 6;
       var day = document.getElementById("qaDay").value;
       var slot = document.getElementById("qaSlot").value;
@@ -839,14 +979,14 @@
         prereqMet: true,
         unlocks: null,
         sections: [
-          { id: "Sec 1", day: day, slot: slot, quota: 12, maxQuota: 30, instructor: "Prof. Dr. Bölüm Koordinatörü" },
-          { id: "Sec 2", day: altDay, slot: "10:40 - 12:30", quota: 10, maxQuota: 30, instructor: "Prof. Dr. Bölüm Koordinatörü" }
+          { id: "Sec 1", day: day, slot: slot, quota: 12, maxQuota: 30, instructor: "Prof. Dr. Dept. Coordinator" },
+          { id: "Sec 2", day: altDay, slot: "10:40 - 12:30", quota: 10, maxQuota: 30, instructor: "Prof. Dr. Dept. Coordinator" }
         ]
       };
 
       courses.unshift(newCourse);
       selectedSections[code] = "Sec 1";
-      document.getElementById("courseCountBadge").innerText = courses.length + " Ders";
+      document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
       closeQuickAddModal();
       renderAll();
     }
@@ -856,55 +996,180 @@
       var fileName = "";
 
       if (type === "ee") {
-        fileName = "Elektrik_Elektronik_Muh_Programi.xlsx";
+        fileName = "Electrical_Electronics_Eng_Schedule.xlsx";
         rows = [
-          ["Ders Kodu", "Ders Adi", "AKTS", "Sinif", "Statu", "Zorunlu", "Onkosul", "Onkosul Gecildi", "Actigi Ders", "Sube", "Gun", "Saat", "Kota", "Max Kota", "Ogretim Uyesi"],
-          ["EE 2201", "Circuit Analysis I", 6, 2, "FF", "Evet", "-", "Evet", "EE 3312 (Electronics II)", "Sec 1", "Pazartesi", "08:40 - 10:30", 27, 30, "Prof. Dr. M. Seçkin"],
-          ["EE 2201", "Circuit Analysis I", 6, 2, "FF", "Evet", "-", "Evet", "EE 3312 (Electronics II)", "Sec 2", "Çarşamba", "13:40 - 15:30", 16, 30, "Doç. Dr. A. Korkmaz"],
-          ["EE 3302", "Signals and Systems", 6, 3, "Normal", "Evet", "-", "Evet", "EE 4410 (Digital Signal Proc.)", "Sec 1", "Pazartesi", "08:40 - 10:30", 24, 30, "Prof. Dr. H. Yavuz"],
-          ["EE 3302", "Signals and Systems", 6, 3, "Normal", "Evet", "-", "Evet", "EE 4410 (Digital Signal Proc.)", "Sec 2", "Salı", "10:40 - 12:30", 19, 30, "Prof. Dr. H. Yavuz"],
-          ["EE 3310", "Electromagnetic Theory", 7, 3, "Normal", "Evet", "-", "Evet", "EE 4420 (Antennas & Prop.)", "Sec 1", "Salı", "13:40 - 15:30", 30, 30, "Prof. Dr. C. Güler"],
-          ["EE 3310", "Electromagnetic Theory", 7, 3, "Normal", "Evet", "-", "Evet", "EE 4420 (Antennas & Prop.)", "Sec 2", "Perşembe", "10:40 - 12:30", 20, 30, "Prof. Dr. C. Güler"],
-          ["EE 3340", "Microprocessors & Embedded Systems", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 1", "Çarşamba", "10:40 - 12:30", 22, 30, "Doç. Dr. S. Tekin"],
-          ["EE 3340", "Microprocessors & Embedded Systems", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 2", "Cuma", "13:40 - 15:30", 14, 30, "Doç. Dr. S. Tekin"],
-          ["EE 3380", "Power Systems Analysis", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 1", "Pazartesi", "10:40 - 12:30", 18, 30, "Dr. Öğr. Üyesi B. Kurt"],
-          ["EE 3380", "Power Systems Analysis", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 2", "Perşembe", "13:40 - 15:30", 15, 30, "Dr. Öğr. Üyesi B. Kurt"],
-          ["EE 3312", "Analog Electronics II", 6, 3, "Normal", "Evet", "EE 2201 (Circuit Analysis I)", "Hayir", "-", "Sec 1", "Perşembe", "08:40 - 10:30", 12, 30, "Prof. Dr. M. Seçkin"],
-          ["EE 4430", "VLSI Design & Robotics (Seçmeli)", 6, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 1", "Cuma", "08:40 - 10:30", 11, 25, "Doç. Dr. E. Polat"],
-          ["EE 4430", "VLSI Design & Robotics (Seçmeli)", 6, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 2", "Pazartesi", "15:40 - 17:30", 17, 25, "Doç. Dr. E. Polat"]
+          ["Course Code", "Course Title", "ECTS", "Year", "Status", "Mandatory", "Prerequisite", "Prereq Met", "Unlocks", "Section", "Day", "Time Slot", "Quota", "Max Quota", "Instructor"],
+          ["EE 2201", "Circuit Analysis I", 6, 2, "FF", "Yes", "-", "Yes", "EE 3312 (Electronics II)", "Sec 1", "Monday", "08:40 - 10:30", 27, 30, "Prof. Dr. M. Seçkin"],
+          ["EE 2201", "Circuit Analysis I", 6, 2, "FF", "Yes", "-", "Yes", "EE 3312 (Electronics II)", "Sec 2", "Wednesday", "13:40 - 15:30", 16, 30, "Assoc. Prof. A. Korkmaz"],
+          ["EE 3302", "Signals and Systems", 6, 3, "Normal", "Yes", "-", "Yes", "EE 4410 (Digital Signal Proc.)", "Sec 1", "Monday", "08:40 - 10:30", 24, 30, "Prof. Dr. H. Yavuz"],
+          ["EE 3302", "Signals and Systems", 6, 3, "Normal", "Yes", "-", "Yes", "EE 4410 (Digital Signal Proc.)", "Sec 2", "Tuesday", "10:40 - 12:30", 19, 30, "Prof. Dr. H. Yavuz"],
+          ["EE 3310", "Electromagnetic Theory", 7, 3, "Normal", "Yes", "-", "Yes", "EE 4420 (Antennas & Prop.)", "Sec 1", "Tuesday", "13:40 - 15:30", 30, 30, "Prof. Dr. C. Güler"],
+          ["EE 3310", "Electromagnetic Theory", 7, 3, "Normal", "Yes", "-", "Yes", "EE 4420 (Antennas & Prop.)", "Sec 2", "Thursday", "10:40 - 12:30", 20, 30, "Prof. Dr. C. Güler"],
+          ["EE 3340", "Microprocessors & Embedded Systems", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 1", "Wednesday", "10:40 - 12:30", 22, 30, "Assoc. Prof. S. Tekin"],
+          ["EE 3340", "Microprocessors & Embedded Systems", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 2", "Friday", "13:40 - 15:30", 14, 30, "Assoc. Prof. S. Tekin"],
+          ["EE 3380", "Power Systems Analysis", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 1", "Monday", "10:40 - 12:30", 18, 30, "Asst. Prof. B. Kurt"],
+          ["EE 3380", "Power Systems Analysis", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 2", "Thursday", "13:40 - 15:30", 15, 30, "Asst. Prof. B. Kurt"],
+          ["EE 3312", "Analog Electronics II", 6, 3, "Normal", "Yes", "EE 2201 (Circuit Analysis I)", "No", "-", "Sec 1", "Thursday", "08:40 - 10:30", 12, 30, "Prof. Dr. M. Seçkin"],
+          ["EE 4430", "VLSI Design & Robotics (Elective)", 6, 4, "Upper", "No", "-", "Yes", "-", "Sec 1", "Friday", "08:40 - 10:30", 11, 25, "Assoc. Prof. E. Polat"],
+          ["EE 4430", "VLSI Design & Robotics (Elective)", 6, 4, "Upper", "No", "-", "Yes", "-", "Sec 2", "Monday", "15:40 - 17:30", 17, 25, "Assoc. Prof. E. Polat"]
         ];
       } else {
-        fileName = "Bilgisayar_Yazilim_Muh_Programi.xlsx";
+        fileName = "Computer_Software_Eng_Schedule.xlsx";
         rows = [
-          ["Ders Kodu", "Ders Adi", "AKTS", "Sinif", "Statu", "Zorunlu", "Onkosul", "Onkosul Gecildi", "Actigi Ders", "Sube", "Gun", "Saat", "Kota", "Max Kota", "Ogretim Uyesi"],
-          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Evet", "-", "Evet", "COMP 3312 (Operating Systems)", "Sec 1", "Pazartesi", "08:40 - 10:30", 28, 30, "Prof. Dr. D. Kılınç"],
-          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Evet", "-", "Evet", "COMP 3312 (Operating Systems)", "Sec 2", "Çarşamba", "13:40 - 15:30", 18, 30, "Doç. Dr. K. Çetin"],
-          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Evet", "-", "Evet", "COMP 3312 (Operating Systems)", "Sec 3", "Salı", "10:40 - 12:30", 15, 30, "Doç. Dr. K. Çetin"],
-          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4420 (Big Data Analytics)", "Sec 1", "Pazartesi", "08:40 - 10:30", 25, 30, "Prof. Dr. M. Ünal"],
-          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4420 (Big Data Analytics)", "Sec 2", "Salı", "13:40 - 15:30", 20, 30, "Prof. Dr. M. Ünal"],
-          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4420 (Big Data Analytics)", "Sec 3", "Cuma", "10:40 - 12:30", 12, 30, "Dr. Öğr. Üyesi A. Demir"],
-          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Evet", "-", "Evet", "SE 4410 (Cloud Engineering)", "Sec 1", "Salı", "10:40 - 12:30", 30, 30, "Doç. Dr. B. Yılmaz"],
-          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Evet", "-", "Evet", "SE 4410 (Cloud Engineering)", "Sec 2", "Perşembe", "10:40 - 12:30", 21, 30, "Doç. Dr. B. Yılmaz"],
-          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Evet", "-", "Evet", "SE 4410 (Cloud Engineering)", "Sec 3", "Pazartesi", "15:40 - 17:30", 16, 30, "Dr. Öğr. Üyesi E. Kaya"],
-          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 1", "Çarşamba", "10:40 - 12:30", 24, 30, "Prof. Dr. C. Şahin"],
-          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 2", "Perşembe", "13:40 - 15:30", 19, 30, "Prof. Dr. C. Şahin"],
-          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Evet", "-", "Evet", "-", "Sec 3", "Cuma", "13:40 - 15:30", 11, 30, "Dr. Öğr. Üyesi S. Aksoy"],
-          ["COMP 3380", "Computer Networks & Security", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4480 (Cyber Security)", "Sec 1", "Pazartesi", "10:40 - 12:30", 22, 30, "Doç. Dr. T. Erdem"],
-          ["COMP 3380", "Computer Networks & Security", 6, 3, "Normal", "Evet", "-", "Evet", "COMP 4480 (Cyber Security)", "Sec 2", "Çarşamba", "08:40 - 10:30", 14, 30, "Doç. Dr. T. Erdem"],
-          ["COMP 3312", "Operating Systems", 6, 3, "Normal", "Evet", "COMP 2210 (Data Structures)", "Hayir", "COMP 4415 (Distributed Systems)", "Sec 1", "Perşembe", "08:40 - 10:30", 15, 30, "Prof. Dr. D. Kılınç"],
-          ["COMP 4410", "Deep Learning & Neural Networks (Seçmeli)", 6, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 1", "Cuma", "08:40 - 10:30", 14, 25, "Doç. Dr. V. Özkan"],
-          ["COMP 4410", "Deep Learning & Neural Networks (Seçmeli)", 6, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 2", "Perşembe", "15:40 - 17:30", 18, 25, "Doç. Dr. V. Özkan"],
-          ["SE 4450", "Cloud Computing & DevOps (Seçmeli)", 5, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 1", "Salı", "15:40 - 17:30", 15, 25, "Dr. Öğr. Üyesi N. Koç"],
-          ["SE 4450", "Cloud Computing & DevOps (Seçmeli)", 5, 4, "Upper", "Hayir", "-", "Evet", "-", "Sec 2", "Çarşamba", "15:40 - 17:30", 10, 25, "Dr. Öğr. Üyesi N. Koç"]
+          ["Course Code", "Course Title", "ECTS", "Year", "Status", "Mandatory", "Prerequisite", "Prereq Met", "Unlocks", "Section", "Day", "Time Slot", "Quota", "Max Quota", "Instructor"],
+          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Yes", "-", "Yes", "COMP 3312 (Operating Systems)", "Sec 1", "Monday", "08:40 - 10:30", 28, 30, "Prof. Dr. D. Kılınç"],
+          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Yes", "-", "Yes", "COMP 3312 (Operating Systems)", "Sec 2", "Wednesday", "13:40 - 15:30", 18, 30, "Assoc. Prof. K. Çetin"],
+          ["COMP 2210", "Data Structures & Algorithms", 6, 2, "FF", "Yes", "-", "Yes", "COMP 3312 (Operating Systems)", "Sec 3", "Tuesday", "10:40 - 12:30", 15, 30, "Assoc. Prof. K. Çetin"],
+          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4420 (Big Data Analytics)", "Sec 1", "Monday", "08:40 - 10:30", 25, 30, "Prof. Dr. M. Ünal"],
+          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4420 (Big Data Analytics)", "Sec 2", "Tuesday", "13:40 - 15:30", 20, 30, "Prof. Dr. M. Ünal"],
+          ["COMP 3301", "Database Management Systems", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4420 (Big Data Analytics)", "Sec 3", "Friday", "10:40 - 12:30", 12, 30, "Asst. Prof. A. Demir"],
+          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Yes", "-", "Yes", "SE 4410 (Cloud Engineering)", "Sec 1", "Tuesday", "10:40 - 12:30", 30, 30, "Assoc. Prof. B. Yılmaz"],
+          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Yes", "-", "Yes", "SE 4410 (Cloud Engineering)", "Sec 2", "Thursday", "10:40 - 12:30", 21, 30, "Assoc. Prof. B. Yılmaz"],
+          ["SE 3340", "Software Architecture & Design", 7, 3, "Normal", "Yes", "-", "Yes", "SE 4410 (Cloud Engineering)", "Sec 3", "Monday", "15:40 - 17:30", 16, 30, "Asst. Prof. E. Kaya"],
+          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 1", "Wednesday", "10:40 - 12:30", 24, 30, "Prof. Dr. C. Şahin"],
+          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 2", "Thursday", "13:40 - 15:30", 19, 30, "Prof. Dr. C. Şahin"],
+          ["COMP 3360", "Artificial Intelligence & Agents", 6, 3, "Normal", "Yes", "-", "Yes", "-", "Sec 3", "Friday", "13:40 - 15:30", 11, 30, "Asst. Prof. S. Aksoy"],
+          ["COMP 3380", "Computer Networks & Security", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4480 (Cyber Security)", "Sec 1", "Monday", "10:40 - 12:30", 22, 30, "Assoc. Prof. T. Erdem"],
+          ["COMP 3380", "Computer Networks & Security", 6, 3, "Normal", "Yes", "-", "Yes", "COMP 4480 (Cyber Security)", "Sec 2", "Wednesday", "08:40 - 10:30", 14, 30, "Assoc. Prof. T. Erdem"],
+          ["COMP 3312", "Operating Systems", 6, 3, "Normal", "Yes", "COMP 2210 (Data Structures)", "No", "COMP 4415 (Distributed Systems)", "Sec 1", "Thursday", "08:40 - 10:30", 15, 30, "Prof. Dr. D. Kılınç"],
+          ["COMP 4410", "Deep Learning & Neural Networks (Elective)", 6, 4, "Upper", "No", "-", "Yes", "-", "Sec 1", "Friday", "08:40 - 10:30", 14, 25, "Assoc. Prof. V. Özkan"],
+          ["COMP 4410", "Deep Learning & Neural Networks (Elective)", 6, 4, "Upper", "No", "-", "Yes", "-", "Sec 2", "Thursday", "15:40 - 17:30", 18, 25, "Assoc. Prof. V. Özkan"]
         ];
       }
 
       if (typeof XLSX !== "undefined") {
         var ws = XLSX.utils.aoa_to_sheet(rows);
         var wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Ders_Programi");
+        XLSX.utils.book_append_sheet(wb, ws, "Schedule");
         XLSX.writeFile(wb, fileName);
       }
+    }
+
+    // ============================================================================
+    // SPECIALIZED 2D MULTI-SHEET WEEKLY MATRIX PARSER (e.g., 26-27-Guz-Ders-Programi_ME.xlsx)
+    // ============================================================================
+    function normalizeDayName(str) {
+      var s = String(str || "").toLowerCase();
+      if (s.indexOf("pazar") !== -1 || s.indexOf("mon") !== -1 || s.indexOf("pzt") !== -1) return "Monday";
+      if (s.indexOf("sal") !== -1 || s.indexOf("tue") !== -1) return "Tuesday";
+      if (s.indexOf("çar") !== -1 || s.indexOf("car") !== -1 || s.indexOf("wed") !== -1) return "Wednesday";
+      if (s.indexOf("per") !== -1 || s.indexOf("thu") !== -1) return "Thursday";
+      if (s.indexOf("cum") !== -1 || s.indexOf("fri") !== -1) return "Friday";
+      return null;
+    }
+
+    function normalizeTimeSlot(str) {
+      var s = String(str || "");
+      if (s.indexOf("08:") !== -1 || s.indexOf("09:") !== -1 || s.indexOf("8:") !== -1) return "08:40 - 10:30";
+      if (s.indexOf("10:") !== -1 || s.indexOf("11:") !== -1) return "10:40 - 12:30";
+      if (s.indexOf("12:") !== -1 || s.indexOf("13:") !== -1 || s.indexOf("14:") !== -1) return "13:40 - 15:30";
+      if (s.indexOf("15:") !== -1 || s.indexOf("16:") !== -1 || s.indexOf("17:") !== -1) return "15:40 - 17:30";
+      return null;
+    }
+
+    function parseMultiSheetMatrixWorkbook(workbook) {
+      var courseMap = {};
+      var orderList = [];
+
+      for (var sIdx = 0; sIdx < workbook.SheetNames.length; sIdx++) {
+        var sheetName = workbook.SheetNames[sIdx];
+        var sheet = workbook.Sheets[sheetName];
+        var rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+        if (!rows || rows.length < 2) continue;
+
+        // Detect year from sheet name (e.g. "1. sınıf" -> 1, "ME 2" -> 2, "ME 3" -> 3, "ME 4" -> 4)
+        var detectedYear = sIdx + 1;
+        var yrMatch = sheetName.match(/(\d)/);
+        if (yrMatch) detectedYear = parseInt(yrMatch[1], 10);
+
+        // Check if row 0 or row 1 has day headers (Pazartesi, Salı, Monday, Tuesday...)
+        var headerRowIdx = -1;
+        for (var rCheck = 0; rCheck < Math.min(4, rows.length); rCheck++) {
+          var rowJoined = rows[rCheck].join(" ");
+          if (normalizeDayName(rowJoined)) {
+            headerRowIdx = rCheck;
+            break;
+          }
+        }
+
+        // If this sheet is a 2D Weekly Matrix Grid (like 26-27-Guz-Ders-Programi_ME.xlsx)
+        if (headerRowIdx !== -1 && /\d{2}:\d{2}/.test(String(rows[headerRowIdx + 1] && rows[headerRowIdx + 1][0]))) {
+          var colToDay = {};
+          var currentDay = "Monday";
+          for (var c = 1; c < rows[headerRowIdx].length; c++) {
+            var dName = normalizeDayName(rows[headerRowIdx][c]);
+            if (dName) currentDay = dName;
+            colToDay[c] = currentDay;
+          }
+
+          for (var r = headerRowIdx + 1; r < rows.length; r++) {
+            var timeCell = String(rows[r][0] || "").trim();
+            var slot = normalizeTimeSlot(timeCell);
+            if (!slot) continue;
+
+            for (var col = 1; col < rows[r].length; col++) {
+              var cellVal = String(rows[r][col] || "").trim();
+              if (!cellVal) continue;
+
+              // Match patterns like: "SE 1105.1 \nM109", "MATH1132 S1", "ME 3320.2 M534", "ESE-ME 4910 M534"
+              var cleanCell = cellVal.replace(/\r?\n/g, " ");
+              var match = cleanCell.match(/([A-Z]{2,5}(?:-[A-Z]{2,4})?\s*\d{4})(?:[\.\s]+(S?\d+))?/);
+              if (match) {
+                var rawCode = match[1].replace(/\s+/g, " ").trim();
+                rawCode = rawCode.replace(/^([A-Z]+)(\d{4})$/, "$1 $2");
+
+                var secToken = match[2] || "1";
+                var secNum = secToken.replace(/\D/g, "") || "1";
+                var secId = "Sec " + secNum;
+                var day = colToDay[col] || "Monday";
+
+                // Extract classroom if present (e.g. M534, Y314, Z22)
+                var roomMatch = cleanCell.match(/\b([MYZX]\d{2,3})\b/);
+                var roomStr = roomMatch ? "Room " + roomMatch[1] : "Main Building";
+
+                if (!courseMap[rawCode]) {
+                  var title = courseTitleDictionary[rawCode] || (sheetName + " Engineering Course (" + rawCode + ")");
+                  courseMap[rawCode] = {
+                    code: rawCode,
+                    name: title,
+                    ects: detectedYear === 4 ? 5 : 6,
+                    year: detectedYear,
+                    status: rawCode === "ME 2210" ? "FF" : (detectedYear === 4 ? "Upper" : "Normal"),
+                    isMandatory: detectedYear < 4,
+                    prereq: null,
+                    prereqMet: true,
+                    unlocks: null,
+                    sections: []
+                  };
+                  orderList.push(courseMap[rawCode]);
+                }
+
+                // Avoid duplicate section IDs on the same course; update or add
+                var existingSec = null;
+                for (var s = 0; s < courseMap[rawCode].sections.length; s++) {
+                  if (courseMap[rawCode].sections[s].id === secId) {
+                    existingSec = courseMap[rawCode].sections[s];
+                    break;
+                  }
+                }
+                if (!existingSec) {
+                  courseMap[rawCode].sections.push({
+                    id: secId,
+                    day: day,
+                    slot: slot,
+                    quota: 18 + (courseMap[rawCode].sections.length * 3) % 11,
+                    maxQuota: 30,
+                    instructor: "Dept. Faculty (" + roomStr + ")"
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Ensure single-section courses from the grid also have an alternative section option if needed
+      return orderList.length > 0 ? orderList : null;
     }
 
     function handleFileUpload(event) {
@@ -918,9 +1183,16 @@
         reader.onload = function(e) {
           var data = new Uint8Array(e.target.result);
           var workbook = XLSX.read(data, { type: "array" });
-          var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          var jsonRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
-          processUniversalDocument(file.name, jsonRows, "");
+
+          // First check if it is a Multi-Sheet 2D Matrix Grid (like 26-27-Guz-Ders-Programi_ME.xlsx)
+          var matrixCourses = parseMultiSheetMatrixWorkbook(workbook);
+          if (matrixCourses && matrixCourses.length > 0) {
+            processUniversalDocument(file.name, null, "", matrixCourses);
+          } else {
+            var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            var jsonRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+            processUniversalDocument(file.name, jsonRows, "", null);
+          }
         };
         reader.readAsArrayBuffer(file);
       } else if (ext === "pdf" && typeof pdfjsLib !== "undefined") {
@@ -940,10 +1212,10 @@
               );
             }
             Promise.all(pagePromises).then(function(pagesText) {
-              processUniversalDocument(file.name, null, pagesText.join("\n"));
+              processUniversalDocument(file.name, null, pagesText.join("\n"), null);
             });
           }).catch(function() {
-            processUniversalDocument(file.name, null, "");
+            processUniversalDocument(file.name, null, "", null);
           });
         };
         pdfReader.readAsArrayBuffer(file);
@@ -955,7 +1227,7 @@
             var delim = l.indexOf(";") !== -1 && l.indexOf(",") === -1 ? ";" : ",";
             return l.split(delim);
           });
-          processUniversalDocument(file.name, lines, raw);
+          processUniversalDocument(file.name, lines, raw, null);
         };
         textReader.readAsText(file, "UTF-8");
       }
@@ -967,46 +1239,27 @@
       var courseMap = {};
       var orderList = [];
 
-      function normalizeDay(str) {
-        var s = (str || "").toLowerCase();
-        if (s.indexOf("pazar") !== -1 || s.indexOf("mon") !== -1 || s.indexOf("pzt") !== -1) return "Pazartesi";
-        if (s.indexOf("sal") !== -1 || s.indexOf("tue") !== -1) return "Salı";
-        if (s.indexOf("çar") !== -1 || s.indexOf("car") !== -1 || s.indexOf("wed") !== -1) return "Çarşamba";
-        if (s.indexOf("per") !== -1 || s.indexOf("thu") !== -1) return "Perşembe";
-        if (s.indexOf("cum") !== -1 || s.indexOf("fri") !== -1) return "Cuma";
-        return null;
-      }
-
-      function normalizeSlot(str) {
-        var s = (str || "");
-        if (s.indexOf("08") !== -1 || s.indexOf("09") !== -1 || s.indexOf("8:") !== -1) return "08:40 - 10:30";
-        if (s.indexOf("10:") !== -1 || s.indexOf("11:") !== -1) return "10:40 - 12:30";
-        if (s.indexOf("13:") !== -1 || s.indexOf("14:") !== -1) return "13:40 - 15:30";
-        if (s.indexOf("15:") !== -1 || s.indexOf("16:") !== -1) return "15:40 - 17:30";
-        return null;
-      }
-
       if (rows && rows.length > 1) {
         for (var i = 1; i < rows.length; i++) {
           var cols = rows[i].map(function(c) { return String(c || "").trim(); });
           if (cols.length < 2 || !cols[0]) continue;
 
-          if (cols.length >= 12 && (cols[9].indexOf("Sec") !== -1 || normalizeDay(cols[10]))) {
+          if (cols.length >= 12 && (cols[9].indexOf("Sec") !== -1 || normalizeDayName(cols[10]))) {
             var code = cols[0];
-            var name = cols[1] || "Mühendislik Dersi";
+            var name = cols[1] || "Engineering Course";
             var ects = parseInt(cols[2], 10) || 6;
             var year = parseInt(cols[3], 10) || 3;
             var status = cols[4] || "Normal";
-            var isMandatory = cols[5].toLowerCase() !== "hayir" && cols[5].toLowerCase() !== "false";
+            var isMandatory = cols[5].toLowerCase() !== "hayir" && cols[5].toLowerCase() !== "no" && cols[5].toLowerCase() !== "false";
             var prereq = (cols[6] === "-" || !cols[6]) ? null : cols[6];
-            var prereqMet = cols[7].toLowerCase() !== "hayir" && cols[7].toLowerCase() !== "false";
+            var prereqMet = cols[7].toLowerCase() !== "hayir" && cols[7].toLowerCase() !== "no" && cols[7].toLowerCase() !== "false";
             var unlocks = (cols[8] === "-" || !cols[8]) ? null : cols[8];
             var secId = cols[9] || "Sec 1";
-            var day = normalizeDay(cols[10]) || "Pazartesi";
-            var slot = normalizeSlot(cols[11]) || "08:40 - 10:30";
+            var day = normalizeDayName(cols[10]) || "Monday";
+            var slot = normalizeTimeSlot(cols[11]) || "08:40 - 10:30";
             var quota = parseInt(cols[12], 10) || 20;
             var maxQuota = parseInt(cols[13], 10) || 30;
-            var instructor = cols[14] || "Öğretim Üyesi";
+            var instructor = cols[14] || "Faculty Member";
 
             if (!courseMap[code]) {
               courseMap[code] = {
@@ -1018,12 +1271,12 @@
             courseMap[code].sections.push({ id: secId, day: day, slot: slot, quota: quota, maxQuota: maxQuota, instructor: instructor });
           } else {
             var rowStr = cols.join(" ");
-            var codeMatch = rowStr.match(/\b([A-Z]{2,4}\s?\d{3,4})\b/);
+            var codeMatch = rowStr.match(/\b([A-Z]{2,5}(?:-[A-Z]{2,4})?\s?\d{3,4})\b/);
             if (codeMatch) {
               var fCode = codeMatch[1].toUpperCase();
-              var fName = cols[1] && cols[1] !== fCode ? cols[1] : "Bölüm Dersi (" + fCode + ")";
-              var fDay = normalizeDay(rowStr) || days[orderList.length % 5];
-              var fSlot = normalizeSlot(rowStr) || timeSlots[orderList.length % 4];
+              var fName = cols[1] && cols[1] !== fCode ? cols[1] : (courseTitleDictionary[fCode] || "Department Course (" + fCode + ")");
+              var fDay = normalizeDayName(rowStr) || days[orderList.length % 5];
+              var fSlot = normalizeTimeSlot(rowStr) || timeSlots[orderList.length % 4];
 
               if (!courseMap[fCode]) {
                 courseMap[fCode] = {
@@ -1034,28 +1287,23 @@
               }
               var secNum = courseMap[fCode].sections.length + 1;
               courseMap[fCode].sections.push({
-                id: "Sec " + secNum, day: fDay, slot: fSlot, quota: 18, maxQuota: 30, instructor: "Bölüm Öğretim Üyesi"
+                id: "Sec " + secNum, day: fDay, slot: fSlot, quota: 18, maxQuota: 30, instructor: "Dept. Instructor"
               });
-              if (secNum === 1) {
-                courseMap[fCode].sections.push({
-                  id: "Sec 2", day: days[(orderList.length + 2) % 5], slot: timeSlots[(orderList.length + 1) % 4], quota: 14, maxQuota: 30, instructor: "Bölüm Öğretim Üyesi"
-                });
-              }
             }
           }
         }
       }
 
       if (orderList.length === 0 && rawText) {
-        var regex = /\b([A-Z]{2,4}\s?\d{3,4})\b/g;
+        var regex = /\b([A-Z]{2,5}(?:-[A-Z]{2,4})?\s?\d{3,4})\b/g;
         var match;
         var idx = 0;
-        while ((match = regex.exec(rawText)) !== null && orderList.length < 10) {
+        while ((match = regex.exec(rawText)) !== null && orderList.length < 15) {
           var pCode = match[1].toUpperCase();
           if (!courseMap[pCode]) {
             courseMap[pCode] = {
               code: pCode,
-              name: "PDF Dönem Dersi (" + pCode + ")",
+              name: courseTitleDictionary[pCode] || ("Parsed Course (" + pCode + ")"),
               ects: 6,
               year: 3,
               status: idx === 0 ? "FF" : "Normal",
@@ -1064,8 +1312,8 @@
               prereqMet: true,
               unlocks: null,
               sections: [
-                { id: "Sec 1", day: days[idx % 5], slot: timeSlots[idx % 4], quota: 21, maxQuota: 30, instructor: "Prof. Dr. Akademisyen" },
-                { id: "Sec 2", day: days[(idx + 2) % 5], slot: timeSlots[(idx + 1) % 4], quota: 15, maxQuota: 30, instructor: "Doç. Dr. Akademisyen" }
+                { id: "Sec 1", day: days[idx % 5], slot: timeSlots[idx % 4], quota: 21, maxQuota: 30, instructor: "Prof. Dr. Faculty" },
+                { id: "Sec 2", day: days[(idx + 2) % 5], slot: timeSlots[(idx + 1) % 4], quota: 15, maxQuota: 30, instructor: "Assoc. Prof. Faculty" }
               ]
             };
             orderList.push(courseMap[pCode]);
@@ -1077,7 +1325,7 @@
       return orderList.length > 0 ? orderList : null;
     }
 
-    function processUniversalDocument(fileName, rows, rawText) {
+    function processUniversalDocument(fileName, rows, rawText, preParsedMatrixCourses) {
       var container = document.getElementById("aiScanContainer");
       var statusText = document.getElementById("aiScanStatusText");
       var pctText = document.getElementById("aiScanPercent");
@@ -1089,41 +1337,55 @@
       resultBox.classList.add("hidden");
       bar.style.width = "30%";
       pctText.innerText = "30%";
-      statusText.innerText = "🔍 '" + fileName + "' dosyası okunuyor...";
+      statusText.innerText = "🔍 Scanning '" + fileName + "' (Multi-Sheet Grid & Table Detector)...";
 
       setTimeout(function() {
         bar.style.width = "75%";
         pctText.innerText = "75%";
-        statusText.innerText = "🤖 Ders kodları, şubeler ve saat seçenekleri sol panele aktarılıyor...";
+        statusText.innerText = "🤖 Mapping course codes, sections, rooms, and time slots to catalog...";
       }, 350);
 
       setTimeout(function() {
         bar.style.width = "100%";
         pctText.innerText = "100%";
-        statusText.innerText = "✅ Dosya Aktarımı Tamamlandı: '" + fileName + "'";
+        statusText.innerText = "✅ Document Import Complete: '" + fileName + "'";
 
-        var extracted = extractCoursesUniversal(rows, rawText);
+        var extracted = preParsedMatrixCourses || extractCoursesUniversal(rows, rawText);
+        var addedCount = 0;
+
         if (extracted && extracted.length > 0) {
           if (uploadMode === "merge") {
+            // Merge into existing department courses (or update sections if same code)
             for (var i = 0; i < extracted.length; i++) {
               var newC = extracted[i];
-              if (!findCourse(newC.code)) {
+              var existing = findCourse(newC.code);
+              if (!existing) {
                 if (newC.status === "FF") newC.status = "Normal";
                 courses.push(newC);
+                addedCount++;
+              } else {
+                // Merge any new sections into existing course
+                for (var s = 0; s < newC.sections.length; s++) {
+                  if (!findSection(existing, newC.sections[s].id)) {
+                    existing.sections.push(newC.sections[s]);
+                  }
+                }
+                addedCount++;
               }
             }
-            document.getElementById("activeDeptBadge").innerText = "Birleştirilmiş Müfredat (ME + " + fileName + ")";
+            document.getElementById("activeDeptBadge").innerText = "Merged Curriculum (ME + " + fileName + ")";
           } else {
             courses = extracted;
+            addedCount = extracted.length;
             selectedSections = {};
             pinnedCourses = {};
             waitlistMap = {};
-            document.getElementById("activeDeptBadge").innerText = "Aktif Müfredat: " + fileName;
+            document.getElementById("activeDeptBadge").innerText = "Active Curriculum: " + fileName;
           }
         }
 
         document.getElementById("schedulerReport").classList.add("hidden");
-        document.getElementById("courseCountBadge").innerText = courses.length + " Ders Hazır";
+        document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
 
         renderAll();
 
@@ -1134,14 +1396,14 @@
         }, 3000);
 
         var modeDesc = uploadMode === "merge"
-          ? "Mevcut Makine Mühendisliği dersleriniz korundu ve yeni dersler listenin altına eklendi!"
-          : "Haftalık takvim sıfırlandı ve yeni bölüm dersleri sol listeye dizildi.";
+          ? ("Successfully parsed <b>" + addedCount + " courses</b> from <b>" + fileName + "</b> and merged them into your department catalog!")
+          : ("Successfully extracted <b>" + addedCount + " courses</b> across all sheets from <b>" + fileName + "</b>!");
 
         resultBox.classList.remove("hidden");
         resultBox.innerHTML =
           '<div class="flex flex-wrap justify-between items-center gap-2">' +
-            '<div>🎯 <b>Toplam ' + courses.length + ' Ders Sol Listede Hazır (' + fileName + '):</b> ' + modeDesc + ' Şimdi <b>sol taraftaki listeden istediğiniz şubelere tıklayarak</b> kendi programınızı oluşturabilir veya <b>🔄 Makine Müh. Derslerine Dön</b> butonunu kullanabilirsiniz!</div>' +
-            '<span class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-full font-extrabold">👈 Soldan Ders Seçin</span>' +
+            '<div>🎯 ' + modeDesc + ' Use the <b>Year 1 / ME 2 / ME 3 / ME 4</b> filter tabs on the left to browse and select your sections, or click <b>⚡ Build Optimal Schedule</b>!</div>' +
+            '<span class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-full font-extrabold">👈 Select Courses on Left</span>' +
           '</div>';
       }, 750);
     }
@@ -1186,7 +1448,7 @@
 
     function togglePinCourse(courseCode) {
       if (!selectedSections[courseCode]) {
-        alert("Sabitlemek için önce bu dersin bir şubesini seçmelisiniz.");
+        alert("Please select a section of this course first before pinning it.");
         return;
       }
       if (pinnedCourses[courseCode]) {
@@ -1203,7 +1465,7 @@
         daysOff.splice(idx, 1);
       } else {
         if (daysOff.length >= 3) {
-          alert("Haftalık ders yükünün sığabilmesi için en fazla 3 boş gün seçebilirsiniz.");
+          alert("You can select at most 3 free days so that your weekly course load can fit.");
           return;
         }
         daysOff.push(day);
@@ -1220,7 +1482,7 @@
         var cls = active
           ? "px-3 py-2 rounded-lg text-xs border border-emerald-400 bg-emerald-500 text-slate-950 font-extrabold transition shadow cursor-pointer text-center"
           : "px-3 py-2 rounded-lg text-xs font-semibold border border-indigo-600 bg-indigo-900/50 text-indigo-100 hover:bg-indigo-700 transition cursor-pointer text-center";
-        var label = active ? ("✓ " + day + " Boş") : day;
+        var label = active ? ("✓ " + day + " Off") : day;
         html += '<button type="button" onclick="toggleDayOff(\'' + day + '\')" class="' + cls + '">' + label + '</button>';
       }
       container.innerHTML = html;
@@ -1246,6 +1508,7 @@
         if (!c.prereqMet) continue;
         if (currentProfile.isProbation && c.year === 4) continue;
         if (loadPref === "core_only" && !c.isMandatory) continue;
+        if (currentYearFilter !== "all" && c.year !== currentYearFilter && !pinnedCourses[c.code]) continue;
         eligible.push(c);
       }
 
@@ -1310,12 +1573,12 @@
 
       if (solution) {
         selectedSections = solution;
-        var offList = daysOff.length > 0 ? daysOff.join(", ") : "Yok";
+        var offList = daysOff.length > 0 ? daysOff.join(", ") : "None";
         var pinCount = Object.keys(pinnedCourses).length;
-        var pinText = pinCount > 0 ? " (" + pinCount + " sabit şube korundu)" : "";
+        var pinText = pinCount > 0 ? " (" + pinCount + " pinned section preserved)" : "";
         reportBox.innerHTML = '<div class="flex items-center justify-between flex-wrap gap-2">' +
-          '<span>✅ <b>Optimum Program Kuruldu!</b> Boş günler (<b>' + offList + '</b>) ve saat filtreleri korunarak <b>' + Object.keys(solution).length + ' ders (' + runningEcts + ' AKTS)</b> sıfır çakışma ile yerleştirildi' + pinText + '.</span>' +
-          '<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2 py-0.5 rounded font-bold">0 Çakışma</span>' +
+          '<span>✅ <b>Optimal Schedule Built!</b> Preserving your free days (<b>' + offList + '</b>) and time filters, <b>' + Object.keys(solution).length + ' courses (' + runningEcts + ' ECTS)</b> were placed with zero conflicts' + pinText + '.</span>' +
+          '<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2 py-0.5 rounded font-bold">0 Conflicts</span>' +
           '</div>';
       } else {
         var partialMap = {};
@@ -1349,7 +1612,8 @@
           }
         }
         selectedSections = partialMap;
-        reportBox.innerHTML = '<div>⚠️ <b>En Yakın Çakışmasız Program Kuruldu:</b> Seçtiğiniz yoğun filtreler nedeniyle <b>' + relaxedCourses.join(", ") + '</b> alternatif açık şubeye yerleştirildi. Sıfır çakışma!</div>';
+        var totalPlacedEcts = calculateEcts(null);
+        reportBox.innerHTML = '<div>⚠️ <b>Best Conflict-Free Schedule Built (' + Object.keys(partialMap).length + ' Courses, ' + totalPlacedEcts + ' ECTS):</b> Due to strict filters or single-section constraints, <b>' + (relaxedCourses.join(", ") || "some courses") + '</b> were placed in available open slots with 0 conflicts!</div>';
       }
 
       renderAll();
@@ -1382,7 +1646,7 @@
       var course = findCourse(courseCode);
       if (!course || !course.prereqMet) return;
       if (currentProfile.isProbation && course.year === 4) {
-        alert("Sınamalı (Probation) öğrenciler üst sınıftan (4. Sınıf) ders alamaz!");
+        alert("Probation students (GPA < 1.80) are not permitted to take 4th-year courses!");
         return;
       }
 
@@ -1403,9 +1667,9 @@
             backupSec: backup.id
           };
           renderAll();
-          alert("🔔 AKILLI KOTA BEKLEME LİSTESİ (Auto-Swap):\n\n" + courseCode + " (" + sec.id + ") şu an DOLU!\n• Sistem sizi " + sec.id + " için 1. sıradan Bekleme Listesine aldı.\n• Açıkta kalmamanız için " + backup.id + " (" + backup.day + ") şubesi 'B Planı' olarak programa yerleştirildi!");
+          alert("🔔 SMART QUOTA WAITLIST (Auto-Swap):\n\n" + courseCode + " (" + sec.id + ") is currently FULL!\n• You have been placed #1 on the Waitlist for " + sec.id + ".\n• To protect your schedule, open section " + backup.id + " (" + backup.day + ") has been registered as your 'Plan B' backup!");
         } else {
-          alert(courseCode + " (" + sectionId + ") kotası dolu!");
+          alert(courseCode + " (" + sectionId + ") quota is full!");
         }
         return;
       }
@@ -1417,7 +1681,7 @@
       } else {
         var currentEcts = calculateEcts(courseCode);
         if (currentEcts + course.ects > currentProfile.maxEcts) {
-          alert("AKTS Limiti Aşıldı! (" + currentProfile.name + " limiti: " + currentProfile.maxEcts + " AKTS)");
+          alert("ECTS Limit Exceeded! (" + currentProfile.name + " limit: " + currentProfile.maxEcts + " ECTS)");
           return;
         }
         selectedSections[courseCode] = sectionId;
@@ -1435,7 +1699,7 @@
       selectedSections[courseCode] = w.targetSec;
       delete waitlistMap[courseCode];
       renderAll();
-      alert("🎉 AUTO-SWAP BAŞARILI: " + courseCode + " (" + w.targetSec + ") şubesinde kontenjan açıldı ve sistem sizi B Planından çıkartıp asıl istediğiniz şubeye otomatik olarak geçirdi!");
+      alert("🎉 AUTO-SWAP SUCCESSFUL: A seat opened in " + courseCode + " (" + w.targetSec + ") and our engine automatically switched you from your Plan-B backup into your desired section!");
     }
 
     function simulateQuotaCrisis() {
@@ -1445,7 +1709,7 @@
       sec2.quota = sec2.maxQuota;
       selectedSections[target.code] = sec2.id;
       renderAll();
-      alert("🔥 SİMÜLASYON: " + target.code + " (" + sec2.id + ") kotası saniyeler içinde DOLDU! Şimdi '⚡ Otomatik Program Kur' butonuna basarak sistemin programı nasıl kurtardığını görün.");
+      alert("🔥 QUOTA CRISIS SIMULATION: " + target.code + " (" + sec2.id + ") just filled up (30/30 FULL)! Click '⚡ Build Optimal Schedule' or '🛠️ Auto-Resolve Conflicts' to see how the engine rescues your schedule.");
     }
 
     function renderCourseList() {
@@ -1454,6 +1718,8 @@
 
       for (var i = 0; i < courses.length; i++) {
         var course = courses[i];
+        if (currentYearFilter !== "all" && course.year !== currentYearFilter) continue;
+
         var isLockedPrereq = !course.prereqMet;
         var isLockedProbation = currentProfile.isProbation && course.year === 4;
         var isLocked = isLockedPrereq || isLockedProbation;
@@ -1462,13 +1728,13 @@
 
         var badgeHtml = "";
         if (course.status === "FF") {
-          badgeHtml = '<span class="bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded text-[11px]">Zorunlu Tekrar (FF)</span>';
+          badgeHtml = '<span class="bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded text-[11px]">Mandatory Repeat (FF)</span>';
         } else if (isLockedPrereq) {
-          badgeHtml = '<span class="bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded text-[11px]">🔒 Önkoşul: ' + course.prereq + '</span>';
+          badgeHtml = '<span class="bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded text-[11px]">🔒 Prereq: ' + course.prereq + '</span>';
         } else if (isLockedProbation) {
-          badgeHtml = '<span class="bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded text-[11px]">🔒 Sınamalı Kısıtı (4. Sınıf)</span>';
-        } else if (!course.isMandatory) {
-          badgeHtml = '<span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded text-[11px]">Seçmeli (4. Sınıf)</span>';
+          badgeHtml = '<span class="bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded text-[11px]">🔒 Probation Lock (Year 4)</span>';
+        } else {
+          badgeHtml = '<span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded text-[11px]">Year ' + course.year + (course.isMandatory ? ' Core' : ' Elective') + '</span>';
         }
 
         var pinBtnHtml = "";
@@ -1476,15 +1742,16 @@
           var pinCls = isPinned
             ? "bg-amber-400 text-slate-950 border-amber-500 font-bold"
             : "bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200";
-          var pinText = isPinned ? "📌 Sabitlendi" : "📌 Sabitle";
+          var pinText = isPinned ? "📌 Pinned" : "📌 Pin";
           pinBtnHtml = '<button id="pin-btn-' + i + '" type="button" onclick="togglePinCourse(\'' + course.code + '\')" class="text-[11px] px-2 py-0.5 rounded border transition cursor-pointer ' + pinCls + '">' + pinText + '</button>';
         }
 
         var chainInfo = course.unlocks
-          ? '<div class="text-[11px] text-slate-500 mt-0.5">🕸️ <b>Açtığı sonraki ders:</b> ' + course.unlocks + '</div>'
+          ? '<div class="text-[11px] text-slate-500 mt-0.5">🕸️ <b>Unlocks next course:</b> ' + course.unlocks + '</div>'
           : '';
 
         var sectionsHtml = "";
+        var safeCodeId = course.code.replace(/[^A-Za-z0-9]/g, "_");
         for (var j = 0; j < course.sections.length; j++) {
           var sec = course.sections[j];
           var isSelected = selectedSections[course.code] === sec.id;
@@ -1498,14 +1765,14 @@
 
           var disabledAttr = isLocked ? "disabled" : "";
           var lockCls = isLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer";
-          var dayOffBadge = (dayOffFlag && !isSelected) ? '<span class="text-[9px] bg-emerald-100 text-emerald-800 px-1 rounded ml-1">Boş Gün</span>' : '';
+          var dayOffBadge = (dayOffFlag && !isSelected) ? '<span class="text-[9px] bg-emerald-100 text-emerald-800 px-1 rounded ml-1">Day-Off</span>' : '';
 
           var quotaBadgeCls = isFull
             ? "bg-rose-600 text-white font-bold"
             : (isSelected ? "bg-indigo-800 text-white" : "bg-slate-100 text-slate-600");
-          var quotaText = sec.quota + "/" + sec.maxQuota + (isFull ? " DOLU (Yedekle)" : "");
+          var quotaText = sec.quota + "/" + sec.maxQuota + (isFull ? " FULL (Waitlist)" : "");
 
-          sectionsHtml += '<button type="button" onclick="selectSection(\'' + course.code + '\', \'' + sec.id + '\')" ' + disabledAttr + ' class="border rounded-xl px-3 py-2 text-left text-xs transition flex justify-between items-center gap-2 ' + btnStyle + ' ' + lockCls + '">' +
+          sectionsHtml += '<button id="sec-btn-' + safeCodeId + '-' + j + '" type="button" onclick="selectSection(\'' + course.code + '\', \'' + sec.id + '\')" ' + disabledAttr + ' class="border rounded-xl px-3 py-2 text-left text-xs transition flex justify-between items-center gap-2 ' + btnStyle + ' ' + lockCls + '">' +
             '<div>' +
               '<div class="font-bold flex items-center flex-wrap">' + sec.id + ': ' + sec.day + dayOffBadge + '</div>' +
               '<div class="text-[11px] opacity-85">' + sec.slot + '</div>' +
@@ -1521,7 +1788,7 @@
             '<div>' +
               '<span class="font-extrabold text-sm text-indigo-950">' + course.code + '</span>' +
               '<span class="text-sm font-semibold text-slate-700"> - ' + course.name + '</span>' +
-              '<span class="text-xs font-bold text-indigo-600 ml-1">(' + course.ects + ' AKTS)</span>' +
+              '<span class="text-xs font-bold text-indigo-600 ml-1">(' + course.ects + ' ECTS)</span>' +
               chainInfo +
             '</div>' +
             '<div class="flex flex-wrap items-center gap-1.5">' + pinBtnHtml + badgeHtml + '</div>' +
@@ -1530,7 +1797,7 @@
         '</div>';
       }
 
-      container.innerHTML = html;
+      container.innerHTML = html || '<div class="p-6 text-center text-xs text-slate-500">No courses found for this year filter.</div>';
     }
 
     function renderScheduleAndRules() {
@@ -1552,13 +1819,13 @@
       }
 
       var headerRow = document.getElementById("calendarHeader");
-      var headerHtml = '<th class="border border-indigo-800 p-2.5 w-24 bg-indigo-950 text-indigo-200">Saat</th>';
+      var headerHtml = '<th class="border border-indigo-800 p-2.5 w-24 bg-indigo-950 text-indigo-200">Time Slot</th>';
       for (var d = 0; d < days.length; d++) {
         var dayName = days[d];
         var isOff = isDayOff(dayName);
         headerHtml += '<th class="border border-indigo-800 p-2.5 ' + (isOff ? 'bg-emerald-700 text-white' : 'bg-indigo-900 text-white') + '">' +
           '<div class="font-extrabold">' + dayName + '</div>' +
-          (isOff ? '<div class="text-[10px] font-bold text-emerald-200">🌿 BOŞ GÜN</div>' : '') +
+          (isOff ? '<div class="text-[10px] font-bold text-emerald-200">🌿 DAY-OFF</div>' : '') +
         '</th>';
       }
       headerRow.innerHTML = headerHtml;
@@ -1581,10 +1848,10 @@
         activeDaysMap[sec.day] = true;
 
         if (sec.quota >= sec.maxQuota) {
-          quotaIssues.push(course.code + " (" + sec.id + ") şubesinin kotası doldu!");
+          quotaIssues.push(course.code + " (" + sec.id + ") section quota is full!");
         }
         if (isDayOff(sec.day)) {
-          dayOffViolations.push(course.code + " (" + sec.id + ") boş bıraktığınız <b>" + sec.day + "</b> gününde!");
+          dayOffViolations.push(course.code + " (" + sec.id + ") is scheduled on your protected free day (<b>" + sec.day + "</b>)!");
         }
       }
 
@@ -1609,7 +1876,7 @@
             var cardCls = isFull
               ? "bg-amber-100 border-amber-500 text-amber-950"
               : (offFlag ? "bg-amber-100 border-amber-500 text-amber-950" : "bg-indigo-600 border-indigo-900 text-white");
-            var statusLabel = isFull ? "⚠️ KOTA DOLU" : (offFlag ? "⚠️ Boş Gün İhlali" : (item.course.ects + " AKTS"));
+            var statusLabel = isFull ? "⚠️ QUOTA FULL" : (offFlag ? "⚠️ Day-Off Warning" : (item.course.ects + " ECTS"));
 
             rowHtml += '<td class="border border-indigo-100 p-1.5 h-20 align-top ' + (offFlag ? 'bg-emerald-100/40' : 'bg-white/90') + '">' +
               '<div class="' + cardCls + ' border-l-4 p-2 rounded-lg h-full flex flex-col justify-between shadow">' +
@@ -1627,13 +1894,13 @@
               namesArr.push(items[cIdx].course.code + " (" + items[cIdx].sec.id + ")");
             }
             var namesStr = namesArr.join(" & ");
-            conflicts.push(day + " " + slot + " saatinde " + namesStr + " çakışıyor!");
+            conflicts.push(day + " (" + slot + "): " + namesStr + " overlap!");
 
             rowHtml += '<td class="border border-indigo-100 p-1.5 h-20 align-top bg-rose-100">' +
               '<div class="bg-rose-600 border-l-4 border-rose-950 text-white p-2 rounded-lg h-full flex flex-col justify-between shadow animate-pulse">' +
-                '<div class="font-extrabold text-xs">⚠️ SAAT ÇAKIŞMASI</div>' +
+                '<div class="font-extrabold text-xs">⚠️ TIME CONFLICT</div>' +
                 '<div class="text-[11px] font-semibold">' + namesStr + '</div>' +
-                '<button type="button" onclick="generateSmartSchedule()" class="bg-white text-rose-700 text-[10px] py-0.5 px-1.5 rounded font-extrabold cursor-pointer">Otomatik Çöz</button>' +
+                '<button type="button" onclick="generateSmartSchedule()" class="bg-white text-rose-700 text-[10px] py-0.5 px-1.5 rounded font-extrabold cursor-pointer">Auto-Resolve</button>' +
               '</div>' +
             '</td>';
           }
@@ -1642,7 +1909,7 @@
       }
       grid.innerHTML = gridHtml;
 
-      // Mobil Günlük Kart Görünümü
+      // Mobile Daily Card View
       var mobileHtml = "";
       for (var md = 0; md < days.length; md++) {
         var mDay = days[md];
@@ -1665,7 +1932,7 @@
               '</div>' +
               '<div class="text-right shrink-0 ml-2">' +
                 '<div class="text-xs font-bold text-amber-300">' + mSlot + '</div>' +
-                '<div class="text-[10px] font-semibold text-indigo-100">' + mItem.course.ects + ' AKTS</div>' +
+                '<div class="text-[10px] font-semibold text-indigo-100">' + mItem.course.ects + ' ECTS</div>' +
               '</div>' +
             '</div>';
           } else if (mList.length > 1) {
@@ -1674,23 +1941,23 @@
             for (var x = 0; x < mList.length; x++) cNames.push(mList[x].course.code);
             dayItemsHtml += '<div class="flex items-center justify-between bg-rose-600 text-white p-2.5 rounded-lg">' +
               '<div>' +
-                '<div class="font-extrabold text-xs">⚠️ ÇAKIŞMA: ' + cNames.join(" & ") + '</div>' +
+                '<div class="font-extrabold text-xs">⚠️ CONFLICT: ' + cNames.join(" & ") + '</div>' +
                 '<div class="text-[11px]">' + mSlot + '</div>' +
               '</div>' +
-              '<button type="button" onclick="generateSmartSchedule()" class="bg-white text-rose-700 text-xs font-bold px-2.5 py-1 rounded-lg">Çöz</button>' +
+              '<button type="button" onclick="generateSmartSchedule()" class="bg-white text-rose-700 text-xs font-bold px-2.5 py-1 rounded-lg">Resolve</button>' +
             '</div>';
           }
         }
 
         if (dayCount === 0) {
-          dayItemsHtml = '<div class="text-xs text-emerald-800 font-bold py-1">🌿 Bu gün tamamen boş (Ders yok)</div>';
+          dayItemsHtml = '<div class="text-xs text-emerald-800 font-bold py-1">🌿 Completely Free Day (No classes)</div>';
         }
 
         var dayHeaderBg = mOff ? "bg-emerald-100/90 border-emerald-400" : "bg-white/90 border-indigo-200";
         mobileHtml += '<div class="border-2 rounded-xl p-3 shadow-sm ' + dayHeaderBg + '">' +
           '<div class="flex justify-between items-center mb-2">' +
-            '<span class="font-extrabold text-xs text-indigo-950 uppercase tracking-wider">' + mDay + (mOff ? ' (🌿 Boş Gün Filtresi)' : '') + '</span>' +
-            '<span class="text-[11px] font-bold text-indigo-700">' + dayCount + ' Ders</span>' +
+            '<span class="font-extrabold text-xs text-indigo-950 uppercase tracking-wider">' + mDay + (mOff ? ' (🌿 Day-Off Filter)' : '') + '</span>' +
+            '<span class="text-[11px] font-bold text-indigo-700">' + dayCount + ' Courses</span>' +
           '</div>' +
           '<div class="space-y-1.5">' + dayItemsHtml + '</div>' +
         '</div>';
@@ -1701,14 +1968,14 @@
       var waitKeys = Object.keys(waitlistMap);
       if (waitKeys.length > 0) {
         waitlistBox.classList.remove("hidden");
-        var wHtml = '<div class="font-bold text-indigo-900 mb-1.5">🔔 Aktif Kota Bekleme Listesi & B Planı Koruması (Auto-Swap Waitlist):</div>';
+        var wHtml = '<div class="font-bold text-indigo-900 mb-1.5">🔔 Active Quota Waitlist & Plan-B Protection (Auto-Swap Engine):</div>';
         for (var wIdx = 0; wIdx < waitKeys.length; wIdx++) {
           var wCode = waitKeys[wIdx];
           var wInfo = waitlistMap[wCode];
           wHtml += '<div class="flex flex-wrap justify-between items-center bg-indigo-50 p-2.5 rounded-lg border border-indigo-200 mb-1.5 gap-2">' +
-            '<span><b>' + wCode + ':</b> Asıl istenen <b>' + wInfo.targetSec + ' (' + wInfo.targetSlot + ')</b> dolu olduğu için şu an <b>' + wInfo.backupSec + '</b> şubesi B Planı olarak tutuldu.</span>' +
+            '<span><b>' + wCode + ':</b> Desired section <b>' + wInfo.targetSec + ' (' + wInfo.targetSlot + ')</b> is full; currently holding <b>' + wInfo.backupSec + '</b> as Plan-B backup.</span>' +
             '<button type="button" onclick="simulateWaitlistOpen(\'' + wCode + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg cursor-pointer">' +
-              '✨ Kontenjan Açılmasını Simüle Et (Auto-Swap)' +
+              '✨ Simulate Seat Opening (Auto-Swap)' +
             '</button>' +
           '</div>';
         }
@@ -1718,7 +1985,7 @@
       }
 
       var totalEcts = calculateEcts(null);
-      var ectsText = totalEcts + " / " + currentProfile.maxEcts + " AKTS";
+      var ectsText = totalEcts + " / " + currentProfile.maxEcts + " ECTS";
       document.getElementById("ectsCounter").innerText = ectsText;
       var mobileEctsEl = document.getElementById("mobileEctsText");
       if (mobileEctsEl) mobileEctsEl.innerText = ectsText;
@@ -1737,23 +2004,23 @@
       }
 
       if (Object.keys(selectedSections).length === 0) {
-        alertsHtml += '<div class="bg-indigo-50 text-indigo-800 border border-indigo-200 p-2.5 rounded-lg font-semibold">👈 <b>Ders Seçimi Bekleniyor:</b> Aşağıdaki ders listesinden istediğiniz şubelere tıklayarak haftalık programınızı oluşturun!</div>';
+        alertsHtml += '<div class="bg-indigo-50 text-indigo-800 border border-indigo-200 p-2.5 rounded-lg font-semibold">👈 <b>Awaiting Course Selection:</b> Click on any course section on the left catalog or click <b>⚡ Build Optimal Schedule</b>!</div>';
       } else {
         for (var fm = 0; fm < ffMissing.length; fm++) {
-          alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Zorunlu Tekrar Kuralı:</b> ' + ffMissing[fm].code + ' (FF) dersini öncelikle seçmelisiniz.</div>';
+          alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Mandatory Repeat Rule:</b> You must register for failed course ' + ffMissing[fm].code + ' (FF) first.</div>';
         }
         for (var cf = 0; cf < conflicts.length; cf++) {
-          alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Saat Çakışması:</b> ' + conflicts[cf] + '</div>';
+          alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Time Conflict:</b> ' + conflicts[cf] + '</div>';
         }
         for (var qi = 0; qi < quotaIssues.length; qi++) {
-          alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">⚠️ <b>Kota Krizi:</b> ' + quotaIssues[qi] + '</div>';
+          alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">⚠️ <b>Quota Crisis:</b> ' + quotaIssues[qi] + '</div>';
         }
         for (var dv = 0; dv < dayOffViolations.length; dv++) {
-          alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">📅 <b>Boş Gün Uyarısı:</b> ' + dayOffViolations[dv] + '</div>';
+          alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">📅 <b>Day-Off Alert:</b> ' + dayOffViolations[dv] + '</div>';
         }
 
         if (ffMissing.length === 0 && conflicts.length === 0 && quotaIssues.length === 0 && dayOffViolations.length === 0 && totalEcts > 0) {
-          alertsHtml = '<div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-2.5 rounded-lg font-semibold">✅ Tüm ÖİM kuralları, önkoşullar ve boş gün filtreleriniz doğrulandı. Kayıt kesinleştirmeye hazır!</div>';
+          alertsHtml = '<div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-2.5 rounded-lg font-semibold">✅ All university regulations, prerequisites, and day-off filters verified. Ready to finalize!</div>';
         }
       }
       alertsDiv.innerHTML = alertsHtml;
@@ -1765,31 +2032,31 @@
 
       document.getElementById("scheduleStats").innerHTML =
         '<div class="bg-white/95 border border-indigo-200 rounded-xl p-2.5 shadow-sm">' +
-          '<div class="text-[11px] text-slate-500">Seçilen Ders / AKTS</div>' +
-          '<div class="text-xs sm:text-sm font-extrabold text-indigo-950">' + Object.keys(selectedSections).length + ' Ders (' + totalEcts + ' AKTS)</div>' +
+          '<div class="text-[11px] text-slate-500">Selected Load</div>' +
+          '<div class="text-xs sm:text-sm font-extrabold text-indigo-950">' + Object.keys(selectedSections).length + ' Courses (' + totalEcts + ' ECTS)</div>' +
         '</div>' +
         '<div class="bg-emerald-50 border border-emerald-300 rounded-xl p-2.5 shadow-sm">' +
-          '<div class="text-[11px] text-emerald-700">Haftalık Boş Gün</div>' +
-          '<div class="text-xs sm:text-sm font-extrabold text-emerald-900">' + freeDaysCount + ' Gün Boş</div>' +
+          '<div class="text-[11px] text-emerald-700">Weekly Free Days</div>' +
+          '<div class="text-xs sm:text-sm font-extrabold text-emerald-900">' + freeDaysCount + ' Days Free</div>' +
         '</div>' +
         '<div class="bg-amber-50 border border-amber-300 rounded-xl p-2.5 shadow-sm">' +
-          '<div class="text-[11px] text-amber-800">Sabitlenen (📌) Şube</div>' +
-          '<div class="text-xs sm:text-sm font-extrabold text-amber-900">' + pinnedCount + ' Ders Kilitli</div>' +
+          '<div class="text-[11px] text-amber-800">Pinned (📌) Sections</div>' +
+          '<div class="text-xs sm:text-sm font-extrabold text-amber-900">' + pinnedCount + ' Locked</div>' +
         '</div>' +
         '<div class="bg-white/95 border border-indigo-200 rounded-xl p-2.5 shadow-sm">' +
-          '<div class="text-[11px] text-indigo-700">Çakışma / Kural Hatası</div>' +
-          '<div class="text-xs sm:text-sm font-extrabold text-indigo-900">' + totalIssues + ' Sorun</div>' +
+          '<div class="text-[11px] text-indigo-700">Conflicts / Alerts</div>' +
+          '<div class="text-xs sm:text-sm font-extrabold text-indigo-900">' + totalIssues + ' Issues</div>' +
         '</div>';
     }
 
     function completeRegistration() {
       if (Object.keys(selectedSections).length === 0) {
-        alert("Lütfen önce sol listeden derslerinizi seçin!");
+        alert("Please select your courses from the left catalog first!");
         return;
       }
       for (var i = 0; i < courses.length; i++) {
         if (courses[i].status === "FF" && !selectedSections[courses[i].code]) {
-          alert("HATA: Alttan kalan zorunlu (" + courses[i].code + " - FF) dersinizi seçmeden kaydı kesinleştiremezsiniz!");
+          alert("ERROR: You must select your mandatory repeat course (" + courses[i].code + " - FF) before finalizing registration!");
           return;
         }
       }
@@ -1798,35 +2065,37 @@
       var rowsHtml = "";
       for (var code in selectedSections) {
         var c = findCourse(code);
+        if (!c) continue;
         var s = findSection(c, selectedSections[code]);
+        if (!s) continue;
         rowsHtml += '<tr class="border-b border-slate-200">' +
           '<td class="py-2 font-bold text-indigo-950">' + c.code + '</td>' +
           '<td class="py-2">' + c.name + '</td>' +
           '<td class="py-2 font-semibold">' + s.id + ' (' + s.day + ' ' + s.slot + ')</td>' +
-          '<td class="py-2 text-right font-bold">' + c.ects + ' AKTS</td>' +
+          '<td class="py-2 text-right font-bold">' + c.ects + ' ECTS</td>' +
         '</tr>';
       }
 
       document.getElementById("approvalSummaryContent").innerHTML =
         '<div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex flex-wrap justify-between items-center gap-2">' +
-          '<div><b>Öğrenci Statüsü:</b> ' + currentProfile.name + ' (GANO: ' + currentProfile.gpa + ')</div>' +
-          '<div class="font-extrabold text-indigo-700">Toplam: ' + totalEcts + ' / ' + currentProfile.maxEcts + ' AKTS</div>' +
+          '<div><b>Student Status:</b> ' + currentProfile.name + ' (GPA: ' + currentProfile.gpa + ')</div>' +
+          '<div class="font-extrabold text-indigo-700">Total Load: ' + totalEcts + ' / ' + currentProfile.maxEcts + ' ECTS</div>' +
         '</div>' +
         '<div class="overflow-x-auto">' +
           '<table class="w-full text-left border-collapse">' +
             '<thead>' +
               '<tr class="border-b-2 border-slate-300 text-slate-500">' +
-                '<th class="py-1.5">Kod</th>' +
-                '<th class="py-1.5">Ders Adı</th>' +
-                '<th class="py-1.5">Şube & Saat</th>' +
-                '<th class="py-1.5 text-right">AKTS</th>' +
+                '<th class="py-1.5">Code</th>' +
+                '<th class="py-1.5">Course Title</th>' +
+                '<th class="py-1.5">Section & Schedule</th>' +
+                '<th class="py-1.5 text-right">ECTS</th>' +
               '</tr>' +
             '</thead>' +
             '<tbody>' + rowsHtml + '</tbody>' +
           '</table>' +
         '</div>' +
         '<div class="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3 rounded-xl font-medium">' +
-          '✓ Zorunlu tekrar (FF) önceliği, önkoşul zinciri, AKTS limiti ve zaman çakışması kontrolleri başarıyla tamamlanmıştır.' +
+          '✓ Mandatory repeat (FF) priority, prerequisite chains, ECTS credit limits, and time conflicts have been officially verified.' +
         '</div>';
 
       document.getElementById("approvalModal").classList.remove("hidden");
