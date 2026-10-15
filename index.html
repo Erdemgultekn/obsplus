@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>OBS+ V4.5 | Evrensel Excel/PDF & ÇAP Birleştiricili Ders Kayıt Motoru</title>
+  <title>OBS+ V5.0 | Otonom AI Sunum & Sesli Test Motoru</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Gerçek Excel (.xlsx / .xls / .csv) Okuma Kütüphanesi (SheetJS) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -12,12 +12,69 @@
   <style>
     * { -webkit-tap-highlight-color: transparent; }
     @media print {
-      header, .no-print, #mobileStickyBar { display: none !important; }
+      header, .no-print, #mobileStickyBar, #aiCursor, #aiSubtitleBanner { display: none !important; }
       body { background: white !important; padding: 0 !important; }
+    }
+    /* Yapay Zeka Sanal Mouse İmleci Tasarımı */
+    #aiCursor {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 999999;
+      pointer-events: none;
+      transition: top 0.85s cubic-bezier(0.22, 1, 0.36, 1), left 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.2s ease;
+    }
+    .ai-click-ripple {
+      position: fixed;
+      width: 44px;
+      height: 44px;
+      border-radius: 9999px;
+      background: rgba(244, 63, 94, 0.45);
+      border: 3px solid #f43f5e;
+      z-index: 999998;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.3);
+      animation: rippleAnim 0.65s ease-out forwards;
+    }
+    @keyframes rippleAnim {
+      0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
     }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-24 lg:pb-12">
+
+  <!-- YAPAY ZEKA SANAL MOUSE İMLECİ (Otonom Sunum Sırasında Görünür) -->
+  <div id="aiCursor" class="hidden">
+    <div class="relative flex items-center">
+      <!-- Parlayan Mouse Ok İkonu -->
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" class="drop-shadow-[0_6px_12px_rgba(225,29,72,0.8)]">
+        <path d="M4 3L11.5 20L14.5 13.5L21 10.5L4 3Z" fill="#e11d48" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <span class="ml-1 bg-rose-600 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-xl border border-white whitespace-nowrap">
+        🤖 Claude/MCP AI Agent
+      </span>
+    </div>
+  </div>
+
+  <!-- SİNEMATİK SESLİ ANLATIM ALTYAZI BARI -->
+  <div id="aiSubtitleBanner" class="hidden fixed bottom-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+    <div class="bg-slate-950/95 text-white border-2 border-rose-500 shadow-2xl rounded-2xl px-5 py-3.5 max-w-3xl w-full flex items-center justify-between gap-4 pointer-events-auto">
+      <div class="flex items-center gap-3">
+        <span class="flex h-3.5 w-3.5 relative shrink-0">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-rose-600"></span>
+        </span>
+        <div>
+          <div id="aiStepTitle" class="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">Otonom AI Test Ajanı Aktif</div>
+          <div id="aiSubtitleText" class="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5">Sesli anlatım başlatılıyor...</div>
+        </div>
+      </div>
+      <button type="button" onclick="stopAiPresentation()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl shrink-0 cursor-pointer">
+        ⏹️ Durdur
+      </button>
+    </div>
+  </div>
 
   <!-- ÜST BAR -->
   <header class="bg-indigo-950 text-white shadow-lg sticky top-0 z-30">
@@ -29,20 +86,25 @@
           <div>
             <div class="flex items-center gap-1.5">
               <h1 class="font-bold text-sm sm:text-lg leading-tight">Akıllı Ders Kayıt & Program Motoru</h1>
-              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v4.5 Pro</span>
+              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v5.0 AI Video</span>
             </div>
-            <p class="text-[11px] text-indigo-200 hidden sm:block">Evrensel Excel/PDF Okuyucu • ÇAP Ders Birleştirici • Canlı Ders Ekleme • Auto-Swap Waitlist</p>
+            <p class="text-[11px] text-indigo-200 hidden sm:block">Otonom Sesli AI Sunum • Evrensel Excel/PDF Okuyucu • ÇAP Ders Birleştirici • Auto-Swap</p>
           </div>
         </div>
 
-        <button type="button" onclick="openMcpModal()" class="sm:hidden bg-indigo-800 hover:bg-indigo-700 text-indigo-100 border border-indigo-600 text-[11px] font-bold px-2.5 py-1.5 rounded-lg shrink-0">
-          🌐 MCP & Kurallar
+        <button type="button" onclick="startAiPresentation()" class="sm:hidden bg-rose-600 text-white text-[11px] font-extrabold px-2.5 py-1.5 rounded-lg shrink-0">
+          🎬 AI Demo
         </button>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <button type="button" onclick="openMcpModal()" class="hidden sm:flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 border border-indigo-600 text-xs font-bold px-3 py-2 rounded-lg transition items-center gap-1.5 cursor-pointer">
-          <span>🌐 Chrome MCP & ÖİM Kuralları</span>
+        <!-- YENİ: OTONOM SESLİ VE MOUSE HAREKETLİ AI SUNUM BUTONU -->
+        <button id="btnStartAiDemo" type="button" onclick="startAiPresentation()" class="bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shadow-lg transition flex items-center gap-1.5 cursor-pointer border border-white/20 animate-pulse">
+          <span>🎬 AI Sesli Sunum & Otonom Test Başlat</span>
+        </button>
+
+        <button id="btnMcpModal" type="button" onclick="openMcpModal()" class="hidden sm:flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 border border-indigo-600 text-xs font-bold px-3 py-2 rounded-lg transition items-center gap-1.5 cursor-pointer">
+          <span>🌐 Chrome MCP & Kurallar</span>
         </button>
 
         <div class="flex items-center justify-between w-full sm:w-auto gap-2 bg-indigo-900/90 p-1.5 rounded-lg border border-indigo-700">
@@ -65,7 +127,7 @@
     <div id="errorBanner" class="hidden bg-rose-600 text-white p-3 rounded-xl text-xs font-bold"></div>
 
     <!-- EVRENSEL EXCEL / CSV / PDF DERS PROGRAMI YÜKLEYİCİ & ÇAP BİRLEŞTİRİCİ -->
-    <section class="no-print bg-gradient-to-r from-teal-950 via-emerald-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-emerald-700/80">
+    <section id="excelUploadSection" class="no-print bg-gradient-to-r from-teal-950 via-emerald-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-emerald-700/80">
       <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
         
         <div class="space-y-1.5">
@@ -76,7 +138,7 @@
             <span id="activeDeptBadge" class="bg-slate-900/80 border border-emerald-500/40 text-amber-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
               Aktif Müfredat: Makine Mühendisliği (ME)
             </span>
-            <button type="button" onclick="restoreDefaultMeCourses()" class="bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full transition cursor-pointer shadow" title="Varsayılan Makine Mühendisliği derslerine tek tıkla geri döner">
+            <button id="btnRestoreMe" type="button" onclick="restoreDefaultMeCourses()" class="bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full transition cursor-pointer shadow">
               🔄 Makine Müh. (ME) Derslerine Dön
             </button>
           </div>
@@ -86,20 +148,19 @@
 
         <!-- Yükleme Modu + Örnek İndirme + Dosya Seçme -->
         <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 shrink-0">
-          <!-- Yükleme Modu Seçici -->
           <select id="uploadModeSelect" class="bg-emerald-950 text-emerald-100 border border-emerald-500 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none cursor-pointer">
             <option value="replace">📂 Mod: Sadece Yüklenen Bölümü Göster</option>
             <option value="merge">🔗 Mod: Mevcut Derslerle Birleştir (ÇAP/Seçmeli)</option>
           </select>
 
-          <button type="button" onclick="downloadSampleExcel('comp')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
+          <button id="btnSampleComp" type="button" onclick="downloadSampleExcel('comp')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
             📥 Örnek 1: Bilgisayar (.xlsx)
           </button>
-          <button type="button" onclick="downloadSampleExcel('ee')" class="bg-sky-400 hover:bg-sky-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
+          <button id="btnSampleEe" type="button" onclick="downloadSampleExcel('ee')" class="bg-sky-400 hover:bg-sky-300 text-slate-950 font-extrabold py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow">
             📥 Örnek 2: Elektrik (.xlsx)
           </button>
 
-          <label for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2 px-4 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-emerald-400">
+          <label id="lblFileUpload" for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2 px-4 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer border-2 border-dashed border-emerald-400">
             <span>📂 Excel / PDF Yükle</span>
             <input id="scheduleFileInput" type="file" accept=".xlsx,.xls,.csv,.pdf,.txt" onchange="handleFileUpload(event)" class="hidden">
           </label>
@@ -121,7 +182,7 @@
     </section>
 
     <!-- OTOMATİK PROGRAM KURAN FİLTRE PANELİ -->
-    <section class="no-print bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-indigo-700">
+    <section id="schedulerFilterSection" class="no-print bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-indigo-700">
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4">
         <div>
           <div class="inline-flex items-center gap-1.5 bg-indigo-500/30 border border-indigo-400/40 text-indigo-100 text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-1">
@@ -134,7 +195,7 @@
         </div>
 
         <div class="flex items-center gap-2 w-full lg:w-auto">
-          <button type="button" onclick="generateSmartSchedule()" class="flex-1 sm:flex-initial bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-extrabold py-2.5 px-4 sm:px-5 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <button id="btnAutoSchedule" type="button" onclick="generateSmartSchedule()" class="flex-1 sm:flex-initial bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-extrabold py-2.5 px-4 sm:px-5 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
             <span>⚡ Filtrelere Göre Otomatik Program Kur</span>
           </button>
           <button type="button" onclick="resetSelections()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3.5 rounded-xl text-xs transition cursor-pointer shrink-0">
@@ -197,10 +258,10 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-          <button type="button" onclick="generateSmartSchedule()" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm text-xs transition flex items-center justify-center gap-1 cursor-pointer">
+          <button id="btnResolveConflicts" type="button" onclick="generateSmartSchedule()" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm text-xs transition flex items-center justify-center gap-1 cursor-pointer">
             <span>🛠️ Çakışmaları Çöz</span>
           </button>
-          <button type="button" onclick="simulateQuotaCrisis()" class="bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm text-xs transition flex items-center justify-center gap-1 cursor-pointer">
+          <button id="btnQuotaCrisis" type="button" onclick="simulateQuotaCrisis()" class="bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm text-xs transition flex items-center justify-center gap-1 cursor-pointer">
             <span>🔥 Kota Krizi Testi</span>
           </button>
         </div>
@@ -212,7 +273,7 @@
               <p class="text-[11px] text-slate-500">Şubeye tıklayıp seçin • İsterseniz canlı ders ekleyin</p>
             </div>
             <div class="flex items-center gap-1.5">
-              <button type="button" onclick="openQuickAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm transition cursor-pointer">
+              <button id="btnQuickAdd" type="button" onclick="openQuickAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm transition cursor-pointer">
                 ➕ Hızlı Ders Ekle
               </button>
               <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">8 Ders</span>
@@ -248,7 +309,7 @@
               <button type="button" onclick="window.print()" class="hidden sm:inline-flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 text-xs font-bold px-3 py-2 rounded-xl border border-indigo-600 transition cursor-pointer">
                 🖨️ Yazdır
               </button>
-              <button type="button" onclick="completeRegistration()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs sm:text-sm font-extrabold px-4 py-2 rounded-xl shadow-md transition cursor-pointer">
+              <button id="btnSubmitReg" type="button" onclick="completeRegistration()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs sm:text-sm font-extrabold px-4 py-2 rounded-xl shadow-md transition cursor-pointer">
                 ✓ Kaydı Kesinleştir
               </button>
             </div>
@@ -294,7 +355,7 @@
     </div>
   </div>
 
-  <!-- MODAL 1: HIZLI MANUEL DERS EKLEME (SPONTANE JÜRİ İSTEKLERİ İÇİN) -->
+  <!-- MODAL 1: HIZLI MANUEL DERS EKLEME -->
   <div id="quickAddModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-200 space-y-4">
       <div class="flex justify-between items-center">
@@ -360,7 +421,7 @@
         <div>[Chrome-MCP] Connected: https://oim.yasar.edu.tr/ders-kayitlari/</div>
         <div>[Chrome-MCP] Regulation Art. 22: Normal=40 ECTS, Probation(GPA&lt;1.80)=32 ECTS, DoubleMajor=42 ECTS</div>
         <div>[SheetJS + PDF.js] Universal Excel (.xlsx/.xls/.csv) &amp; PDF Course Extractor Active ✓</div>
-        <div>[Merge-Engine] Cross-Department Course Merging (Double Major / Elective) Ready ✓</div>
+        <div>[AI-Voice-Agent] Autonomous Cursor &amp; Turkish Speech Synthesis Engine Ready ✓</div>
       </div>
 
       <div class="flex justify-end">
@@ -417,8 +478,8 @@
     var daysOff = ["Cuma"];
     var pinnedCourses = {};
     var waitlistMap = {};
+    var isAiDemoRunning = false;
 
-    // VARSAYILAN MAKİNE MÜHENDİSLİĞİ YEDEK KOPYASI (Tek tıkla geri dönmek için)
     function getDefaultMeCourses() {
       return [
         {
@@ -556,7 +617,187 @@
       "ME 3360": "Sec 3"
     };
 
-    // TEK TIKLA MAKİNE MÜHENDİSLİĞİ DERSLERİNE GERİ DÖNME
+    // =========================================================================
+    // YENİ: OTONOM SESLİ VE MOUSE HAREKETLİ YAPAY ZEKA SUNUM & TEST AJANI
+    // =========================================================================
+    function speakTurkish(text) {
+      return new Promise(function(resolve) {
+        if (!("speechSynthesis" in window)) {
+          setTimeout(resolve, 3200);
+          return;
+        }
+        window.speechSynthesis.cancel();
+        var utter = new SpeechSynthesisUtterance(text);
+        utter.lang = "tr-TR";
+        utter.rate = 1.05;
+        utter.pitch = 1.0;
+
+        var voices = window.speechSynthesis.getVoices();
+        for (var i = 0; i < voices.length; i++) {
+          if (voices[i].lang.indexOf("tr") !== -1) {
+            utter.voice = voices[i];
+            break;
+          }
+        }
+
+        var fallbackTimer = setTimeout(resolve, Math.max(3500, text.length * 75));
+        utter.onend = function() {
+          clearTimeout(fallbackTimer);
+          setTimeout(resolve, 400);
+        };
+        utter.onerror = function() {
+          clearTimeout(fallbackTimer);
+          setTimeout(resolve, 1000);
+        };
+        window.speechSynthesis.speak(utter);
+      });
+    }
+
+    function waitMs(ms) {
+      return new Promise(function(r) { setTimeout(r, ms); });
+    }
+
+    async function moveCursorAndClick(selector, stepLabel, speechText, customAction) {
+      if (!isAiDemoRunning) return;
+
+      document.getElementById("aiStepTitle").innerText = stepLabel;
+      document.getElementById("aiSubtitleText").innerText = speechText;
+
+      var el = typeof selector === "string" ? document.querySelector(selector) : selector;
+      var cursor = document.getElementById("aiCursor");
+
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        await waitMs(450);
+        var rect = el.getBoundingClientRect();
+        var targetX = Math.max(20, Math.min(window.innerWidth - 120, rect.left + rect.width / 2));
+        var targetY = Math.max(20, Math.min(window.innerHeight - 60, rect.top + rect.height / 2));
+
+        cursor.style.left = targetX + "px";
+        cursor.style.top = targetY + "px";
+        await waitMs(850);
+
+        // Tıklama Dalga Efekti (Ripple)
+        var ripple = document.createElement("div");
+        ripple.className = "ai-click-ripple";
+        ripple.style.left = targetX + "px";
+        ripple.style.top = targetY + "px";
+        document.body.appendChild(ripple);
+        cursor.style.transform = "scale(0.85)";
+        setTimeout(function() {
+          cursor.style.transform = "scale(1)";
+          if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+        }, 600);
+      }
+
+      if (customAction) {
+        customAction();
+      }
+      await speakTurkish(speechText);
+    }
+
+    function stopAiPresentation() {
+      isAiDemoRunning = false;
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      document.getElementById("aiCursor").classList.add("hidden");
+      document.getElementById("aiSubtitleBanner").classList.add("hidden");
+      closeMcpModal();
+      closeApprovalModal();
+    }
+
+    async function startAiPresentation() {
+      if (isAiDemoRunning) {
+        stopAiPresentation();
+        return;
+      }
+      isAiDemoRunning = true;
+      closeMcpModal();
+      closeApprovalModal();
+      restoreDefaultMeCourses();
+
+      var cursor = document.getElementById("aiCursor");
+      var banner = document.getElementById("aiSubtitleBanner");
+      cursor.classList.remove("hidden");
+      banner.classList.remove("hidden");
+
+      // Adım 1: Başlangıç ve Kural Motoru
+      await moveCursorAndClick(
+        "#btnMcpModal",
+        "Adım 1/6 • Chrome MCP & Kural Motoru",
+        "Merhaba! Ben OBS Plus yapay zeka test ajanıyım. Üniversitenin resmi ders kayıt kurallarını ve önkoşul zincirini Chrome MCP mimarisiyle sistemimize entegre ettik.",
+        function() { openMcpModal(); }
+      );
+      if (!isAiDemoRunning) return;
+      closeMcpModal();
+
+      // Adım 2: Zorunlu FF Dersini Sabitleme (Pin)
+      await moveCursorAndClick(
+        "#pin-btn-0",
+        "Adım 2/6 • Şube Sabitleme (Pin Lock)",
+        "Şu an pazartesi sabahı saat çakışmamız var. Önce alttan kalan zorunlu Termodinamik dersimizin birinci şubesini sabitliyoruz ki algoritma bu şubeyi korusun.",
+        function() { pinnedCourses["ME 2210"] = true; renderAll(); }
+      );
+      if (!isAiDemoRunning) return;
+
+      // Adım 3: Boş Gün Seçimi ve Otomatik Program Kurma
+      await moveCursorAndClick(
+        "#btnAutoSchedule",
+        "Adım 3/6 • Akıllı Kombinasyon & Boş Gün Filtresi",
+        "Şimdi Cuma gününü boş bırakacak şekilde otomatik program kur butonuna tıklıyoruz. Algoritmamız sabit şubeyi bozmadan 6 dersi ve 37 AKTS yükünü sıfır çakışmayla yerleştirdi!",
+        function() { daysOff = ["Cuma"]; generateSmartSchedule(); }
+      );
+      if (!isAiDemoRunning) return;
+
+      // Adım 4: Kota Krizi Simülasyonu ve Çözümü
+      await moveCursorAndClick(
+        "#btnQuotaCrisis",
+        "Adım 4/6 • Ani Kota Doluluk Krizi Testi",
+        "Kayıt sabahı bir şubenin kotası aniden dolduğunda sistemimiz uyarı verir. Tek tıkla otomatik çözücüyü çalıştırarak açık olan alternatif şubeye anında geçiş yapıyoruz.",
+        function() {
+          var target = courses[1];
+          var sec2 = target.sections[1];
+          sec2.quota = sec2.maxQuota;
+          selectedSections[target.code] = sec2.id;
+          renderAll();
+        }
+      );
+      if (!isAiDemoRunning) return;
+
+      await moveCursorAndClick(
+        "#btnResolveConflicts",
+        "Adım 4/6 • B Planı Otomatik Kurtarma",
+        "Gördüğünüz gibi dolu şubeden çıkılıp açık şubeye otomatik geçiş yapıldı ve program kurtarıldı.",
+        function() { generateSmartSchedule(); }
+      );
+      if (!isAiDemoRunning) return;
+
+      // Adım 5: Evrensel Excel / ÇAP Birleştirme Testi
+      await moveCursorAndClick(
+        "#lblFileUpload",
+        "Adım 5/6 • Evrensel Excel ve PDF Yükleyici",
+        "Öğrenciler kendi bölümlerinin Excel veya PDF ders programlarını yükleyebilir ya da Çift Anadal dersleriyle birleştirebilir.",
+        function() {
+          var cardCont = document.getElementById("courseCardContainer");
+          cardCont.className = "bg-white rounded-xl shadow-lg border-4 border-emerald-500 overflow-hidden transition-all duration-500";
+          setTimeout(function() {
+            cardCont.className = "bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500";
+          }, 2000);
+        }
+      );
+      if (!isAiDemoRunning) return;
+
+      // Adım 6: Kaydı Kesinleştirme ve Danışman Onay Fişi
+      await moveCursorAndClick(
+        "#btnSubmitReg",
+        "Adım 6/6 • Kayıt Kesinleştirme & Danışman Fişi",
+        "Tüm kurallar doğrulandı. Kaydı kesinleştir butonuna basarak danışman onay fişimizi üretiyoruz. Dinlediğiniz için teşekkürler!",
+        function() { completeRegistration(); }
+      );
+
+      await waitMs(1500);
+      stopAiPresentation();
+    }
+
     function restoreDefaultMeCourses() {
       courses = getDefaultMeCourses();
       pinnedCourses = {};
@@ -573,7 +814,6 @@
       renderAll();
     }
 
-    // HIZLI MANUEL DERS EKLEME FONKSİYONLARI
     function openQuickAddModal() {
       document.getElementById("quickAddModal").classList.remove("hidden");
     }
@@ -611,7 +851,6 @@
       renderAll();
     }
 
-    // GERÇEK .XLSX EXCEL DOSYASI ÜRETİP İNDİRME FONKSİYONU
     function downloadSampleExcel(type) {
       var rows = [];
       var fileName = "";
@@ -668,7 +907,6 @@
       }
     }
 
-    // EVRENSEL DOSYA YÜKLEYİCİ
     function handleFileUpload(event) {
       var file = event.target.files[0];
       if (!file) return;
@@ -867,18 +1105,15 @@
         var extracted = extractCoursesUniversal(rows, rawText);
         if (extracted && extracted.length > 0) {
           if (uploadMode === "merge") {
-            // MEVCUT DERSLERLE BİRLEŞTİR (Makine dersleri kalır, yeni dersler altına eklenir)
             for (var i = 0; i < extracted.length; i++) {
               var newC = extracted[i];
               if (!findCourse(newC.code)) {
-                // Birleştirme modunda eklenen diğer bölüm derslerinin FF zorunluluğunu Normal yap ki çakışma çıkarmasın
                 if (newC.status === "FF") newC.status = "Normal";
                 courses.push(newC);
               }
             }
             document.getElementById("activeDeptBadge").innerText = "Birleştirilmiş Müfredat (ME + " + fileName + ")";
           } else {
-            // SADECE YÜKLENEN BÖLÜMÜ GÖSTER
             courses = extracted;
             selectedSections = {};
             pinnedCourses = {};
@@ -1242,7 +1477,7 @@
             ? "bg-amber-400 text-slate-950 border-amber-500 font-bold"
             : "bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200";
           var pinText = isPinned ? "📌 Sabitlendi" : "📌 Sabitle";
-          pinBtnHtml = '<button type="button" onclick="togglePinCourse(\'' + course.code + '\')" class="text-[11px] px-2 py-0.5 rounded border transition cursor-pointer ' + pinCls + '">' + pinText + '</button>';
+          pinBtnHtml = '<button id="pin-btn-' + i + '" type="button" onclick="togglePinCourse(\'' + course.code + '\')" class="text-[11px] px-2 py-0.5 rounded border transition cursor-pointer ' + pinCls + '">' + pinText + '</button>';
         }
 
         var chainInfo = course.unlocks
