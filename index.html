@@ -1,563 +1,475 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>Yaşar Üniversitesi OBS+ v2.0 | Akıllı Ders Kayıt Sistemi</title>
+  <title>OBS+ v2.0 | Smart Course Registration & Schedule Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SheetJS: Çok Sekmeli Üniversite Excel (.xlsx / .xls / .csv) Okuyucu -->
+  <!-- SheetJS for Universal Excel (.xlsx / .xls / .csv) Parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- PDF.js: Evrensel PDF Ders Programı Okuyucu -->
+  <!-- PDF.js for Universal PDF Parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     * { -webkit-tap-highlight-color: transparent; }
-    body { background-color: #e9ecef; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    /* Yaşar OBS Özel Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f3f5; }
-    ::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 3px; }
     @media print {
-      #obsTopHeader, #obsSidebar, .no-print, #aiCursor, #aiSubtitleBanner, #smartDrawerModal { display: none !important; }
-      body { background: white !important; }
+      header, .no-print, #mobileStickyBar, #aiCursor, #aiSubtitleBanner { display: none !important; }
+      body { background: white !important; padding: 0 !important; }
     }
-    /* Yapay Zeka Sanal Mouse İmleci */
+    /* Autonomous AI Agent Mouse Cursor */
     #aiCursor {
       position: fixed;
       top: 50%;
       left: 50%;
       z-index: 999999;
       pointer-events: none;
-      transition: top 1.0s cubic-bezier(0.22, 1, 0.36, 1), left 1.0s cubic-bezier(0.22, 1, 0.36, 1), transform 0.2s ease;
+      transition: top 1.05s cubic-bezier(0.22, 1, 0.36, 1), left 1.05s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s ease;
     }
     .ai-click-ripple {
       position: fixed;
-      width: 46px;
-      height: 46px;
+      width: 48px;
+      height: 48px;
       border-radius: 9999px;
       background: rgba(244, 63, 94, 0.45);
       border: 3px solid #f43f5e;
       z-index: 999998;
       pointer-events: none;
       transform: translate(-50%, -50%) scale(0.3);
-      animation: rippleAnim 0.7s ease-out forwards;
+      animation: rippleAnim 0.75s ease-out forwards;
     }
     @keyframes rippleAnim {
       0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(2.3); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
     }
   </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col overflow-x-hidden">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-24 lg:pb-12">
 
-  <!-- OTONOM AI MOUSE İMLECİ -->
+  <!-- AUTONOMOUS AI AGENT VIRTUAL CURSOR -->
   <div id="aiCursor" class="hidden">
     <div class="relative flex items-center">
-      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" class="drop-shadow-[0_6px_12px_rgba(225,29,72,0.85)]">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" class="drop-shadow-[0_6px_14px_rgba(225,29,72,0.85)]">
         <path d="M4 3L11.5 20L14.5 13.5L21 10.5L4 3Z" fill="#e11d48" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
       </svg>
-      <span class="ml-1.5 bg-rose-600 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-2xl border border-white whitespace-nowrap">
-        🤖 OBS+ AI Presenter
+      <span class="ml-1.5 bg-rose-600 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-2xl border border-white whitespace-nowrap">
+        🤖 Claude / MCP AI Presenter
       </span>
     </div>
   </div>
 
-  <!-- SİNEMATİK AI SESLİ ANLATIM ALTYAZI VE KONTROL BARI -->
-  <div id="aiSubtitleBanner" class="hidden fixed bottom-5 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
-    <div class="bg-slate-950/95 text-white border-2 border-rose-500 shadow-2xl rounded-2xl px-5 py-3.5 max-w-4xl w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pointer-events-auto">
-      <div class="flex items-start sm:items-center gap-3">
-        <span class="flex h-3.5 w-3.5 relative shrink-0 mt-1 sm:mt-0">
+  <!-- CINEMATIC AI VOICEOVER SUBTITLE BAR (ENGLISH AUDIO + TURKISH SUBTITLES + MEDIA CONTROLS) -->
+  <div id="aiSubtitleBanner" class="hidden fixed bottom-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+    <div class="bg-slate-950/95 text-white border-2 border-rose-500 shadow-2xl rounded-2xl px-5 py-4 max-w-4xl w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pointer-events-auto">
+      <div class="flex items-start sm:items-center gap-3.5">
+        <span class="flex h-4 w-4 relative shrink-0 mt-1 sm:mt-0">
           <span id="aiPulseDot" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-rose-600"></span>
+          <span class="relative inline-flex rounded-full h-4 w-4 bg-rose-600"></span>
         </span>
         <div>
-          <div id="aiStepTitle" class="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">Otonom AI Sunumu (İngilizce Ses • Türkçe Altyazı)</div>
+          <div id="aiStepTitle" class="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">Otonom AI Sunumu Aktif (İngilizce Ses • Türkçe Altyazı)</div>
           <div id="aiSubtitleText" class="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5 leading-relaxed">Sesli anlatım başlatılıyor...</div>
         </div>
       </div>
 
+      <!-- Media Control Buttons: Pause/Resume, Restart, Stop -->
       <div class="flex items-center justify-end gap-2 shrink-0">
-        <button id="btnPauseResumeAi" type="button" onclick="togglePauseAiPresentation()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer transition shadow">
+        <button id="btnPauseResumeAi" type="button" onclick="togglePauseAiPresentation()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow">
           ⏸️ Duraklat
         </button>
-        <button type="button" onclick="restartAiPresentation()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer transition shadow">
+        <button type="button" onclick="restartAiPresentation()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow">
           ⏮️ Başa Sar
         </button>
-        <button type="button" onclick="stopAiPresentation()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer transition shadow">
+        <button type="button" onclick="stopAiPresentation()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold px-3 py-2 rounded-xl cursor-pointer transition shadow">
           ⏹️ Kapat
         </button>
       </div>
     </div>
   </div>
 
-  <!-- 1. YAŞAR ÜNİVERSİTESİ OBS ÜST BAR (TOP HEADER) -->
-  <header id="obsTopHeader" class="bg-[#2b3035] text-slate-200 h-12 px-3 sm:px-5 flex items-center justify-between shadow-md sticky top-0 z-30 border-b border-slate-700">
-    <!-- Sol: Hamburger Menü + Üniversite Adı + Dönem -->
-    <div class="flex items-center gap-3">
-      <button type="button" onclick="toggleMobileSidebar()" class="text-slate-300 hover:text-white p-1 rounded cursor-pointer">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-      <div class="flex items-baseline gap-2.5">
-        <span id="uiUnivTitle" class="font-semibold text-sm sm:text-base text-white tracking-tight">Yaşar Üniversitesi</span>
-        <span id="uiSemesterText" class="text-xs text-slate-400 font-medium">2026-2027 Güz</span>
-        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full hidden sm:inline-block">OBS+ v2.0</span>
+  <!-- 1. TOP NAVIGATION BAR -->
+  <header class="bg-indigo-950 text-white shadow-lg sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5">
+      
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <div class="bg-rose-600 text-white font-extrabold px-2.5 py-1 rounded-lg text-base sm:text-lg tracking-tight shadow">OBS+</div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h1 class="font-bold text-sm sm:text-lg leading-tight">Smart Course Registration & Schedule Engine</h1>
+              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">v2.0</span>
+            </div>
+            <p class="text-[11px] text-indigo-200 hidden sm:block">University Registration Rules • Universal Excel & PDF Parser • Day-Off Filter • Auto-Swap Waitlist</p>
+          </div>
+        </div>
+
+        <button type="button" onclick="startAiPresentation()" class="sm:hidden bg-rose-600 text-white text-[11px] font-extrabold px-2.5 py-1.5 rounded-lg shrink-0">
+          🎬 AI Tour
+        </button>
       </div>
-    </div>
 
-    <!-- Sağ: Tek Tıkla Dil Değiştirici + AI Sunum + MCP + Öğrenci Bilgisi -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <!-- TEK TIKLA DİL DEĞİŞTİRME BUTONU (TR / EN) -->
-      <button id="btnLangToggle" type="button" onclick="toggleLanguage()" class="bg-[#3d444b] hover:bg-slate-600 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-500 transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="Switch Language (Türkçe / English)">
-        <span id="langFlag">🇹🇷</span>
-        <span id="langCodeText">TR</span>
-        <span class="text-slate-400">|</span>
-        <span class="text-[10px] text-amber-300 font-extrabold" id="langOtherText">EN</span>
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- FULL ENGLISH AI VOICEOVER & AUTONOMOUS DEMO BUTTON -->
+        <button id="btnStartAiDemo" type="button" onclick="startAiPresentation()" class="bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl shadow-lg transition flex items-center gap-1.5 cursor-pointer border border-white/20 animate-pulse">
+          <span>🎬 Start Full AI Voice Demo</span>
+        </button>
 
-      <!-- AI Voice Tour Butonu -->
-      <button id="btnStartAiDemo" type="button" onclick="startAiPresentation()" class="bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1 cursor-pointer">
-        <span>🎬</span>
-        <span id="uiBtnAiTour" class="hidden md:inline">AI Sesli Sunum</span>
-      </button>
+        <button id="btnMcpModal" type="button" onclick="openMcpModal()" class="hidden sm:flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 border border-indigo-600 text-xs font-bold px-3 py-2 rounded-lg transition items-center gap-1.5 cursor-pointer">
+          <span>🌐 Chrome MCP Agent Hub</span>
+        </button>
 
-      <!-- Chrome MCP Butonu -->
-      <button id="btnMcpModal" type="button" onclick="openMcpModal()" class="bg-[#3d444b] hover:bg-slate-600 text-slate-200 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-600 transition flex items-center gap-1 cursor-pointer">
-        <span>🌐</span>
-        <span class="hidden lg:inline">MCP</span>
-      </button>
-
-      <!-- Öğrenci Profil Rozeti -->
-      <div class="hidden sm:flex items-center gap-2 pl-2 border-l border-slate-600 text-xs">
-        <div class="w-7 h-7 rounded-full bg-slate-600 text-white font-bold flex items-center justify-center text-[11px] border border-slate-400">JD</div>
-        <span class="text-slate-300 font-medium tracking-tight">23012341234 - JOHN DOE</span>
+        <div id="statusBoxContainer" class="flex items-center justify-between w-full sm:w-auto gap-2 bg-indigo-900/90 p-1.5 rounded-lg border border-indigo-700">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-200 pl-1 shrink-0">Status:</span>
+          <select id="profileSelect" onchange="changeProfile()" class="w-full sm:w-auto bg-white text-slate-900 text-xs font-bold rounded px-2 py-1.5 focus:outline-none cursor-pointer">
+            <option value="normal">Regular Student (GPA: 2.75 | Max: 40 ECTS)</option>
+            <option value="probation">Probation Student (GPA: 1.62 | Max: 32 ECTS)</option>
+            <option value="doubleMajor">Double Major / DM (GPA: 3.40 | Max: 42 ECTS)</option>
+          </select>
+        </div>
       </div>
+
     </div>
   </header>
 
-  <!-- ANA GÖVDE: SOL OBS MENÜSÜ + ORTA DERS LİSTESİ + SAĞ HAFTALIK PROGRAM -->
-  <div class="flex-1 flex relative">
+  <!-- MAIN CONTENT -->
+  <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-5 space-y-4 sm:space-y-5">
 
-    <!-- 2. SOL YAŞAR OBS YAN MENÜSÜ (SIDEBAR) -->
-    <aside id="obsSidebar" class="w-56 bg-[#343a40] text-slate-300 flex-col shrink-0 select-none hidden xl:flex border-r border-slate-700">
-      <!-- Logo Alanı -->
-      <div class="py-5 px-4 flex flex-col items-center border-b border-slate-700/80">
-        <div class="w-14 h-14 rounded-full bg-white p-1 flex items-center justify-center shadow-md mb-2">
-          <div class="w-full h-full rounded-full border-2 border-[#1e3a8a] flex items-center justify-center text-[#1e3a8a] font-black text-lg tracking-tighter">YÜ</div>
+    <!-- Error Banner -->
+    <div id="errorBanner" class="hidden bg-rose-600 text-white p-3 rounded-xl text-xs font-bold"></div>
+
+    <!-- 2. UNIVERSAL EXCEL & PDF SCHEDULE IMPORTER SECTION (CLEAN & STREAMLINED) -->
+    <section id="excelUploadSection" class="no-print bg-gradient-to-r from-teal-950 via-emerald-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-emerald-700/80">
+      <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
+        
+        <div class="space-y-1.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+              🤖 UNIVERSAL AI SCHEDULE PARSER
+            </span>
+            <span id="activeDeptBadge" class="bg-slate-900/80 border border-emerald-500/40 text-amber-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
+              Active Catalog: Empty (Ready for Upload)
+            </span>
+          </div>
+          <h2 class="text-base sm:text-lg font-bold">Upload Any Course Schedule (.xlsx, .xls, .csv, .pdf)</h2>
+          <p class="text-xs text-emerald-100/90">Automatically detects and parses any university schedule file—including multi-sheet weekly timetables, standard Excel tables, and PDF documents. Choose <b>Load as New Curriculum</b> for a fresh start or <b>Merge Mode</b> to combine multiple files.</p>
         </div>
-        <div id="uiSidebarTitle" class="text-xs font-semibold text-slate-200 text-center">Öğrenci Bilgi Sistemi</div>
+
+        <!-- Upload Mode + File Input Only -->
+        <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 shrink-0">
+          <select id="uploadModeSelect" class="bg-emerald-950 text-emerald-100 border border-emerald-500 rounded-xl px-3.5 py-2.5 text-xs font-bold focus:outline-none cursor-pointer">
+            <option value="replace">📂 Mode: Load as New Curriculum</option>
+            <option value="merge">🔗 Mode: Merge with Existing List</option>
+          </select>
+
+          <label id="lblFileUpload" for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2.5 px-5 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer border-2 border-dashed border-emerald-400">
+            <span>📂 Upload Excel / PDF Schedule</span>
+            <input id="scheduleFileInput" type="file" accept=".xlsx,.xls,.csv,.pdf,.txt" onchange="handleFileUpload(event)" class="hidden">
+          </label>
+        </div>
+
       </div>
 
-      <!-- Menüde Ara -->
-      <div class="p-3 border-b border-slate-700/60">
-        <input id="uiMenuSearch" type="text" placeholder="Menüde Ara..." class="w-full bg-[#2b3035] text-xs text-slate-200 placeholder-slate-400 px-3 py-1.5 rounded border border-slate-600 focus:outline-none">
+      <!-- AI Scanning Progress Bar & Report -->
+      <div id="aiScanContainer" class="hidden mt-4 pt-3.5 border-t border-emerald-700/60 space-y-2">
+        <div class="flex justify-between items-center text-xs">
+          <span id="aiScanStatusText" class="font-bold text-emerald-200 flex items-center gap-2">🔍 AI Engine is scanning document...</span>
+          <span id="aiScanPercent" class="font-extrabold text-emerald-300">0%</span>
+        </div>
+        <div class="w-full bg-emerald-950 h-2.5 rounded-full overflow-hidden border border-emerald-700">
+          <div id="aiScanProgressBar" class="bg-emerald-400 h-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div id="aiScanResultBox" class="hidden bg-slate-900/90 border border-emerald-500/40 rounded-xl p-3 text-xs text-emerald-100 leading-relaxed"></div>
+      </div>
+    </section>
+
+    <!-- 3. SMART AUTO-SCHEDULER & FILTER PANEL -->
+    <section id="schedulerFilterSection" class="no-print bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-md border border-indigo-700">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4">
+        <div>
+          <div class="inline-flex items-center gap-1.5 bg-indigo-500/30 border border-indigo-400/40 text-indigo-100 text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-1">
+            <span>🎯 CONSTRAINT SATISFACTION & BACKTRACKING</span>
+            <span>•</span>
+            <span>Protects Pinned (📌) Sections</span>
+          </div>
+          <h2 class="text-base sm:text-lg font-bold">Smart Auto-Scheduler & Day-Off Filter</h2>
+          <p class="text-xs text-indigo-200 mt-0.5">Select your desired free days, time preferences, or pin (📌) your favorite sections; our backtracking algorithm builds a conflict-free schedule in milliseconds.</p>
+        </div>
+
+        <div class="flex items-center gap-2 w-full lg:w-auto">
+          <button id="btnAutoSchedule" type="button" onclick="generateSmartSchedule()" class="flex-1 sm:flex-initial bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-extrabold py-2.5 px-4 sm:px-5 rounded-xl shadow-md text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <span>⚡ Build Optimal Schedule</span>
+          </button>
+          <button id="btnResetSelections" type="button" onclick="resetSelections()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3.5 rounded-xl text-xs transition cursor-pointer shrink-0">
+            Unselect All
+          </button>
+        </div>
       </div>
 
-      <!-- Menü Linkleri -->
-      <nav class="flex-1 overflow-y-auto py-2 text-xs space-y-0.5">
-        <div id="uiMenuHeaderGenel" class="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Genel</div>
-        <a href="javascript:void(0)" class="flex items-center justify-between px-4 py-2 hover:bg-slate-700/60 transition">
-          <span id="uiMenuGenelIslemler">⊞ Genel İşlemler</span>
-          <span class="text-[10px]">›</span>
-        </a>
-        <div class="bg-[#2b3035]">
-          <div class="flex items-center justify-between px-4 py-2 text-white font-semibold border-l-4 border-sky-500">
-            <span id="uiMenuDersDonem">🎓 Ders ve Dönem İşlemleri</span>
-            <span class="text-[10px]">⌄</span>
-          </div>
-          <div class="pl-6 pr-3 py-1 space-y-1 text-[11px]">
-            <a href="javascript:void(0)" class="block px-3 py-1.5 rounded bg-slate-600/80 text-white font-bold">
-              • <span id="uiMenuDersKayit">Ders Kayıt</span>
-            </a>
-            <a href="javascript:void(0)" onclick="openSmartDrawer()" class="block px-3 py-1.5 rounded hover:bg-slate-700 text-emerald-300 font-semibold">
-              • <span id="uiMenuOtoOlustur">✨ Otomatik Oluştur / Excel</span>
-            </a>
-            <a href="javascript:void(0)" class="block px-3 py-1.5 rounded hover:bg-slate-700 text-slate-300">
-              • <span id="uiMenuDersEkleBirak">Ders Ekle/Bırak</span>
-            </a>
-            <a href="javascript:void(0)" class="block px-3 py-1.5 rounded hover:bg-slate-700 text-slate-300">
-              • <span id="uiMenuDonemOrt">Dönem Ortalamaları</span>
-            </a>
-            <a href="javascript:void(0)" class="block px-3 py-1.5 rounded hover:bg-slate-700 text-slate-300">
-              • <span id="uiMenuNotListesi">Not Listesi</span>
-            </a>
-            <a href="javascript:void(0)" class="block px-3 py-1.5 rounded hover:bg-slate-700 text-slate-300">
-              • <span id="uiMenuTranskript">Transkript</span>
-            </a>
-            <a href="javascript:void(0)" class="block px-3 py-1.5 rounded hover:bg-slate-700 text-slate-300">
-              • <span id="uiMenuMufredatDurum">Müfredat Durum</span>
-            </a>
-          </div>
+      <!-- Filter Controls -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 mt-4 pt-4 border-t border-indigo-700/70">
+        
+        <div class="md:col-span-6 bg-indigo-950/60 p-3 rounded-xl border border-indigo-800">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-200 mb-2">
+            📅 Select Your Desired Free Days (Day-Off Filter):
+          </label>
+          <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2" id="dayOffContainer"></div>
         </div>
-        <a href="javascript:void(0)" class="flex items-center justify-between px-4 py-2 hover:bg-slate-700/60 transition">
-          <span id="uiMenuFormIslemleri">📝 Form İşlemleri</span>
-          <span class="text-[10px]">›</span>
-        </a>
-        <a href="javascript:void(0)" class="flex items-center justify-between px-4 py-2 hover:bg-slate-700/60 transition">
-          <span id="uiMenuBelgeTalebi">📄 Belge Talebi</span>
-          <span class="text-[10px]">›</span>
-        </a>
-      </nav>
-    </aside>
 
-    <!-- 3. ORTA ve SAĞ ÇALIŞMA ALANI (MAIN WORKSPACE) -->
-    <main class="flex-1 p-3 sm:p-4 max-w-[1600px] mx-auto w-full">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <div class="md:col-span-3 bg-indigo-950/60 p-3 rounded-xl border border-indigo-800">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-200 mb-2">
+            ⏰ Morning / Time Filter:
+          </label>
+          <select id="timeFilterSelect" class="w-full bg-indigo-900 text-white border border-indigo-600 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none">
+            <option value="any">All Time Slots Allowed (08:40 - 17:30)</option>
+            <option value="no_early">No Early 08:40 Morning Classes!</option>
+            <option value="no_late">No Late 15:40 Afternoon Classes!</option>
+          </select>
+        </div>
 
-        <!-- ORTA SÜTUN: DERS KAYIT LİSTESİ (7 Sütun) -->
-        <section id="leftCourseColumn" class="lg:col-span-7 space-y-3">
-          
-          <!-- Üst Kompakt Bilgi & Sınıf Filtresi Barı -->
-          <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-3 flex flex-wrap justify-between items-center gap-2">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <span id="activeDeptBadge" class="text-xs font-bold text-slate-700">Aktif Katalog: Boş (Yükleme Bekleniyor)</span>
-            </div>
+        <div class="md:col-span-3 bg-indigo-950/60 p-3 rounded-xl border border-indigo-800">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-indigo-200 mb-2">
+            🎓 Course Load Preference:
+          </label>
+          <select id="loadFilterSelect" class="w-full bg-indigo-900 text-white border border-indigo-600 rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none">
+            <option value="max">Maximize Course Load (Up to ECTS Limit)</option>
+            <option value="core_only">Mandatory & Repeat (FF) Courses Only</option>
+          </select>
+        </div>
 
-            <!-- Sınıf (Year) Filtre Butonları -->
-            <div class="flex flex-wrap items-center gap-1" id="yearFilterContainer">
-              <button type="button" onclick="setYearFilter('all')" id="yr-btn-all" class="px-2 py-1 rounded text-[11px] font-bold bg-[#343a40] text-white cursor-pointer">Tümü</button>
-              <button type="button" onclick="setYearFilter(1)" id="yr-btn-1" class="px-2 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">1. Sınıf</button>
-              <button type="button" onclick="setYearFilter(2)" id="yr-btn-2" class="px-2 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">2. Sınıf</button>
-              <button type="button" onclick="setYearFilter(3)" id="yr-btn-3" class="px-2 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">3. Sınıf</button>
-              <button type="button" onclick="setYearFilter(4)" id="yr-btn-4" class="px-2 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">4. Sınıf</button>
-              <button type="button" onclick="openQuickAddModal()" class="ml-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded cursor-pointer" title="Manuel Ders Ekle">➕</button>
-              <button type="button" onclick="clearAllCourses()" class="bg-rose-100 hover:bg-rose-200 text-rose-700 text-[11px] font-bold px-2 py-1 rounded cursor-pointer" title="Kataloğu Temizle">🗑️</button>
-            </div>
+      </div>
+
+      <div id="schedulerReport" class="hidden mt-3 bg-indigo-950/90 border border-indigo-500/50 rounded-xl p-3 text-xs text-indigo-100"></div>
+    </section>
+
+    <!-- 4. MAIN WORKSPACE GRID: LEFT COURSE CATALOG & RIGHT COLORED TIMETABLE -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- LEFT PANEL: ECTS LOAD, ALERTS & COURSE CATALOG -->
+      <section id="leftCoursePanel" class="no-print lg:col-span-5 space-y-4">
+        
+        <div id="ectsRuleCard" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold text-slate-700">ECTS Credit Load & Rule Status</span>
+            <span id="ectsCounter" class="text-sm font-extrabold text-indigo-700">0 / 40 ECTS</span>
           </div>
+          <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+            <div id="ectsBar" class="bg-indigo-600 h-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <div id="ruleAlerts" class="mt-3 space-y-1.5 text-xs"></div>
+        </div>
 
-          <!-- Ders Kartları Listesi (Yaşar OBS Tasarımı) -->
-          <div id="courseList" class="space-y-3.5"></div>
-        </section>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btnResolveConflicts" type="button" onclick="generateSmartSchedule()" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm text-xs transition flex items-center justify-center gap-1 cursor-pointer">
+            <span>🛠️ Auto-Resolve Conflicts</span>
+          </button>
+          <button id="btnQuotaCrisis" type="button" onclick="simulateQuotaCrisis()" class="bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm text-xs transition flex items-center justify-center gap-1 cursor-pointer">
+            <span>🔥 Simulate Quota Crisis</span>
+          </button>
+        </div>
 
-        <!-- SAĞ SÜTUN: HAFTALIK PROGRAM, OTOMATİK OLUŞTUR BUTONU VE ÖZET KUTULARI (5 Sütun) -->
-        <section id="rightScheduleColumn" class="lg:col-span-5 space-y-3 lg:sticky lg:top-14">
-          
-          <!-- Haftalık Program Kartı -->
-          <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-3.5">
-            <!-- Başlık ve Siyah "✨ Otomatik Oluştur" Butonu -->
-            <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-              <div class="flex items-center gap-1.5">
-                <span class="text-slate-600 text-sm">📅</span>
-                <h2 id="uiScheduleTitle" class="font-bold text-sm text-slate-800">Haftalık Program</h2>
+        <div id="courseCardContainer" class="bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500">
+          <div class="bg-slate-50 px-3.5 py-3 border-b border-slate-200 space-y-2">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+              <div>
+                <h2 class="font-bold text-sm text-slate-800">Available Courses & Sections</h2>
+                <p class="text-[11px] text-slate-500">Click section to select • Pin (📌) to lock • 🗑️ to remove course</p>
               </div>
+              <div class="flex flex-wrap items-center gap-1.5">
+                <button id="btnQuickAdd" type="button" onclick="openQuickAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm transition cursor-pointer">
+                  ➕ Add Course
+                </button>
+                <button id="btnClearCatalog" type="button" onclick="clearAllCourses()" class="bg-rose-100 hover:bg-rose-200 text-rose-700 text-[11px] font-bold px-2.5 py-1 rounded-lg transition cursor-pointer" title="Remove all courses from catalog">
+                  🗑️ Clear Catalog
+                </button>
+                <span id="courseCountBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">0 Courses</span>
+              </div>
+            </div>
 
-              <div class="flex items-center gap-1.5">
-                <!-- KULLANICININ İSTEDİĞİ: BASINCA AÇILAN "OTOMATİK OLUŞTUR & EXCEL YÜKLE" BUTONU -->
-                <button id="btnOpenSmartDrawer" type="button" onclick="openSmartDrawer()" class="bg-[#212529] hover:bg-slate-800 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow flex items-center gap-1.5 cursor-pointer transition border border-slate-600">
-                  <span class="text-amber-400">✦</span>
-                  <span id="uiBtnAutoCreate">Otomatik Oluştur</span>
+            <!-- Year Filter Tabs -->
+            <div class="flex flex-wrap gap-1 pt-1" id="yearFilterContainer">
+              <button type="button" onclick="setYearFilter('all')" id="yr-btn-all" class="px-2.5 py-1 rounded text-[11px] font-bold bg-indigo-600 text-white cursor-pointer">All Years</button>
+              <button type="button" onclick="setYearFilter(1)" id="yr-btn-1" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 1</button>
+              <button type="button" onclick="setYearFilter(2)" id="yr-btn-2" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 2</button>
+              <button type="button" onclick="setYearFilter(3)" id="yr-btn-3" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 3</button>
+              <button type="button" onclick="setYearFilter(4)" id="yr-btn-4" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer">Year 4</button>
+            </div>
+          </div>
+
+          <div id="courseList" class="divide-y divide-slate-200 lg:max-h-[640px] lg:overflow-y-auto"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT PANEL: COLORED LIVE WEEKLY TIMETABLE -->
+      <section id="scheduleSection" class="lg:col-span-7 space-y-4">
+        <div class="bg-gradient-to-br from-indigo-100/90 via-sky-50 to-violet-100/80 rounded-2xl shadow-lg border-2 border-indigo-300 overflow-hidden">
+          
+          <div class="bg-gradient-to-r from-indigo-950 via-indigo-900 to-slate-900 text-white px-4 py-3.5 flex flex-wrap justify-between items-center gap-2 border-b border-indigo-800">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full">LIVE MATRIX</span>
+                <h2 class="font-extrabold text-base text-white">Live Weekly Class Schedule</h2>
+              </div>
+              <p class="text-xs text-indigo-200 mt-0.5">Pinned sections show <span class="text-amber-300 font-semibold">📌</span> • Protected free days show <span class="text-emerald-300 font-semibold">green banners</span></p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5 no-print">
+              <div class="inline-flex rounded-lg border border-indigo-700 bg-indigo-950/90 p-0.5">
+                <button type="button" id="btnViewTable" onclick="setViewMode('table')" class="px-2.5 py-1 rounded-md text-xs font-bold transition cursor-pointer">
+                  💻 Grid View
+                </button>
+                <button type="button" id="btnViewMobile" onclick="setViewMode('mobile')" class="px-2.5 py-1 rounded-md text-xs font-bold transition cursor-pointer">
+                  📱 Daily Cards
                 </button>
               </div>
-            </div>
 
-            <!-- Haftalık Takvim Grid (Hover Kesikli Çizgi Önizleme Destekli) -->
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse text-[11px] select-none">
+              <button type="button" onclick="window.print()" class="hidden sm:inline-flex bg-indigo-800 hover:bg-indigo-700 text-indigo-100 text-xs font-bold px-3 py-2 rounded-xl border border-indigo-600 transition cursor-pointer">
+                🖨️ Print / PDF
+              </button>
+              <button id="btnSubmitReg" type="button" onclick="completeRegistration()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs sm:text-sm font-extrabold px-4 py-2 rounded-xl shadow-md transition cursor-pointer">
+                ✓ Finalize Registration
+              </button>
+            </div>
+          </div>
+
+          <div class="p-3.5 sm:p-4">
+            <div id="tableScheduleContainer" class="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
+              <table class="w-full min-w-[600px] border-collapse text-xs bg-white/90 rounded-xl overflow-hidden shadow-sm border border-indigo-200">
                 <thead>
-                  <tr id="calendarHeader" class="bg-[#f8f9fa] text-slate-600 border-b border-slate-300"></tr>
+                  <tr id="calendarHeader" class="bg-indigo-900 text-white"></tr>
                 </thead>
                 <tbody id="scheduleGrid"></tbody>
               </table>
             </div>
 
-            <!-- Renk Lejantı ve Açıklama (Fotoğraftakiyle Birebir) -->
-            <div class="mt-3 pt-2.5 border-t border-slate-200 space-y-1.5 text-[11px] text-slate-600">
-              <div class="flex flex-wrap items-center gap-3">
-                <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block rounded-sm bg-sky-100 border border-sky-500"></span> <span id="uiLegCore">Zorunlu</span></span>
-                <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block rounded-sm bg-emerald-100 border border-emerald-500"></span> <span id="uiLegElec">Seçmeli</span></span>
-                <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block rounded-sm bg-amber-100 border border-amber-500"></span> <span id="uiLegRepeat">Alttan (FF)</span></span>
-                <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block rounded-sm bg-rose-100 border border-rose-500"></span> <span id="uiLegConflict">Çakışma</span></span>
-              </div>
-              <p id="uiHoverHintText" class="text-[10px] text-slate-500 leading-normal">
-                Soldaki bir şubenin üzerine geldiğinizde programda <b>kesik çizgiyle</b> önizlenir. Programdaki bir derse tıklayarak onu çıkarabilirsiniz.
-              </p>
-            </div>
-
-            <!-- Dinamik Uyarı Kutuları (Fotoğraftaki Sarı & Mavi Kutular) -->
-            <div id="obsRightAlerts" class="mt-3 space-y-2 text-[11px]"></div>
-
-            <!-- Waitlist (Akıllı Yedek Kota) Kutusu -->
-            <div id="waitlistBox" class="hidden mt-3 bg-indigo-50 border border-indigo-200 rounded-lg p-2.5 text-[11px] text-indigo-950"></div>
+            <div id="mobileScheduleContainer" class="hidden space-y-2.5"></div>
+            <div id="waitlistBox" class="hidden mt-4 bg-white/95 border-2 border-indigo-300 rounded-xl p-3 text-xs text-indigo-950 shadow-sm"></div>
+            <div id="scheduleStats" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center"></div>
           </div>
 
-          <!-- Seçilen Dersler & Kesinleştirme Kartı (Fotoğraftaki Sağ Alt Kutu) -->
-          <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-3.5 space-y-3">
-            <div class="flex justify-between items-center">
-              <h3 id="uiSelectedCoursesTitle" class="font-bold text-xs text-slate-800">Seçilen Dersler</h3>
-              <span id="ectsCounter" class="text-[11px] font-bold text-slate-600">0 ders • 0 Krd • 0 / 40 AKTS</span>
-            </div>
-            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-              <div id="ectsBar" class="bg-[#198754] h-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-
-            <div id="selectedCoursesMiniList" class="text-[11px] text-slate-500 space-y-1 max-h-32 overflow-y-auto">
-              Henüz ders seçmediniz. Soldaki listeden bir şube seçin ya da Otomatik Oluştur'u deneyin.
-            </div>
-
-            <div class="pt-2 border-t border-slate-200 space-y-1 text-[11px]">
-              <div><b id="uiStudentApprovalLabel">Öğrenci Onay Durumu:</b> <span id="uiStudentApprovalVal" class="text-slate-600">Kesinleştirilmedi</span></div>
-              <div><b id="uiAdvisorApprovalLabel">Danışman Onay Durumu:</b> <span class="text-slate-600">-</span></div>
-            </div>
-
-            <div class="flex items-center justify-between pt-1">
-              <button id="btnSubmitReg" type="button" onclick="completeRegistration()" class="bg-[#6ea88c] hover:bg-[#198754] text-white text-xs font-bold px-4 py-2 rounded shadow-sm transition cursor-pointer flex items-center gap-1.5">
-                <span>✓</span>
-                <span id="uiBtnFinalize">Kaydı Kesinleştir</span>
-              </button>
-
-              <div class="flex items-center gap-1 text-xs font-mono text-slate-500 bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
-                <span>🕒</span>
-                <span id="sessionTimer">59:52</span>
-              </div>
-            </div>
-          </div>
-
-        </section>
-
-      </div>
-    </main>
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- MODAL 1: "✨ OTOMATİK OLUŞTUR" BUTONUNA BASINCA AÇILAN AKILLI PANEL       -->
-  <!-- (Excel/PDF Yükleme + Boş Gün Filtresi + Sabah Filtresi + Statü Seçimi)   -->
-  <!-- ========================================================================= -->
-  <div id="smartDrawerModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-slate-300 overflow-hidden max-h-[92vh] flex flex-col">
-      
-      <!-- Modal Başlığı -->
-      <div class="bg-[#212529] text-white px-5 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-2.5">
-          <span class="bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded text-xs">✦ OBS+ AI</span>
-          <div>
-            <h3 id="uiModalSmartTitle" class="text-base font-bold">Otomatik Program Oluşturucu & Evrensel Excel/PDF Yükleyici</h3>
-            <p id="uiModalSmartSub" class="text-[11px] text-slate-300">Kendi bölüm Excel/PDF dosyanızı yükleyin, boş gün ve saat filtrelerinizi seçip tek tıkla programı kurun.</p>
-          </div>
         </div>
-        <button type="button" onclick="closeSmartDrawer()" class="text-slate-400 hover:text-white text-xl font-bold px-2 cursor-pointer">✕</button>
-      </div>
+      </section>
 
-      <!-- Modal İçeriği -->
-      <div class="p-5 overflow-y-auto space-y-5 text-xs">
+    </div>
+  </main>
 
-        <!-- BÖLÜM 1: EXCEL / PDF DERS PROGRAMI YÜKLEME -->
-        <div class="bg-emerald-950 text-white p-4 rounded-xl border border-emerald-700 space-y-3">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-bold px-2 py-0.5 rounded-full">ADIM 1 • DERS PROGRAMI YÜKLE</span>
-              <h4 id="uiUploadBoxTitle" class="text-sm font-bold mt-1">Üniversite Ders Programı Yükle (.xlsx, .xls, .csv, .pdf)</h4>
-              <p id="uiUploadBoxDesc" class="text-[11px] text-emerald-200 mt-0.5">Çok sekmeli haftalık ders programı tablolarını (1. Sınıf, ME 2, ME 3, ME 4 vb.) ve standart Excel/PDF dosyalarını otomatik tanır.</p>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2 shrink-0">
-              <select id="uploadModeSelect" class="bg-slate-900 text-emerald-200 border border-emerald-600 rounded-lg px-2.5 py-2 text-xs font-bold">
-                <option value="replace" id="uiOptReplace">📂 Yeni Müfredat Olarak Yükle</option>
-                <option value="merge" id="uiOptMerge">🔗 Mevcut Derslerle Birleştir</option>
-              </select>
-
-              <label id="lblFileUpload" for="scheduleFileInput" class="bg-white hover:bg-emerald-50 text-slate-900 font-extrabold py-2 px-4 rounded-lg shadow text-xs cursor-pointer border-2 border-dashed border-emerald-400 flex items-center gap-1.5">
-                <span>📂</span>
-                <span id="uiBtnSelectFile">Excel / PDF Seç</span>
-                <input id="scheduleFileInput" type="file" accept=".xlsx,.xls,.csv,.pdf,.txt" onchange="handleFileUpload(event)" class="hidden">
-              </label>
-            </div>
-          </div>
-
-          <!-- Hızlı Demo Yükleme Butonu -->
-          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-emerald-800/80 text-[11px]">
-            <span id="uiDemoHintText" class="text-emerald-200">Dosyanız yanınızda değil mi? Tek tıkla örnek mühendislik derslerini yükleyin:</span>
-            <button type="button" onclick="loadDemoCatalog()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer shadow">
-              ⚡ <span id="uiBtnLoadDemo">Örnek Mühendislik Derslerini Yükle</span>
-            </button>
-          </div>
-
-          <!-- Tarama İlerleme Çubuğu -->
-          <div id="aiScanContainer" class="hidden pt-2 space-y-1.5">
-            <div class="flex justify-between text-[11px]">
-              <span id="aiScanStatusText" class="font-bold text-emerald-300">🔍 Belge taranıyor...</span>
-              <span id="aiScanPercent" class="font-bold text-emerald-300">0%</span>
-            </div>
-            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-              <div id="aiScanProgressBar" class="bg-emerald-400 h-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-            <div id="aiScanResultBox" class="hidden bg-slate-900/90 border border-emerald-500/40 rounded-lg p-2.5 text-[11px] text-emerald-100"></div>
-          </div>
-        </div>
-
-        <!-- BÖLÜM 2: BOŞ GÜN, SAAT VE STATÜ FİLTRELERİ -->
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-          <div class="flex flex-wrap justify-between items-center gap-2">
-            <div>
-              <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-0.5 rounded-full">ADIM 2 • KİŞİSEL FİLTRELER & KURAL MOTORU</span>
-              <h4 id="uiFilterBoxTitle" class="text-sm font-bold text-slate-800 mt-1">Boş Gün (Day-Off), Saat ve Öğrenci Statüsü Tercihleri</h4>
-            </div>
-
-            <!-- Öğrenci Statüsü Seçici -->
-            <div class="flex items-center gap-1.5">
-              <span id="uiStatusLabel" class="font-bold text-slate-600">Statü:</span>
-              <select id="profileSelect" onchange="changeProfile()" class="bg-white border border-slate-300 text-slate-900 text-xs font-bold rounded-lg px-2.5 py-1.5">
-                <option value="normal">Normal (GANO: 2.75 | 40 AKTS)</option>
-                <option value="probation">Sınamalı / Probation (GANO: 1.62 | 32 AKTS)</option>
-                <option value="doubleMajor">Çift Anadal / ÇAP (GANO: 3.40 | 42 AKTS)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-            <!-- Boş Gün Seçimi -->
-            <div class="md:col-span-6 bg-white p-3 rounded-lg border border-slate-200">
-              <label id="uiDayOffLabel" class="block text-[11px] font-bold text-slate-700 mb-2">📅 Boş Kalmasını İstediğiniz Günler:</label>
-              <div class="flex flex-wrap gap-1.5" id="dayOffContainer"></div>
-            </div>
-
-            <!-- Saat Tercihi -->
-            <div class="md:col-span-3 bg-white p-3 rounded-lg border border-slate-200">
-              <label id="uiTimeFilterLabel" class="block text-[11px] font-bold text-slate-700 mb-2">⏰ Saat Filtresi:</label>
-              <select id="timeFilterSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
-                <option value="any" id="uiTimeAny">Tüm Saatler Uygun</option>
-                <option value="no_early" id="uiTimeNoEarly">Sabah 09:00 Dersi Olmasın</option>
-                <option value="no_late" id="uiTimeNoLate">Akşamüstü 15:00+ Olmasın</option>
-              </select>
-            </div>
-
-            <!-- Yoğunluk -->
-            <div class="md:col-span-3 bg-white p-3 rounded-lg border border-slate-200">
-              <label id="uiLoadFilterLabel" class="block text-[11px] font-bold text-slate-700 mb-2">🎓 Ders Yoğunluğu:</label>
-              <select id="loadFilterSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
-                <option value="max" id="uiLoadMax">Maksimum Ders (AKTS Tavanı)</option>
-                <option value="core_only" id="uiLoadCore">Sadece Zorunlu & Alttan (FF)</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="schedulerReport" class="hidden bg-indigo-950 text-indigo-100 rounded-lg p-3 text-xs"></div>
-        </div>
-
-      </div>
-
-      <!-- Modal Alt Aksiyon Barı -->
-      <div class="bg-slate-100 px-5 py-3.5 border-t border-slate-200 flex flex-wrap justify-between items-center gap-2">
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="simulateQuotaCrisis()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-3 py-2 rounded-lg cursor-pointer">
-            🔥 <span id="uiBtnQuotaTest">Kota Krizi Testi</span>
-          </button>
-          <button type="button" onclick="resetSelections()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs px-3 py-2 rounded-lg cursor-pointer">
-            <span id="uiBtnResetSel">Seçimleri Temizle</span>
-          </button>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="closeSmartDrawer()" class="bg-white border border-slate-300 text-slate-700 font-bold text-xs px-4 py-2 rounded-lg cursor-pointer">
-            <span id="uiBtnCloseDrawer">Kapat</span>
-          </button>
-          <button id="btnAutoSchedule" type="button" onclick="generateSmartSchedule(true)" class="bg-[#198754] hover:bg-emerald-700 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg shadow-md cursor-pointer flex items-center gap-1.5">
-            <span>⚡</span>
-            <span id="uiBtnRunOptimizer">Filtrelere Göre Otomatik Oluştur</span>
-          </button>
-        </div>
-      </div>
-
+  <!-- MOBILE STICKY BOTTOM BAR -->
+  <div id="mobileStickyBar" class="lg:hidden fixed bottom-0 inset-x-0 bg-indigo-950 text-white border-t border-indigo-800 px-3 py-2.5 z-40 shadow-2xl flex items-center justify-between gap-2">
+    <div>
+      <div class="text-[10px] text-indigo-300 uppercase font-bold">Selected Load</div>
+      <div id="mobileEctsText" class="text-xs font-extrabold text-white">0 / 40 ECTS</div>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button type="button" onclick="generateSmartSchedule()" class="bg-emerald-500 active:bg-emerald-600 text-slate-950 font-extrabold text-xs px-3 py-2 rounded-lg shadow">
+        ⚡ Auto-Build
+      </button>
+      <button type="button" onclick="scrollToSchedule()" class="bg-indigo-800 text-indigo-100 font-bold text-xs px-2.5 py-2 rounded-lg border border-indigo-600">
+        📅 Timetable
+      </button>
+      <button type="button" onclick="completeRegistration()" class="bg-rose-600 active:bg-rose-700 text-white font-bold text-xs px-3 py-2 rounded-lg shadow">
+        ✓ Submit
+      </button>
     </div>
   </div>
 
-  <!-- MODAL 2: HIZLI MANUEL DERS EKLEME -->
+  <!-- MODAL 1: QUICK MANUAL COURSE ADD -->
   <div id="quickAddModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-200 space-y-4">
       <div class="flex justify-between items-center">
-        <h3 class="text-base font-bold text-slate-900">➕ Hızlı Ders & Şube Ekle</h3>
+        <h3 class="text-base font-bold text-slate-900">➕ Quick Add Custom Course & Section</h3>
         <button type="button" onclick="closeQuickAddModal()" class="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer">✕</button>
       </div>
       <div class="space-y-3 text-xs">
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="font-bold text-slate-700 block mb-1">Ders Kodu:</label>
+            <label class="font-bold text-slate-700 block mb-1">Course Code:</label>
             <input id="qaCode" type="text" value="ME 4999" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-bold">
           </div>
           <div>
-            <label class="font-bold text-slate-700 block mb-1">AKTS:</label>
+            <label class="font-bold text-slate-700 block mb-1">ECTS Credits:</label>
             <input id="qaEcts" type="number" value="6" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-bold">
           </div>
         </div>
         <div>
-          <label class="font-bold text-slate-700 block mb-1">Ders Adı:</label>
-          <input id="qaName" type="text" value="Bitirme Projesi (Capstone)" class="w-full border border-slate-300 rounded-lg px-2.5 py-2">
+          <label class="font-bold text-slate-700 block mb-1">Course Title:</label>
+          <input id="qaName" type="text" value="Capstone Engineering Project" class="w-full border border-slate-300 rounded-lg px-2.5 py-2">
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="font-bold text-slate-700 block mb-1">1. Şube Günü:</label>
+            <label class="font-bold text-slate-700 block mb-1">Section 1 Day:</label>
             <select id="qaDay" class="w-full border border-slate-300 rounded-lg px-2 py-2">
-              <option value="Monday">Pazartesi (Monday)</option>
-              <option value="Tuesday">Salı (Tuesday)</option>
-              <option value="Wednesday">Çarşamba (Wednesday)</option>
-              <option value="Thursday">Perşembe (Thursday)</option>
-              <option value="Friday">Cuma (Friday)</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
             </select>
           </div>
           <div>
-            <label class="font-bold text-slate-700 block mb-1">1. Şube Saati:</label>
+            <label class="font-bold text-slate-700 block mb-1">Section 1 Time Slot:</label>
             <select id="qaSlot" class="w-full border border-slate-300 rounded-lg px-2 py-2">
-              <option value="08:40 - 10:30">09:00 - 11:00 (08:40)</option>
-              <option value="10:40 - 12:30">11:00 - 13:00 (10:40)</option>
-              <option value="13:40 - 15:30">13:00 - 15:00 (13:40)</option>
-              <option value="15:40 - 17:30">15:00 - 17:00 (15:40)</option>
+              <option value="08:40 - 10:30">08:40 - 10:30</option>
+              <option value="10:40 - 12:30">10:40 - 12:30</option>
+              <option value="13:40 - 15:30">13:40 - 15:30</option>
+              <option value="15:40 - 17:30">15:40 - 17:30</option>
             </select>
           </div>
         </div>
       </div>
       <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-        <button type="button" onclick="closeQuickAddModal()" class="bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">İptal</button>
-        <button type="button" onclick="saveQuickCourse()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">✓ Ekle & Seç</button>
+        <button type="button" onclick="closeQuickAddModal()" class="bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">Cancel</button>
+        <button type="button" onclick="saveQuickCourse()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl cursor-pointer">✓ Add to Catalog & Select</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 3: CHROME MCP KOMUTA MERKEZİ -->
+  <!-- MODAL 2: INTERACTIVE CHROME MCP AGENT HUB & LIVE OBS SIMULATOR -->
   <div id="mcpModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 shadow-2xl border border-slate-200 space-y-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start gap-2">
         <div>
           <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-full">Interactive Chrome MCP Command Center</span>
-          <h3 class="text-base font-bold text-slate-900 mt-1">Chrome MCP Otomasyonu & Üniversite Kural Senkronizasyonu</h3>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-1">Chrome MCP Automation & University Rule Sync</h3>
         </div>
         <button type="button" onclick="closeMcpModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 cursor-pointer">✕</button>
       </div>
 
+      <!-- Interactive MCP Action Buttons -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <button type="button" onclick="mcpActionScrapeDemo()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs p-3 rounded-xl shadow flex flex-col items-center text-center gap-1 cursor-pointer">
           <span class="text-base">🕸️</span>
-          <span>1. MCP ile Müfredat Kazı (Scrape)</span>
+          <span>1. Live Scrape Curriculum via MCP</span>
         </button>
         <button type="button" onclick="mcpActionExportJson()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs p-3 rounded-xl shadow flex flex-col items-center text-center gap-1 cursor-pointer">
           <span class="text-base">📋</span>
-          <span>2. OBS Veri Paketini Kopyala</span>
+          <span>2. Copy Official OBS Auto-Fill Payload</span>
         </button>
         <button type="button" onclick="mcpActionSimulateObsFill()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs p-3 rounded-xl shadow flex flex-col items-center text-center gap-1 cursor-pointer">
           <span class="text-base">⚡</span>
-          <span>3. Tek Tıkla OBS Form Doldur</span>
+          <span>3. Test 1-Click OBS Form Injection</span>
         </button>
       </div>
 
       <div id="mcpTerminalLog" class="bg-slate-900 text-emerald-400 font-mono text-[11px] p-3.5 rounded-xl space-y-1 overflow-x-auto max-h-44">
-        <div>[Chrome-MCP] Connected to https://obs.yasar.edu.tr/ &amp; https://oim.yasar.edu.tr/</div>
+        <div>[Chrome-MCP] Connected to https://oim.yasar.edu.tr/ders-kayitlari/</div>
         <div>[Chrome-MCP] Regulation Art. 22: Regular=40 ECTS, Probation(GPA&lt;1.80)=32 ECTS, DoubleMajor=42 ECTS</div>
-        <div>[Graduation-Analyzer] Prerequisite Chain &amp; Semester Delay Calculator Active ✓</div>
+        <div>[Chrome-MCP] Mandatory Priority: Failed courses (FF/FD/W/U) must be registered first.</div>
+        <div>[Universal-Parser] Multi-Sheet 2D Matrix &amp; Standard Excel/PDF Recognition Ready ✓</div>
         <div class="text-indigo-300 font-bold">[MCP-Bridge] Ready for bidirectional DOM scraping &amp; OBS form auto-fill ✓</div>
       </div>
 
       <div class="flex justify-end">
-        <button type="button" onclick="closeMcpModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-5 py-2 rounded-xl cursor-pointer">Kapat</button>
+        <button type="button" onclick="closeMcpModal()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer">Close Hub</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 4: RESMİ DANIŞMAN ONAY FİŞİ -->
+  <!-- MODAL 3: ADVISOR APPROVAL & OFFICIAL REGISTRATION SLIP -->
   <div id="approvalModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white rounded-2xl max-w-xl w-full p-5 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start gap-2">
         <div class="flex items-center gap-2.5">
           <div class="bg-emerald-100 text-emerald-700 font-extrabold p-2.5 rounded-xl text-lg">✓</div>
           <div>
-            <h3 class="text-base font-bold text-slate-900">Ders Kaydı Kesinleştirildi & Danışman Onayına Gönderildi</h3>
-            <p class="text-xs text-slate-500">Yaşar Üniversitesi OBS+ v2.0 Resmi Doğrulama Raporu</p>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">Registration Finalized & Sent for Advisor Approval</h3>
+            <p class="text-xs text-slate-500">OBS+ v2.0 Official Rule Engine Verification Report</p>
           </div>
         </div>
         <button type="button" onclick="closeApprovalModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 cursor-pointer">✕</button>
@@ -565,9 +477,9 @@
 
       <div id="approvalSummaryContent" class="space-y-3 text-xs"></div>
 
-      <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-        <button type="button" onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-4 py-2 rounded-xl border border-slate-300 cursor-pointer">🖨️ PDF Kaydet / Yazdır</button>
-        <button type="button" onclick="closeApprovalModal()" class="bg-[#198754] hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2 rounded-xl cursor-pointer">Tamam</button>
+      <div class="flex flex-col sm:flex-row justify-end gap-2 pt-2 border-t border-slate-200">
+        <button type="button" onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-4 py-2.5 rounded-xl border border-slate-300 cursor-pointer">🖨️ Save as PDF</button>
+        <button type="button" onclick="closeApprovalModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer">Close</button>
       </div>
     </div>
   </div>
@@ -578,159 +490,12 @@
       pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
 
-    // ÇİFT DİL (TR / EN) SÖZLÜĞÜ
-    var currentLang = "tr";
-    var i18n = {
-      tr: {
-        univTitle: "Yaşar Üniversitesi",
-        semester: "2026-2027 Güz",
-        aiTourBtn: "AI Sesli Sunum",
-        sidebarTitle: "Öğrenci Bilgi Sistemi",
-        menuSearch: "Menüde Ara...",
-        menuDersDonem: "🎓 Ders ve Dönem İşlemleri",
-        menuDersKayit: "Ders Kayıt",
-        menuOtoOlustur: "✨ Otomatik Oluştur / Excel",
-        menuDersEkleBirak: "Ders Ekle/Bırak",
-        menuDonemOrt: "Dönem Ortalamaları",
-        menuNotListesi: "Not Listesi",
-        menuTranskript: "Transkript",
-        menuMufredatDurum: "Müfredat Durum",
-        scheduleTitle: "Haftalık Program",
-        btnAutoCreate: "Otomatik Oluştur",
-        legCore: "Zorunlu",
-        legElec: "Seçmeli",
-        legRepeat: "Alttan (FF)",
-        legConflict: "Çakışma",
-        hoverHint: "Soldaki bir şubenin üzerine geldiğinizde programda <b>kesik çizgiyle</b> önizlenir. Programdaki bir derse tıklayarak onu çıkarabilirsiniz.",
-        selectedTitle: "Seçilen Dersler",
-        emptySelected: "Henüz ders seçmediniz. Soldaki listeden bir şube seçin ya da Otomatik Oluştur'u deneyin.",
-        stuApproval: "Öğrenci Onay Durumu:",
-        stuApprovalVal: "Kesinleştirilmedi",
-        stuApprovalDone: "Kesinleştirildi ✓",
-        advApproval: "Danışman Onay Durumu:",
-        btnFinalize: "Kaydı Kesinleştir",
-        daysShort: { Monday: "Pzt", Tuesday: "Sal", Wednesday: "Çar", Thursday: "Per", Friday: "Cum" },
-        daysFull: { Monday: "Pazartesi", Tuesday: "Salı", Wednesday: "Çarşamba", Thursday: "Perşembe", Friday: "Cuma" },
-        hourCol: "Saat",
-        emptyCatalogTitle: "Henüz Ders Yüklenmedi (Temiz Başlangıç)",
-        emptyCatalogDesc: "Önceden yüklü derslerle çakışma olmaması için katalog boş başlatıldı. Sağ üstteki '✦ Otomatik Oluştur' butonuna basarak kendi Excel/PDF ders programınızı yükleyebilir veya aşağıdaki örnek müfredatı açabilirsiniz.",
-        btnLoadDemo: "⚡ Örnek Mühendislik Derslerini Yükle",
-        btnOpenDrawer: "✦ Otomatik Oluştur & Excel Yükle",
-        prereqMetText: "✓ Önkoşul sağlandı:",
-        prereqLockText: "🔒 Önkoşul sağlanmadı:",
-        gradDelayPrefix: "🔒 Bu dersi almazsan kilitlenir:",
-        remainingText: "Kalan",
-        selectBtn: "Seç",
-        selectedBtn: "Seçildi ✓",
-        waitlistBtn: "Yedekle (Dolu)",
-        avgLabel: "Ort.",
-        electiveWarn: "⚠️ Bu yarıyıl en az 1 seçmeli ders almalısınız; kesinleştirme için gereklidir.",
-        unselectedWarnPrefix: "ℹ️ Seçilmeyen zorunlu/alttan dersler:"
-      },
-      en: {
-        univTitle: "Yaşar University",
-        semester: "2026-2027 Fall",
-        aiTourBtn: "AI Voice Tour",
-        sidebarTitle: "Student Information System",
-        menuSearch: "Search Menu...",
-        menuDersDonem: "🎓 Course & Term Operations",
-        menuDersKayit: "Course Registration",
-        menuOtoOlustur: "✨ Auto-Build / Upload Excel",
-        menuDersEkleBirak: "Add / Drop Courses",
-        menuDonemOrt: "Semester Averages",
-        menuNotListesi: "Grade List",
-        menuTranskript: "Transcript",
-        menuMufredatDurum: "Curriculum Status",
-        scheduleTitle: "Weekly Schedule",
-        btnAutoCreate: "Auto-Build / Upload",
-        legCore: "Mandatory",
-        legElec: "Elective",
-        legRepeat: "Repeat (FF)",
-        legConflict: "Conflict",
-        hoverHint: "Hovering over any section on the left previews it with a <b>dashed border</b> on the schedule. Click any placed course on the timetable to remove it.",
-        selectedTitle: "Selected Courses",
-        emptySelected: "No courses selected yet. Pick a section from the left list or click Auto-Build.",
-        stuApproval: "Student Approval Status:",
-        stuApprovalVal: "Not Finalized",
-        stuApprovalDone: "Finalized ✓",
-        advApproval: "Advisor Approval Status:",
-        btnFinalize: "Finalize Registration",
-        daysShort: { Monday: "Mon", Tuesday: "Tue", Wednesday: "Wed", Thursday: "Thu", Friday: "Fri" },
-        daysFull: { Monday: "Monday", Tuesday: "Tuesday", Wednesday: "Wednesday", Thursday: "Thursday", Friday: "Friday" },
-        hourCol: "Time",
-        emptyCatalogTitle: "No Courses Loaded Yet (Clean Slate)",
-        emptyCatalogDesc: "The catalog starts empty so preloaded courses never clash with your file. Click '✦ Auto-Build / Upload' on the top-right to upload your Excel/PDF schedule, or load our Demo Engineering Catalog below.",
-        btnLoadDemo: "⚡ Load Demo Engineering Catalog",
-        btnOpenDrawer: "✦ Open Auto-Builder & Excel Uploader",
-        prereqMetText: "✓ Prerequisite satisfied:",
-        prereqLockText: "🔒 Prerequisite not met:",
-        gradDelayPrefix: "🔒 If not taken, locks:",
-        remainingText: "Left",
-        selectBtn: "Select",
-        selectedBtn: "Selected ✓",
-        waitlistBtn: "Waitlist (Full)",
-        avgLabel: "Avg.",
-        electiveWarn: "⚠️ You must take at least 1 elective course this semester; required for finalization.",
-        unselectedWarnPrefix: "ℹ️ Unselected mandatory/repeat courses:"
-      }
-    };
-
-    function t(key) {
-      return i18n[currentLang][key] || key;
-    }
-
-    function toggleLanguage() {
-      currentLang = currentLang === "tr" ? "en" : "tr";
-      document.getElementById("langFlag").innerText = currentLang === "tr" ? "🇹🇷" : "🇬🇧";
-      document.getElementById("langCodeText").innerText = currentLang === "tr" ? "TR" : "EN";
-      document.getElementById("langOtherText").innerText = currentLang === "tr" ? "EN" : "TR";
-
-      document.getElementById("uiUnivTitle").innerText = t("univTitle");
-      document.getElementById("uiSemesterText").innerText = t("semester");
-      document.getElementById("uiBtnAiTour").innerText = t("aiTourBtn");
-      document.getElementById("uiSidebarTitle").innerText = t("sidebarTitle");
-      document.getElementById("uiMenuSearch").placeholder = t("menuSearch");
-      document.getElementById("uiMenuDersDonem").innerText = t("menuDersDonem");
-      document.getElementById("uiMenuDersKayit").innerText = t("menuDersKayit");
-      document.getElementById("uiMenuOtoOlustur").innerText = t("menuOtoOlustur");
-      document.getElementById("uiMenuDersEkleBirak").innerText = t("menuDersEkleBirak");
-      document.getElementById("uiMenuDonemOrt").innerText = t("menuDonemOrt");
-      document.getElementById("uiMenuNotListesi").innerText = t("menuNotListesi");
-      document.getElementById("uiMenuTranskript").innerText = t("menuTranskript");
-      document.getElementById("uiMenuMufredatDurum").innerText = t("menuMufredatDurum");
-      document.getElementById("uiScheduleTitle").innerText = t("scheduleTitle");
-      document.getElementById("uiBtnAutoCreate").innerText = t("btnAutoCreate");
-      document.getElementById("uiLegCore").innerText = t("legCore");
-      document.getElementById("uiLegElec").innerText = t("legElec");
-      document.getElementById("uiLegRepeat").innerText = t("legRepeat");
-      document.getElementById("uiLegConflict").innerText = t("legConflict");
-      document.getElementById("uiHoverHintText").innerHTML = t("hoverHint");
-      document.getElementById("uiSelectedCoursesTitle").innerText = t("selectedTitle");
-      document.getElementById("uiStudentApprovalLabel").innerText = t("stuApproval");
-      document.getElementById("uiAdvisorApprovalLabel").innerText = t("advApproval");
-      document.getElementById("uiBtnFinalize").innerText = t("btnFinalize");
-
-      renderAll();
-    }
-
-    function toggleMobileSidebar() {
-      var sb = document.getElementById("obsSidebar");
-      sb.classList.toggle("hidden");
-      sb.classList.toggle("flex");
-    }
-
     var timeSlots = [
       "08:40 - 10:30",
       "10:40 - 12:30",
       "13:40 - 15:30",
       "15:40 - 17:30"
     ];
-    var slotDisplayHours = {
-      "08:40 - 10:30": "09:00",
-      "10:40 - 12:30": "11:00",
-      "13:40 - 15:30": "13:00",
-      "15:40 - 17:30": "15:00"
-    };
     var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
     var profiles = {
@@ -739,30 +504,19 @@
       doubleMajor: { name: "Double Major (DM)", gpa: 3.40, maxEcts: 42, isProbation: false }
     };
     var currentProfile = profiles.normal;
+    var currentViewMode = window.innerWidth < 640 ? "mobile" : "table";
     var currentYearFilter = "all";
 
     var daysOff = ["Friday"];
     var pinnedCourses = {};
     var waitlistMap = {};
 
-    // Hover Kesikli Çizgi (Dashed Preview) Durumu
-    var hoveredPreview = null; // { code, secId, day, slot, name }
-
-    // AI Sunum Durumu
+    // AI Tour State & Pause/Resume/Restart Controls
     var isAiDemoRunning = false;
     var isAiDemoPaused = false;
     var aiTourSessionId = 0;
 
-    // Oturum Sayacı (59:52)
-    var sessionSeconds = 59 * 60 + 52;
-    setInterval(function() {
-      if (sessionSeconds > 0) sessionSeconds--;
-      var m = Math.floor(sessionSeconds / 60);
-      var s = sessionSeconds % 60;
-      var el = document.getElementById("sessionTimer");
-      if (el) el.innerText = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-    }, 1000);
-
+    // Comprehensive Engineering Course Title Dictionary
     var courseTitleDictionary = {
       "SE 1105": "Programming & Algorithms I",
       "MATH 1131": "Calculus I",
@@ -798,135 +552,134 @@
       return [
         {
           code: "ME 2210",
-          name: "TERMODİNAMİK I (Thermodynamics I)",
+          name: "Thermodynamics I",
           ects: 6,
-          credit: 4,
-          tu: "3+2",
           year: 2,
           status: "FF",
           isMandatory: true,
-          prereq: "PHYS 1121, MATH 1131",
+          prereq: null,
           prereqMet: true,
-          unlocks: "ME 3312 (5. → 7. yarıyıl), ME 4240 (7. → 9. yarıyıl) • Mezuniyet 2 dönem (1 yıl) gecikir",
+          unlocks: "ME 3312 (Heat Transfer)",
           sections: [
-            { id: "Şb.1", day: "Monday", slot: "08:40 - 10:30", quota: 51, maxQuota: 60, avgGpa: "1,97", room: "MF-201", instructor: "Prof. Dr. Ahmet Yıldız" },
-            { id: "Şb.2", day: "Wednesday", slot: "13:40 - 15:30", quota: 42, maxQuota: 50, avgGpa: "2,59", room: "MF-204", instructor: "Doç. Dr. Seda Kılıç" }
+            { id: "Sec 1", day: "Monday", slot: "08:40 - 10:30", quota: 28, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz (M534)" },
+            { id: "Sec 2", day: "Wednesday", slot: "13:40 - 15:30", quota: 19, maxQuota: 30, instructor: "Assoc. Prof. K. Demir (M534)" },
+            { id: "Sec 3", day: "Tuesday", slot: "10:40 - 12:30", quota: 14, maxQuota: 30, instructor: "Assoc. Prof. K. Demir (M528)" }
           ]
         },
         {
           code: "ME 3301",
-          name: "AKIŞKANLAR MEKANİĞİ (Fluid Mechanics)",
-          ects: 7,
-          credit: 4,
-          tu: "3+2",
+          name: "Fluid Mechanics",
+          ects: 6,
           year: 3,
           status: "Normal",
           isMandatory: true,
-          prereq: "ENGR 2120",
+          prereq: null,
           prereqMet: true,
-          unlocks: "ME 4420 (7. → 9. yarıyıl) • Mezuniyet 2 dönem (1 yıl) gecikir (2028-29 Bahar)",
+          unlocks: "ME 4420 (Computational Fluid Dynamics)",
           sections: [
-            { id: "Şb.1", day: "Monday", slot: "08:40 - 10:30", quota: 49, maxQuota: 60, avgGpa: "2,23", room: "MF-105 / LAB-E2", instructor: "Doç. Dr. Murat Demir" },
-            { id: "Şb.2", day: "Tuesday", slot: "13:40 - 15:30", quota: 40, maxQuota: 50, avgGpa: "2,74", room: "MF-107 / LAB-E1", instructor: "Dr. Öğr. Üyesi Gizem Aksoy" }
+            { id: "Sec 1", day: "Monday", slot: "08:40 - 10:30", quota: 25, maxQuota: 30, instructor: "Prof. Dr. S. Kaya (M528)" },
+            { id: "Sec 2", day: "Tuesday", slot: "13:40 - 15:30", quota: 22, maxQuota: 30, instructor: "Prof. Dr. S. Kaya (M528)" },
+            { id: "Sec 3", day: "Friday", slot: "10:40 - 12:30", quota: 10, maxQuota: 30, instructor: "Asst. Prof. M. Ak (M113)" }
           ]
         },
         {
           code: "ME 3340",
-          name: "MAKİNE ELEMANLARI I (Machine Elements I)",
-          ects: 6,
-          credit: 3,
-          tu: "3+0",
+          name: "Machine Elements I",
+          ects: 7,
           year: 3,
           status: "Normal",
           isMandatory: true,
-          prereq: "ME 2710",
+          prereq: null,
           prereqMet: true,
-          unlocks: "ME 3342 (6. → 8. yarıyıl) • Mezuniyet tarihi değişmez",
+          unlocks: "ME 3342 (Machine Elements II)",
           sections: [
-            { id: "Şb.1", day: "Tuesday", slot: "10:40 - 12:30", quota: 60, maxQuota: 60, avgGpa: "1,80", room: "MF-301", instructor: "Prof. Dr. Kemal Öztürk" },
-            { id: "Şb.2", day: "Thursday", slot: "10:40 - 12:30", quota: 52, maxQuota: 65, avgGpa: "2,45", room: "MF-305", instructor: "Prof. Dr. Kemal Öztürk" }
+            { id: "Sec 1", day: "Tuesday", slot: "10:40 - 12:30", quota: 30, maxQuota: 30, instructor: "Prof. Dr. E. Çelik (M534)" },
+            { id: "Sec 2", day: "Thursday", slot: "10:40 - 12:30", quota: 21, maxQuota: 30, instructor: "Prof. Dr. E. Çelik (M534)" },
+            { id: "Sec 3", day: "Monday", slot: "15:40 - 17:30", quota: 17, maxQuota: 30, instructor: "Assoc. Prof. B. Aydın (M216)" }
           ]
         },
         {
           code: "ME 3360",
-          name: "SAYISAL YÖNTEMLER (Numerical Methods)",
+          name: "Numerical Methods for Engineers",
           ects: 6,
-          credit: 3,
-          tu: "3+0",
           year: 3,
           status: "Normal",
           isMandatory: true,
-          prereq: "MATH 2230",
+          prereq: null,
           prereqMet: true,
-          unlocks: "1 ders kayar (Mezuniyet gecikmez)",
+          unlocks: null,
           sections: [
-            { id: "Şb.1", day: "Wednesday", slot: "10:40 - 12:30", quota: 44, maxQuota: 55, avgGpa: "2,62", room: "M-433", instructor: "Doç. Dr. T. Özkan" },
-            { id: "Şb.2", day: "Friday", slot: "13:40 - 15:30", quota: 31, maxQuota: 50, avgGpa: "2,88", room: "M-114", instructor: "Dr. Öğr. Üyesi C. Koç" }
+            { id: "Sec 1", day: "Wednesday", slot: "10:40 - 12:30", quota: 24, maxQuota: 30, instructor: "Assoc. Prof. T. Özkan (M433)" },
+            { id: "Sec 2", day: "Thursday", slot: "13:40 - 15:30", quota: 18, maxQuota: 30, instructor: "Assoc. Prof. T. Özkan (M433)" },
+            { id: "Sec 3", day: "Friday", slot: "13:40 - 15:30", quota: 12, maxQuota: 30, instructor: "Asst. Prof. C. Koç (M114)" }
           ]
         },
         {
           code: "ME 3380",
-          name: "SİSTEM DİNAMİĞİ VE KONTROL (System Dynamics)",
+          name: "System Dynamics & Control",
           ects: 6,
-          credit: 4,
-          tu: "3+2",
           year: 3,
           status: "Normal",
           isMandatory: true,
-          prereq: "MATH 2263",
+          prereq: null,
           prereqMet: true,
-          unlocks: "ME 4330 (7. → 9. yarıyıl) • 1 ders kayar",
+          unlocks: "ME 4480 (Automatic Control)",
           sections: [
-            { id: "Şb.1", day: "Monday", slot: "10:40 - 12:30", quota: 38, maxQuota: 50, avgGpa: "2,15", room: "M-528", instructor: "Prof. Dr. H. Arslan" },
-            { id: "Şb.2", day: "Wednesday", slot: "08:40 - 10:30", quota: 29, maxQuota: 50, avgGpa: "2,40", room: "M-528", instructor: "Prof. Dr. H. Arslan" }
+            { id: "Sec 1", day: "Monday", slot: "10:40 - 12:30", quota: 20, maxQuota: 30, instructor: "Prof. Dr. H. Arslan (M528)" },
+            { id: "Sec 2", day: "Wednesday", slot: "08:40 - 10:30", quota: 16, maxQuota: 30, instructor: "Prof. Dr. H. Arslan (M528)" }
           ]
         },
         {
           code: "ME 3312",
-          name: "ISI TRANSFERİ (Heat Transfer)",
+          name: "Heat Transfer",
           ects: 6,
-          credit: 4,
-          tu: "3+2",
           year: 3,
           status: "Normal",
           isMandatory: true,
-          prereq: "ME 2210 (Termodinamik I)",
+          prereq: "ME 2210 (Thermodynamics I)",
           prereqMet: false,
-          unlocks: "ME 4415 (Termal Sistem Tasarımı)",
+          unlocks: "ME 4415 (Thermal System Design)",
           sections: [
-            { id: "Şb.1", day: "Thursday", slot: "08:40 - 10:30", quota: 25, maxQuota: 50, avgGpa: "2,05", room: "M-534", instructor: "Prof. Dr. Ahmet Yıldız" }
+            { id: "Sec 1", day: "Thursday", slot: "08:40 - 10:30", quota: 15, maxQuota: 30, instructor: "Prof. Dr. A. Yılmaz (M534)" }
           ]
         },
         {
           code: "ME 4410",
-          name: "GÜÇ SANTRALLERİ MÜHENDİSLİĞİ (Teknik Seçmeli)",
+          name: "Power Plant Engineering (4th Year Elective)",
           ects: 6,
-          credit: 3,
-          tu: "3+0",
           year: 4,
           status: "Upper",
           isMandatory: false,
-          prereq: "Önkoşul yok",
+          prereq: null,
           prereqMet: true,
           unlocks: null,
           sections: [
-            { id: "Şb.1", day: "Thursday", slot: "15:40 - 17:30", quota: 19, maxQuota: 35, avgGpa: "3,12", room: "M-531", instructor: "Doç. Dr. V. Şahin" },
-            { id: "Şb.2", day: "Monday", slot: "13:40 - 15:30", quota: 14, maxQuota: 35, avgGpa: "3,12", room: "M-531", instructor: "Doç. Dr. V. Şahin" }
+            { id: "Sec 1", day: "Friday", slot: "08:40 - 10:30", quota: 12, maxQuota: 25, instructor: "Assoc. Prof. V. Şahin (M531)" },
+            { id: "Sec 2", day: "Thursday", slot: "15:40 - 17:30", quota: 19, maxQuota: 25, instructor: "Assoc. Prof. V. Şahin (M531)" },
+            { id: "Sec 3", day: "Monday", slot: "13:40 - 15:30", quota: 14, maxQuota: 25, instructor: "Assoc. Prof. V. Şahin (M531)" }
+          ]
+        },
+        {
+          code: "ME 4450",
+          name: "Renewable Energy Systems (Technical Elective)",
+          ects: 5,
+          year: 4,
+          status: "Upper",
+          isMandatory: false,
+          prereq: null,
+          prereqMet: true,
+          unlocks: null,
+          sections: [
+            { id: "Sec 1", day: "Tuesday", slot: "15:40 - 17:30", quota: 14, maxQuota: 25, instructor: "Asst. Prof. N. Erdem (M527)" },
+            { id: "Sec 2", day: "Wednesday", slot: "15:40 - 17:30", quota: 11, maxQuota: 25, instructor: "Asst. Prof. N. Erdem (M527)" }
           ]
         }
       ];
     }
 
-    // KULLANICI İSTEĞİ: Başlangıçta katalog BOŞ (Clean Slate) başlar
+    // CLEAN SLATE: Start with an empty course catalog
     var courses = [];
     var selectedSections = {};
-
-    function openSmartDrawer() {
-      document.getElementById("smartDrawerModal").classList.remove("hidden");
-    }
-    function closeSmartDrawer() {
-      document.getElementById("smartDrawerModal").classList.add("hidden");
-    }
 
     function loadDemoCatalog() {
       courses = getSampleEngineeringCatalog();
@@ -934,11 +687,12 @@
       waitlistMap = {};
       currentYearFilter = "all";
       selectedSections = {
-        "ME 2210": "Şb.1",
-        "ME 3301": "Şb.1",
-        "ME 3360": "Şb.2"
+        "ME 2210": "Sec 1",
+        "ME 3301": "Sec 1",
+        "ME 3360": "Sec 3"
       };
-      document.getElementById("activeDeptBadge").innerText = "Aktif Katalog: Mühendislik Fakültesi (7 Ders)";
+      document.getElementById("activeDeptBadge").innerText = "Active Catalog: Demo Engineering Curriculum (8 Courses)";
+      document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
       setYearFilter("all");
       renderAll();
     }
@@ -947,14 +701,17 @@
       if (event) event.stopPropagation();
       var updated = [];
       for (var i = 0; i < courses.length; i++) {
-        if (courses[i].code !== courseCode) updated.push(courses[i]);
+        if (courses[i].code !== courseCode) {
+          updated.push(courses[i]);
+        }
       }
       courses = updated;
       delete selectedSections[courseCode];
       delete pinnedCourses[courseCode];
       delete waitlistMap[courseCode];
+      document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
       if (courses.length === 0) {
-        document.getElementById("activeDeptBadge").innerText = "Aktif Katalog: Boş";
+        document.getElementById("activeDeptBadge").innerText = "Active Catalog: Empty (Ready for Upload)";
       }
       renderAll();
     }
@@ -964,57 +721,52 @@
       selectedSections = {};
       pinnedCourses = {};
       waitlistMap = {};
-      document.getElementById("activeDeptBadge").innerText = "Aktif Katalog: Boş (Yükleme Bekleniyor)";
+      document.getElementById("activeDeptBadge").innerText = "Active Catalog: Empty (Ready for Upload)";
+      document.getElementById("courseCountBadge").innerText = "0 Courses";
       document.getElementById("schedulerReport").classList.add("hidden");
       document.getElementById("aiScanContainer").classList.add("hidden");
       renderAll();
     }
 
-    // HOVER KESİKLİ ÇİZGİ (DASHED LINE) ÖNİZLEME FONKSİYONLARI
-    function setHoverPreview(courseCode, secId) {
-      var c = findCourse(courseCode);
-      if (!c) return;
-      var s = findSection(c, secId);
-      if (!s) return;
-      hoveredPreview = { code: c.code, secId: s.id, day: s.day, slot: s.slot, room: s.room || "M-101" };
-      renderScheduleAndRules();
-    }
-
-    function clearHoverPreview() {
-      if (hoveredPreview) {
-        hoveredPreview = null;
-        renderScheduleAndRules();
-      }
-    }
-
-    // CHROME MCP HUB AKSİYONLARI
+    // CHROME MCP HUB INTERACTIVE ACTIONS
     function mcpActionScrapeDemo() {
       var term = document.getElementById("mcpTerminalLog");
-      term.innerHTML += '<div class="text-amber-300">[Chrome-MCP] Scanning Yaşar OBS DOM for active semester courses...</div>';
+      term.innerHTML += '<div class="text-amber-300">[Chrome-MCP] Scanning university portal DOM for active semester courses...</div>';
       setTimeout(function() {
         loadDemoCatalog();
-        term.innerHTML += '<div class="text-emerald-300 font-bold">[Chrome-MCP] Extracted 7 courses &amp; graduation delay rules into OBS+ ✓</div>';
+        term.innerHTML += '<div class="text-emerald-300 font-bold">[Chrome-MCP] Extracted 8 Engineering courses &amp; 20 sections into OBS+ catalog ✓</div>';
         term.scrollTop = term.scrollHeight;
-      }, 450);
+      }, 500);
     }
 
     function mcpActionExportJson() {
       var payload = {
         studentProfile: currentProfile.name,
         totalEcts: calculateEcts(null),
-        selectedCourses: selectedSections
+        selectedCourses: selectedSections,
+        timestamp: new Date().toISOString()
       };
-      if (navigator.clipboard) navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+      var jsonStr = JSON.stringify(payload, null, 2);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(jsonStr);
+      }
       var term = document.getElementById("mcpTerminalLog");
-      term.innerHTML += '<div class="text-sky-300 font-bold">[Chrome-MCP] Copied OBS Auto-Fill payload to clipboard ✓</div>';
+      term.innerHTML += '<div class="text-sky-300 font-bold">[Chrome-MCP] Copied OBS Auto-Fill JSON payload (' + Object.keys(selectedSections).length + ' courses) to clipboard ✓</div>';
       term.scrollTop = term.scrollHeight;
     }
 
     function mcpActionSimulateObsFill() {
       var count = Object.keys(selectedSections).length;
       var term = document.getElementById("mcpTerminalLog");
-      term.innerHTML += '<div class="text-emerald-300 font-bold">[Chrome-MCP] Injected ' + count + ' selected sections into official OBS form ✓</div>';
-      term.scrollTop = term.scrollHeight;
+      if (count === 0) {
+        term.innerHTML += '<div class="text-rose-400">[Chrome-MCP] Warning: No courses selected yet. Select courses first!</div>';
+        return;
+      }
+      term.innerHTML += '<div class="text-amber-300">[Chrome-MCP] Injecting ' + count + ' selected section IDs into target OBS registration form...</div>';
+      setTimeout(function() {
+        term.innerHTML += '<div class="text-emerald-300 font-bold">[Chrome-MCP] All ' + count + ' course checkboxes automatically ticked on OBS portal ✓</div>';
+        term.scrollTop = term.scrollHeight;
+      }, 450);
     }
 
     function setYearFilter(yr) {
@@ -1024,16 +776,17 @@
         var b = document.getElementById("yr-btn-" + btns[i]);
         if (!b) continue;
         if (btns[i] === yr) {
-          b.className = "px-2 py-1 rounded text-[11px] font-bold bg-[#343a40] text-white cursor-pointer";
+          b.className = "px-2.5 py-1 rounded text-[11px] font-bold bg-indigo-600 text-white cursor-pointer shadow-sm";
         } else {
-          b.className = "px-2 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer";
+          b.className = "px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 cursor-pointer";
         }
       }
       renderCourseList();
     }
 
     // ============================================================================
-    // İNGİLİZCE SES + TÜRKÇE ALTYAZILI & DURAKLAT/BAŞA SAR KONTROLLÜ AI SUNUM BOTU
+    // COHESIVE TOP-TO-BOTTOM 10-STEP ENGLISH VOICE + TURKISH SUBTITLE AI TOUR
+    // WITH PAUSE / RESUME AND RESTART CONTROLS
     // ============================================================================
     function togglePauseAiPresentation() {
       if (!isAiDemoRunning) return;
@@ -1044,20 +797,22 @@
         isAiDemoPaused = true;
         if ("speechSynthesis" in window) window.speechSynthesis.pause();
         btn.innerText = "▶️ Devam Et";
-        btn.className = "bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer transition shadow";
+        btn.className = "bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow";
         if (pulse) pulse.classList.remove("animate-ping");
       } else {
         isAiDemoPaused = false;
         if ("speechSynthesis" in window) window.speechSynthesis.resume();
         btn.innerText = "⏸️ Duraklat";
-        btn.className = "bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer transition shadow";
+        btn.className = "bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow";
         if (pulse) pulse.classList.add("animate-ping");
       }
     }
 
     function restartAiPresentation() {
       stopAiPresentation();
-      setTimeout(function() { startAiPresentation(); }, 250);
+      setTimeout(function() {
+        startAiPresentation();
+      }, 250);
     }
 
     function stopAiPresentation() {
@@ -1069,9 +824,9 @@
       document.getElementById("aiSubtitleBanner").classList.add("hidden");
       closeMcpModal();
       closeApprovalModal();
-      closeSmartDrawer();
     }
 
+    // Pausable wait helper
     function waitMsPausable(ms, sessionId) {
       return new Promise(function(resolve) {
         var elapsed = 0;
@@ -1095,16 +850,23 @@
 
     function speakEnglishPausable(text, sessionId) {
       return new Promise(function(resolve) {
-        if (!isAiDemoRunning || sessionId !== aiTourSessionId) { resolve(); return; }
-        if (!("speechSynthesis" in window)) { waitMsPausable(4200, sessionId).then(resolve); return; }
+        if (!isAiDemoRunning || sessionId !== aiTourSessionId) {
+          resolve();
+          return;
+        }
+        if (!("speechSynthesis" in window)) {
+          waitMsPausable(4500, sessionId).then(resolve);
+          return;
+        }
         window.speechSynthesis.cancel();
         var utter = new SpeechSynthesisUtterance(text);
         utter.lang = "en-US";
         utter.rate = 0.96;
+        utter.pitch = 1.0;
 
         var voices = window.speechSynthesis.getVoices();
         for (var i = 0; i < voices.length; i++) {
-          if (voices[i].lang.indexOf("en-US") !== -1 || voices[i].lang.indexOf("en-GB") !== -1) {
+          if (voices[i].lang.indexOf("en-US") !== -1 || voices[i].lang.indexOf("en_US") !== -1 || voices[i].lang.indexOf("en-GB") !== -1) {
             utter.voice = voices[i];
             break;
           }
@@ -1114,15 +876,22 @@
         function finish() {
           if (done) return;
           done = true;
-          waitMsPausable(500, sessionId).then(resolve);
+          waitMsPausable(550, sessionId).then(resolve);
         }
+
         utter.onend = finish;
         utter.onerror = finish;
 
+        // If started while paused, wait until unpaused before speaking
         if (isAiDemoPaused) {
           var waitUnpause = setInterval(function() {
-            if (!isAiDemoRunning || sessionId !== aiTourSessionId) { clearInterval(waitUnpause); finish(); }
-            else if (!isAiDemoPaused) { clearInterval(waitUnpause); window.speechSynthesis.speak(utter); }
+            if (!isAiDemoRunning || sessionId !== aiTourSessionId) {
+              clearInterval(waitUnpause);
+              finish();
+            } else if (!isAiDemoPaused) {
+              clearInterval(waitUnpause);
+              window.speechSynthesis.speak(utter);
+            }
           }, 150);
         } else {
           window.speechSynthesis.speak(utter);
@@ -1132,6 +901,8 @@
 
     async function moveCursorAndClick(selector, stepLabelTr, speechTextEn, subtitleTextTr, customAction, sessionId) {
       if (!isAiDemoRunning || sessionId !== aiTourSessionId) return;
+
+      // Wait if paused before moving cursor
       while (isAiDemoPaused && isAiDemoRunning && sessionId === aiTourSessionId) {
         await waitMsPausable(200, sessionId);
       }
@@ -1145,7 +916,7 @@
 
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
-        await waitMsPausable(450, sessionId);
+        await waitMsPausable(500, sessionId);
         if (!isAiDemoRunning || sessionId !== aiTourSessionId) return;
 
         var rect = el.getBoundingClientRect();
@@ -1154,7 +925,7 @@
 
         cursor.style.left = targetX + "px";
         cursor.style.top = targetY + "px";
-        await waitMsPausable(950, sessionId);
+        await waitMsPausable(1000, sessionId);
         if (!isAiDemoRunning || sessionId !== aiTourSessionId) return;
 
         var ripple = document.createElement("div");
@@ -1166,128 +937,198 @@
         setTimeout(function() {
           cursor.style.transform = "scale(1)";
           if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
-        }, 650);
+        }, 700);
       }
 
-      if (customAction) customAction();
+      if (customAction) {
+        customAction();
+      }
       await speakEnglishPausable(speechTextEn, sessionId);
     }
 
     async function startAiPresentation() {
-      if (isAiDemoRunning) { stopAiPresentation(); return; }
+      if (isAiDemoRunning) {
+        stopAiPresentation();
+        return;
+      }
       aiTourSessionId++;
       var mySession = aiTourSessionId;
       isAiDemoRunning = true;
       isAiDemoPaused = false;
 
+      var pauseBtn = document.getElementById("btnPauseResumeAi");
+      if (pauseBtn) {
+        pauseBtn.innerText = "⏸️ Duraklat";
+        pauseBtn.className = "bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer transition shadow";
+      }
+
       closeMcpModal();
       closeApprovalModal();
-      closeSmartDrawer();
       clearAllCourses();
 
-      document.getElementById("aiCursor").classList.remove("hidden");
-      document.getElementById("aiSubtitleBanner").classList.remove("hidden");
+      var cursor = document.getElementById("aiCursor");
+      var banner = document.getElementById("aiSubtitleBanner");
+      cursor.classList.remove("hidden");
+      banner.classList.remove("hidden");
 
-      // Step 1: Top Bar Language Toggle & Chrome MCP
+      // STEP 1 (TOP HEADER - LEFT): Chrome MCP Agent Hub
       await moveCursorAndClick(
-        "#btnLangToggle",
-        "Adım 1 / 8 (Üst Bar) • Yaşar OBS Arayüzü & Tek Tıkla Dil Değiştirme",
-        "Welcome to Yaşar University OBS Plus Version 2.0. Starting at the top navigation bar, students can switch the entire interface between Turkish and English with a single click, while our Chrome MCP bridge synchronizes all official registration rules.",
-        "Yaşar Üniversitesi OBS+ v2.0 sistemine hoş geldiniz. En üst bardaki dil butonuyla tüm OBS arayüzünü tek tıkla Türkçe ve İngilizce arasında değiştirebilir, Chrome MCP ile resmi kuralları senkronize edebilirsiniz.",
-        function() { toggleLanguage(); setTimeout(function() { if (isAiDemoRunning) toggleLanguage(); }, 2200); },
+        "#btnMcpModal",
+        "Adım 1 / 10 (Üst Bar) • Chrome MCP Ajan Merkezi ve Kural Senkronizasyonu",
+        "Welcome to OBS Plus Version 2.0. We will explore the entire platform sequentially from top to bottom. Starting at the top navigation bar, our Chrome MCP Agent Hub connects to the university portal to synchronize official ECTS limits, prerequisite chains, and repeat rules.",
+        "OBS+ v2.0 platformuna hoş geldiniz. Sistemi yukarıdan aşağıya doğru sırayla inceleyeceğiz. En üst bardaki Chrome MCP Ajan Merkezimiz; üniversitenin resmi AKTS sınırlarını, önkoşul zincirlerini ve tekrar kurallarını canlı olarak sisteme bağlar.",
+        function() { openMcpModal(); },
         mySession
       );
       if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
+      await waitMsPausable(700, mySession);
+      closeMcpModal();
 
-      // Step 2: Opening the Smart Auto-Create & Excel Uploader Drawer
+      // STEP 2 (TOP HEADER - RIGHT): Student Status & Academic Probation Safeguard
       await moveCursorAndClick(
-        "#btnOpenSmartDrawer",
-        "Adım 2 / 8 (Sağ Üst) • 'Otomatik Oluştur' ve Evrensel Excel/PDF Çekmecesi",
-        "Notice that the workspace starts completely empty so preloaded courses never clash. By clicking the Auto-Build button on the top right of the weekly schedule, we open our AI Schedule Uploader and Filter drawer.",
-        "Çalışma alanımız yeni yüklenen dosyalarla çakışmaması için boş başlar. Haftalık Programın sağ üstündeki '✦ Otomatik Oluştur' butonuna tıklayarak Excel/PDF yükleme ve filtre çekmecemizi açıyoruz.",
-        function() { openSmartDrawer(); },
-        mySession
-      );
-      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
-
-      // Step 3: Loading Courses & Setting Day-Off Filter inside Drawer
-      await moveCursorAndClick(
-        "#lblFileUpload",
-        "Adım 3 / 8 (Akıllı Çekmece) • Çok Sekmeli Excel/PDF Yükleme ve Boş Gün Seçimi",
-        "Inside this panel, students can upload any multi-sheet university Excel timetable or PDF file, select their desired free days such as Friday, and configure student status rules like Probation.",
-        "Açılan bu panelden çok sekmeli üniversite Excel ders programlarını veya PDF dosyalarını yükleyebilir, Cuma gününü boş gün (Day-Off) olarak seçebilir ve öğrenci statüsünü ayarlayabilirsiniz.",
-        function() { loadDemoCatalog(); daysOff = ["Friday"]; renderAll(); },
-        mySession
-      );
-      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
-
-      // Step 4: Running the Optimizer from the Drawer
-      await moveCursorAndClick(
-        "#btnAutoSchedule",
-        "Adım 4 / 8 (Optimizasyon) • Çakışmasız Haftalık Programın Otomatik Kurulması",
-        "When we click Build Optimal Schedule, our backtracking algorithm evaluates all section combinations, keeps Friday completely free, and places 6 courses totaling 37 ECTS into the OBS timetable with zero conflicts!",
-        "'Filtrelere Göre Otomatik Oluştur' butonuna bastığımızda; algoritmamız tüm şubeleri tarar, Cuma gününü boş bırakır ve 6 dersi (37 AKTS) sıfır çakışmayla OBS tablosuna yerleştirir!",
-        function() { generateSmartSchedule(true); },
-        mySession
-      );
-      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
-
-      // Step 5: Graduation Delay Warnings & Instructor GPA Badges on Left Cards
-      await moveCursorAndClick(
-        "#leftCourseColumn",
-        "Adım 5 / 8 (Orta Sütun) • Mezuniyet Gecikme Analizi ve Hoca Ortalaması (Ort.)",
-        "Looking at the course cards in the center column, OBS Plus displays prerequisite chains, exact graduation delay warnings in semesters, instructor grade averages, and live quota progress bars.",
-        "Orta sütundaki ders kartlarında; önkoşul durumu, o dersi almazsanız mezuniyetinizin kaç dönem gecikeceği, hocanın geçmiş not ortalaması (Ort. 2,23) ve canlı kontenjan çubukları gösterilir.",
-        null,
-        mySession
-      );
-      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
-
-      // Step 6: Hover Dashed Preview on Weekly Schedule
-      await moveCursorAndClick(
-        "#sec-btn-ME_3301-1",
-        "Adım 6 / 8 (Canlı Önizleme) • Şube Üzerine Gelince Kesikli Çizgi (Dashed) Önizlemesi",
-        "When a student hovers over any section button on the left, the right weekly timetable immediately previews where that class will sit using a dashed outline box before they even click it.",
-        "Soldaki herhangi bir şube butonunun üzerine fareyle geldiğinizde, daha tıklamadan sağdaki Haftalık Programda o dersin nereye yerleşeceği kesikli çizgiyle (dashed box) canlı olarak önizlenir.",
-        function() { setHoverPreview("ME 3301", "Şb.2"); setTimeout(clearHoverPreview, 2800); },
-        mySession
-      );
-      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
-
-      // Step 7: Smart Waitlist & Plan-B Protection on Full Quota
-      await moveCursorAndClick(
-        "#sec-btn-ME_3340-0",
-        "Adım 7 / 8 (Kontenjan Krizi) • Dolu Şubelerde Akıllı Yedek Liste (Auto-Swap Waitlist)",
-        "If a section quota is 60 out of 60 full, clicking it registers the student on the Waitlist while protecting their schedule with Section 2 as a Plan-B backup.",
-        "Eğer bir şubenin kontenjanı 60/60 doluysa, üzerine tıklandığında sistem öğrenciyi Bekleme Listesine alır ve açıkta kalmaması için diğer şubeyi B Planı olarak yedekler.",
+        "#profileSelect",
+        "Adım 2 / 10 (Üst Bar) • Öğrenci Statüsü ve Sınamalı (Probation) Koruması",
+        "Right next to it in the top bar is the Student Status selector. Switching to a Probation Student with a GPA below 1.80 automatically caps the credit limit at 32 ECTS and locks fourth-year courses. Let us switch back to Regular Status.",
+        "Hemen yanında Öğrenci Statüsü seçicisi yer alır. GANO'su 1.80'in altındaki Sınamalı (Probation) öğrenci seçildiğinde, sistem AKTS tavanını otomatik olarak 32'ye düşürür ve 4. sınıf derslerini kilitler.",
         function() {
-          selectedSections["ME 3340"] = "Şb.2";
-          waitlistMap["ME 3340"] = { targetSec: "Şb.1", targetSlot: "Sal 10:40", backupSec: "Şb.2" };
-          renderAll();
+          document.getElementById("profileSelect").value = "probation";
+          changeProfile();
+          setTimeout(function() {
+            if (isAiDemoRunning && mySession === aiTourSessionId) {
+              document.getElementById("profileSelect").value = "normal";
+              changeProfile();
+            }
+          }, 3200);
         },
         mySession
       );
       if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
 
-      // Step 8: Finalizing Registration & Official Advisor Slip
+      // STEP 3 (SECOND SECTION - GREEN BANNER): Universal Excel & PDF Schedule Importer
+      await moveCursorAndClick(
+        "#lblFileUpload",
+        "Adım 3 / 10 (Üst Panel) • Evrensel Excel ve PDF Ders Programı Yükleyici",
+        "Moving one section down, notice that OBS Plus starts with a clean, empty catalog so preloaded courses never clash with your file. When we upload a department schedule, the AI parser extracts all courses and sections directly into the left workspace.",
+        "Bir alt bölüme indiğimizde; sistemin yeni yüklenen dosyalarla çakışmaması için tamamen boş bir katalogla başladığını görüyorsunuz. Herhangi bir bölümün Excel veya PDF ders programı yüklendiğinde yapay zeka tüm dersleri sol panele aktarır.",
+        function() {
+          loadDemoCatalog();
+          var sec = document.getElementById("excelUploadSection");
+          sec.classList.add("ring-4", "ring-emerald-400");
+          setTimeout(function() { sec.classList.remove("ring-4", "ring-emerald-400"); }, 2500);
+        },
+        mySession
+      );
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
+
+      // STEP 4 (THIRD SECTION - INDIGO FILTER PANEL): Day-Off & Time Preferences
+      await moveCursorAndClick(
+        "#dayOffContainer",
+        "Adım 4 / 10 (Filtre Paneli) • Boş Gün (Day-Off) ve Saat Tercihleri",
+        "Continuing downward to the Smart Auto-Scheduler panel, we configure our personal schedule preferences. Here, we keep Friday selected as our protected Day-Off, and we can also filter out early morning classes.",
+        "Aşağıya, Akıllı Otomatik Programlayıcı paneline indiğimizde kişisel tercihlerimizi seçiyoruz. Burada Cuma gününü boş gün (Day-Off) olarak koruma altına alıyor ve sabah erken dersleri filtreleyebiliyoruz.",
+        function() { daysOff = ["Friday"]; renderAll(); },
+        mySession
+      );
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
+
+      // STEP 5 (LEFT WORKSPACE - TOP CARD): ECTS Credit Load & Live Conflict Alerts
+      await moveCursorAndClick(
+        "#ectsRuleCard",
+        "Adım 5 / 10 (Sol Çalışma Alanı) • Canlı AKTS Yükü ve Kural Uyarıları",
+        "Looking directly below at the left workspace panel, our Rule Engine highlights why optimization is needed: we currently have a Monday morning time conflict between Thermodynamics I and Fluid Mechanics, plus a Friday Day-Off violation.",
+        "Hemen altındaki sol çalışma paneline baktığımızda; Kural Motorumuz Pazartesi sabahı Termodinamik I ile Akışkanlar Mekaniği arasındaki saat çakışmasını ve Cuma boş gün ihlalini anında tespit ederek bizi uyarıyor.",
+        null,
+        mySession
+      );
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
+
+      // STEP 6 (LEFT WORKSPACE - COURSE CATALOG): Pinning & Individual Course Removal
+      await moveCursorAndClick(
+        "#pin-btn-0",
+        "Adım 6 / 10 (Ders Kataloğu) • Şube Sabitleme (Pin) ve Manuel Ders Silme",
+        "In the Available Courses catalog below, students can manually add courses, delete any unwanted course using the red trash icon, or click Pin on a favorite section like Thermodynamics I so the algorithm never moves it.",
+        "Sol katalogda öğrenciler manuel ders ekleyebilir, kırmızı çöp kutusu ikonuyla istediği dersi silebilir veya sevdiği bir hocanın şubesini (örneğin Termodinamik I - Şube 1) 📌 Pin butonuyla sabitleyerek algoritmanın o şubeye dokunmamasını sağlayabilir.",
+        function() { pinnedCourses["ME 2210"] = true; renderAll(); },
+        mySession
+      );
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
+
+      // STEP 7 (CONNECTING FILTER TO CATALOG): Running Auto-Scheduler
+      await moveCursorAndClick(
+        "#btnAutoSchedule",
+        "Adım 7 / 10 (Optimizasyon) • Backtracking Otomatik Program Kurucunun Çalıştırılması",
+        "Now, clicking Build Optimal Schedule connects our filters to the catalog. In milliseconds, the backtracking engine resolves all conflicts, preserves our pinned section, keeps Friday completely free, and places 6 courses totaling 37 ECTS!",
+        "Şimdi 'Build Optimal Schedule' butonuna tıklayarak filtrelerimizle kataloğu birleştiriyoruz. Saniyeler içinde tüm çakışmalar çözülüyor, sabitlenen şubemiz korunuyor, Cuma günü tamamen boş bırakılıyor ve 6 ders (37 AKTS) sıfır hatayla yerleştiriliyor!",
+        function() { generateSmartSchedule(); },
+        mySession
+      );
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
+
+      // STEP 8 (LEFT WORKSPACE - QUOTA CRISIS & WAITLIST): Waitlist & Plan-B Auto-Swap
+      await moveCursorAndClick(
+        "#sec-btn-ME_3340-0",
+        "Adım 8 / 10 (Katalog Kotası) • Akıllı Bekleme Listesi (Waitlist) ve B Planı Auto-Swap",
+        "What if a desired section in the catalog is full, such as Machine Elements Section 1? Clicking a full section places the student first on the Waitlist while holding Section 2 as a safe Plan-B backup. When a seat opens, Auto-Swap upgrades them automatically!",
+        "Peki öğrencinin istediği şube (örneğin Makine Elemanları Şube 1) 30/30 doluysa ne olur? Dolu şubeye tıklandığında sistem öğrenciyi 1. sıradan Bekleme Listesine alır ve açık olan 2. şubeyi B Planı olarak yedekler. Kontenjan açıldığı anda ise otomatik geçiş (Auto-Swap) yapar!",
+        function() {
+          selectedSections["ME 3340"] = "Sec 2";
+          waitlistMap["ME 3340"] = { targetSec: "Sec 1", targetSlot: "Tuesday 10:40 - 12:30", backupSec: "Sec 2" };
+          renderAll();
+          setTimeout(function() {
+            if (isAiDemoRunning && mySession === aiTourSessionId) {
+              var c = findCourse("ME 3340");
+              if (c) c.sections[0].quota = 29;
+              selectedSections["ME 3340"] = "Sec 1";
+              delete waitlistMap["ME 3340"];
+              generateSmartSchedule();
+            }
+          }, 3400);
+        },
+        mySession
+      );
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
+
+      // STEP 9 (RIGHT WORKSPACE - LIVE WEEKLY TIMETABLE & MOBILE CARDS): Timetable Views
+      await moveCursorAndClick(
+        "#btnViewMobile",
+        "Adım 9 / 10 (Sağ Çalışma Alanı) • Canlı Haftalık Matris ve Mobil Günlük Kartlar",
+        "Moving across to the right workspace panel, our Live Weekly Class Schedule displays all placed courses, pinned badges, and green Day-Off columns. Students on smartphones can also toggle between the classic Grid View and Mobile Daily Cards.",
+        "Sağ taraftaki Canlı Haftalık Ders Programı tablosuna geçtiğimizde; yerleşen tüm dersleri, sabitlenen rozetleri ve yeşil boş gün sütunlarını görüyoruz. Ayrıca mobil cihazlar için tek tıkla Günlük Kart görünümüne geçiş yapılabiliyor.",
+        function() {
+          setViewMode("mobile");
+          setTimeout(function() {
+            if (isAiDemoRunning && mySession === aiTourSessionId) setViewMode("table");
+          }, 2600);
+        },
+        mySession
+      );
+      if (!isAiDemoRunning || mySession !== aiTourSessionId) return;
+
+      // STEP 10 (RIGHT WORKSPACE - FINALIZATION): Official Advisor Approval Slip
       await moveCursorAndClick(
         "#btnSubmitReg",
-        "Adım 8 / 8 (Sağ Alt) • Kaydı Kesinleştirme ve Danışman Onay Fişi",
-        "Finally, in the bottom right summary card, clicking Finalize Registration updates the Student Approval status and generates the official Advisor Approval Slip. Thank you for watching!",
-        "Son olarak sağ alttaki özet kutusunda 'Kaydı Kesinleştir' butonuna basıldığında Öğrenci Onay Durumu güncellenir ve resmi Danışman Onay Fişi üretilir. İzlediğiniz için teşekkürler!",
+        "Adım 10 / 10 (Tamamlama) • Kaydı Kesinleştirme ve Resmi Danışman Onay Fişi",
+        "Finally, at the top right of the timetable, clicking Finalize Registration verifies all university rules and generates the official Advisor Approval Slip ready for PDF export and Chrome MCP auto-fill. Thank you for watching!",
+        "Son olarak sağ üstteki 'Finalize Registration' butonuna tıkladığımızda; tüm üniversite kuralları onaylanarak PDF çıktısına ve Chrome MCP aktarımına hazır Resmi Danışman Onay Fişi üretilir. Dinlediğiniz için teşekkürler!",
         function() { completeRegistration(); },
         mySession
       );
 
       await waitMsPausable(2200, mySession);
-      if (mySession === aiTourSessionId) stopAiPresentation();
+      if (mySession === aiTourSessionId) {
+        stopAiPresentation();
+      }
     }
 
-    function openQuickAddModal() { document.getElementById("quickAddModal").classList.remove("hidden"); }
-    function closeQuickAddModal() { document.getElementById("quickAddModal").classList.add("hidden"); }
+    function openQuickAddModal() {
+      document.getElementById("quickAddModal").classList.remove("hidden");
+    }
+    function closeQuickAddModal() {
+      document.getElementById("quickAddModal").classList.add("hidden");
+    }
     function saveQuickCourse() {
       var code = document.getElementById("qaCode").value.trim().toUpperCase() || "ME 4999";
-      var name = document.getElementById("qaName").value.trim() || "Özel Mühendislik Dersi";
+      var name = document.getElementById("qaName").value.trim() || "Special Engineering Topic";
       var ects = parseInt(document.getElementById("qaEcts").value, 10) || 6;
       var day = document.getElementById("qaDay").value;
       var slot = document.getElementById("qaSlot").value;
@@ -1297,29 +1138,28 @@
         code: code,
         name: name,
         ects: ects,
-        credit: 3,
-        tu: "3+0",
         year: 3,
         status: "Normal",
         isMandatory: true,
-        prereq: "Önkoşul yok",
+        prereq: null,
         prereqMet: true,
-        unlocks: "1 ders kayar",
+        unlocks: null,
         sections: [
-          { id: "Şb.1", day: day, slot: slot, quota: 18, maxQuota: 35, avgGpa: "2,65", room: "MF-202", instructor: "Prof. Dr. Bölüm Koordinatörü" },
-          { id: "Şb.2", day: altDay, slot: "10:40 - 12:30", quota: 12, maxQuota: 35, avgGpa: "2,65", room: "MF-202", instructor: "Prof. Dr. Bölüm Koordinatörü" }
+          { id: "Sec 1", day: day, slot: slot, quota: 12, maxQuota: 30, instructor: "Prof. Dr. Dept. Coordinator" },
+          { id: "Sec 2", day: altDay, slot: "10:40 - 12:30", quota: 10, maxQuota: 30, instructor: "Prof. Dr. Dept. Coordinator" }
         ]
       };
 
       courses.unshift(newCourse);
-      selectedSections[code] = "Şb.1";
-      document.getElementById("activeDeptBadge").innerText = "Aktif Katalog: Özel & Yüklenen Dersler (" + courses.length + " Ders)";
+      selectedSections[code] = "Sec 1";
+      document.getElementById("activeDeptBadge").innerText = "Active Catalog: Custom & Uploaded Courses";
+      document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
       closeQuickAddModal();
       renderAll();
     }
 
     // ============================================================================
-    // EVRENSEL ÇOK SEKMELİ MATRİS (.XLSX) VE STANDART TABLO / PDF OKUYUCU
+    // UNIVERSAL MULTI-SHEET 2D MATRIX & TABLE PARSER ENGINE
     // ============================================================================
     function normalizeDayName(str) {
       var s = String(str || "").toLowerCase();
@@ -1357,7 +1197,10 @@
         var headerRowIdx = -1;
         for (var rCheck = 0; rCheck < Math.min(5, rows.length); rCheck++) {
           var rowJoined = rows[rCheck].join(" ");
-          if (normalizeDayName(rowJoined)) { headerRowIdx = rCheck; break; }
+          if (normalizeDayName(rowJoined)) {
+            headerRowIdx = rCheck;
+            break;
+          }
         }
 
         if (headerRowIdx !== -1 && /\d{2}:\d{2}/.test(String(rows[headerRowIdx + 1] && rows[headerRowIdx + 1][0]))) {
@@ -1386,29 +1229,27 @@
 
                 var secToken = match[2] || "1";
                 var secNum = secToken.replace(/\D/g, "") || "1";
-                var secId = "Şb." + secNum;
+                var secId = "Sec " + secNum;
                 var day = colToDay[col] || "Monday";
 
                 var roomMatch = cleanCell.match(/\b([MYZX]\d{2,3})\b/);
-                var roomStr = roomMatch ? roomMatch[1] : "M-201";
+                var roomStr = roomMatch ? "Room " + roomMatch[1] : "Main Campus";
 
                 var codeYearMatch = rawCode.match(/\b[A-Z-]+\s*(\d)/);
                 var courseYear = codeYearMatch ? Math.min(4, Math.max(1, parseInt(codeYearMatch[1], 10))) : detectedYear;
 
                 if (!courseMap[rawCode]) {
-                  var title = courseTitleDictionary[rawCode] || ("Mühendislik Dersi (" + rawCode + ")");
+                  var title = courseTitleDictionary[rawCode] || ("Engineering Course (" + rawCode + ")");
                   courseMap[rawCode] = {
                     code: rawCode,
                     name: title,
                     ects: courseYear === 4 ? 5 : 6,
-                    credit: 3,
-                    tu: "3+0",
                     year: courseYear,
                     status: rawCode === "ME 2210" ? "FF" : (courseYear === 4 ? "Upper" : "Normal"),
                     isMandatory: courseYear < 4,
-                    prereq: "Önkoşul sağlandı",
+                    prereq: null,
                     prereqMet: true,
-                    unlocks: courseYear < 4 ? "Üst dönem derslerini açar • 1 dönem gecikme riski" : null,
+                    unlocks: null,
                     sections: []
                   };
                   orderList.push(courseMap[rawCode]);
@@ -1416,20 +1257,19 @@
 
                 var existingSec = null;
                 for (var s = 0; s < courseMap[rawCode].sections.length; s++) {
-                  if (courseMap[rawCode].sections[s].id === secId) { existingSec = courseMap[rawCode].sections[s]; break; }
+                  if (courseMap[rawCode].sections[s].id === secId) {
+                    existingSec = courseMap[rawCode].sections[s];
+                    break;
+                  }
                 }
                 if (!existingSec) {
-                  var qVal = 35 + (courseMap[rawCode].sections.length * 7) % 20;
-                  var gVal = (1.85 + ((orderList.length * 17) % 110) / 100).toFixed(2).replace(".", ",");
                   courseMap[rawCode].sections.push({
                     id: secId,
                     day: day,
                     slot: slot,
-                    quota: qVal,
-                    maxQuota: 60,
-                    avgGpa: gVal,
-                    room: roomStr,
-                    instructor: "Bölüm Öğretim Üyesi"
+                    quota: 18 + (courseMap[rawCode].sections.length * 3) % 11,
+                    maxQuota: 30,
+                    instructor: "Dept. Faculty (" + roomStr + ")"
                   });
                 }
               }
@@ -1437,6 +1277,7 @@
           }
         }
       }
+
       return orderList.length > 0 ? orderList : null;
     }
 
@@ -1498,6 +1339,7 @@
         };
         textReader.readAsText(file, "UTF-8");
       }
+
       event.target.value = "";
     }
 
@@ -1510,25 +1352,52 @@
           var cols = rows[i].map(function(c) { return String(c || "").trim(); });
           if (cols.length < 2 || !cols[0]) continue;
 
-          var rowStr = cols.join(" ");
-          var codeMatch = rowStr.match(/\b([A-Z]{2,5}(?:-[A-Z]{2,4})?\s?\d{3,4})\b/);
-          if (codeMatch) {
-            var fCode = codeMatch[1].toUpperCase();
-            var fName = cols[1] && cols[1] !== fCode ? cols[1] : (courseTitleDictionary[fCode] || "Bölüm Dersi (" + fCode + ")");
-            var fDay = normalizeDayName(rowStr) || days[orderList.length % 5];
-            var fSlot = normalizeTimeSlot(rowStr) || timeSlots[orderList.length % 4];
+          if (cols.length >= 12 && (cols[9].indexOf("Sec") !== -1 || normalizeDayName(cols[10]))) {
+            var code = cols[0];
+            var name = cols[1] || "Engineering Course";
+            var ects = parseInt(cols[2], 10) || 6;
+            var year = parseInt(cols[3], 10) || 3;
+            var status = cols[4] || "Normal";
+            var isMandatory = cols[5].toLowerCase() !== "hayir" && cols[5].toLowerCase() !== "no" && cols[5].toLowerCase() !== "false";
+            var prereq = (cols[6] === "-" || !cols[6]) ? null : cols[6];
+            var prereqMet = cols[7].toLowerCase() !== "hayir" && cols[7].toLowerCase() !== "no" && cols[7].toLowerCase() !== "false";
+            var unlocks = (cols[8] === "-" || !cols[8]) ? null : cols[8];
+            var secId = cols[9] || "Sec 1";
+            var day = normalizeDayName(cols[10]) || "Monday";
+            var slot = normalizeTimeSlot(cols[11]) || "08:40 - 10:30";
+            var quota = parseInt(cols[12], 10) || 20;
+            var maxQuota = parseInt(cols[13], 10) || 30;
+            var instructor = cols[14] || "Faculty Member";
 
-            if (!courseMap[fCode]) {
-              courseMap[fCode] = {
-                code: fCode, name: fName, ects: 6, credit: 3, tu: "3+0", year: 3, status: "Normal",
-                isMandatory: true, prereq: "Önkoşul sağlandı", prereqMet: true, unlocks: "1 ders kayar", sections: []
+            if (!courseMap[code]) {
+              courseMap[code] = {
+                code: code, name: name, ects: ects, year: year, status: status,
+                isMandatory: isMandatory, prereq: prereq, prereqMet: prereqMet, unlocks: unlocks, sections: []
               };
-              orderList.push(courseMap[fCode]);
+              orderList.push(courseMap[code]);
             }
-            var secNum = courseMap[fCode].sections.length + 1;
-            courseMap[fCode].sections.push({
-              id: "Şb." + secNum, day: fDay, slot: fSlot, quota: 42, maxQuota: 60, avgGpa: "2,40", room: "MF-201", instructor: "Bölüm Öğretim Üyesi"
-            });
+            courseMap[code].sections.push({ id: secId, day: day, slot: slot, quota: quota, maxQuota: maxQuota, instructor: instructor });
+          } else {
+            var rowStr = cols.join(" ");
+            var codeMatch = rowStr.match(/\b([A-Z]{2,5}(?:-[A-Z]{2,4})?\s?\d{3,4})\b/);
+            if (codeMatch) {
+              var fCode = codeMatch[1].toUpperCase();
+              var fName = cols[1] && cols[1] !== fCode ? cols[1] : (courseTitleDictionary[fCode] || "Department Course (" + fCode + ")");
+              var fDay = normalizeDayName(rowStr) || days[orderList.length % 5];
+              var fSlot = normalizeTimeSlot(rowStr) || timeSlots[orderList.length % 4];
+
+              if (!courseMap[fCode]) {
+                courseMap[fCode] = {
+                  code: fCode, name: fName, ects: 6, year: 3, status: "Normal",
+                  isMandatory: true, prereq: null, prereqMet: true, unlocks: null, sections: []
+                };
+                orderList.push(courseMap[fCode]);
+              }
+              var secNum = courseMap[fCode].sections.length + 1;
+              courseMap[fCode].sections.push({
+                id: "Sec " + secNum, day: fDay, slot: fSlot, quota: 18, maxQuota: 30, instructor: "Dept. Instructor"
+              });
+            }
           }
         }
       }
@@ -1542,12 +1411,17 @@
           if (!courseMap[pCode]) {
             courseMap[pCode] = {
               code: pCode,
-              name: courseTitleDictionary[pCode] || ("PDF Dersi (" + pCode + ")"),
-              ects: 6, credit: 3, tu: "3+0", year: 3, status: idx === 0 ? "FF" : "Normal",
-              isMandatory: true, prereq: "Önkoşul sağlandı", prereqMet: true, unlocks: "Mezuniyet 1 dönem gecikebilir",
+              name: courseTitleDictionary[pCode] || ("Parsed Course (" + pCode + ")"),
+              ects: 6,
+              year: 3,
+              status: idx === 0 ? "FF" : "Normal",
+              isMandatory: true,
+              prereq: null,
+              prereqMet: true,
+              unlocks: null,
               sections: [
-                { id: "Şb.1", day: days[idx % 5], slot: timeSlots[idx % 4], quota: 45, maxQuota: 60, avgGpa: "2,35", room: "MF-102", instructor: "Prof. Dr. Akademisyen" },
-                { id: "Şb.2", day: days[(idx + 2) % 5], slot: timeSlots[(idx + 1) % 4], quota: 32, maxQuota: 60, avgGpa: "2,60", room: "MF-105", instructor: "Doç. Dr. Akademisyen" }
+                { id: "Sec 1", day: days[idx % 5], slot: timeSlots[idx % 4], quota: 21, maxQuota: 30, instructor: "Prof. Dr. Faculty" },
+                { id: "Sec 2", day: days[(idx + 2) % 5], slot: timeSlots[(idx + 1) % 4], quota: 15, maxQuota: 30, instructor: "Assoc. Prof. Faculty" }
               ]
             };
             orderList.push(courseMap[pCode]);
@@ -1555,6 +1429,7 @@
           }
         }
       }
+
       return orderList.length > 0 ? orderList : null;
     }
 
@@ -1568,14 +1443,20 @@
 
       container.classList.remove("hidden");
       resultBox.classList.add("hidden");
-      bar.style.width = "35%";
-      pctText.innerText = "35%";
-      statusText.innerText = "🔍 '" + fileName + "' taranıyor...";
+      bar.style.width = "30%";
+      pctText.innerText = "30%";
+      statusText.innerText = "🔍 Scanning '" + fileName + "' (Universal Schedule Detector)...";
+
+      setTimeout(function() {
+        bar.style.width = "75%";
+        pctText.innerText = "75%";
+        statusText.innerText = "🤖 Extracting course codes, sections, rooms, and time slots...";
+      }, 350);
 
       setTimeout(function() {
         bar.style.width = "100%";
         pctText.innerText = "100%";
-        statusText.innerText = "✅ Yükleme Tamamlandı: '" + fileName + "'";
+        statusText.innerText = "✅ Schedule Import Complete: '" + fileName + "'";
 
         var extracted = preParsedMatrixCourses || extractCoursesUniversal(rows, rawText);
         var addedCount = 0;
@@ -1591,59 +1472,104 @@
                 addedCount++;
               } else {
                 for (var s = 0; s < newC.sections.length; s++) {
-                  if (!findSection(existing, newC.sections[s].id)) existing.sections.push(newC.sections[s]);
+                  if (!findSection(existing, newC.sections[s].id)) {
+                    existing.sections.push(newC.sections[s]);
+                  }
                 }
                 addedCount++;
               }
             }
-            document.getElementById("activeDeptBadge").innerText = "Birleştirilmiş Katalog (" + fileName + " • " + courses.length + " Ders)";
+            document.getElementById("activeDeptBadge").innerText = "Merged Catalog (" + fileName + ")";
           } else {
             courses = extracted;
             addedCount = extracted.length;
             selectedSections = {};
             pinnedCourses = {};
             waitlistMap = {};
-            document.getElementById("activeDeptBadge").innerText = "Aktif Katalog: " + fileName + " (" + courses.length + " Ders)";
+            document.getElementById("activeDeptBadge").innerText = "Active Catalog: " + fileName;
           }
         }
 
+        document.getElementById("schedulerReport").classList.add("hidden");
+        document.getElementById("courseCountBadge").innerText = courses.length + " Courses";
+
         renderAll();
+
+        var cardCont = document.getElementById("courseCardContainer");
+        cardCont.className = "bg-white rounded-xl shadow-lg border-4 border-emerald-500 overflow-hidden transition-all duration-500";
+        setTimeout(function() {
+          cardCont.className = "bg-white rounded-xl shadow-sm border-2 border-slate-200 overflow-hidden transition-all duration-500";
+        }, 3000);
 
         resultBox.classList.remove("hidden");
         resultBox.innerHTML =
-          "🎯 <b>" + addedCount + " ders</b> başarıyla OBS kataloğuna aktarıldı! Şimdi alttaki <b>⚡ Filtrelere Göre Otomatik Oluştur</b> butonuna basabilir veya pencereyi kapatıp soldan şube seçebilirsiniz.";
-      }, 600);
+          '<div class="flex flex-wrap justify-between items-center gap-2">' +
+            '<div>🎯 Successfully loaded <b>' + addedCount + ' courses</b> from <b>' + fileName + '</b>! Use the <b>Year 1–4</b> tabs on the left to select your courses or click <b>🗑️</b> on any course you wish to remove.</div>' +
+            '<span class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-full font-extrabold">👈 Select Courses on Left</span>' +
+          '</div>';
+      }, 750);
     }
 
-    function isDayOff(day) { return daysOff.indexOf(day) !== -1; }
+    function isDayOff(day) {
+      return daysOff.indexOf(day) !== -1;
+    }
+
     function findCourse(code) {
-      for (var i = 0; i < courses.length; i++) { if (courses[i].code === code) return courses[i]; }
-      return null;
-    }
-    function findSection(course, secId) {
-      for (var i = 0; i < course.sections.length; i++) { if (course.sections[i].id === secId) return course.sections[i]; }
+      for (var i = 0; i < courses.length; i++) {
+        if (courses[i].code === code) return courses[i];
+      }
       return null;
     }
 
-    function openMcpModal() { document.getElementById("mcpModal").classList.remove("hidden"); }
-    function closeMcpModal() { document.getElementById("mcpModal").classList.add("hidden"); }
-    function closeApprovalModal() { document.getElementById("approvalModal").classList.add("hidden"); }
+    function findSection(course, secId) {
+      for (var i = 0; i < course.sections.length; i++) {
+        if (course.sections[i].id === secId) return course.sections[i];
+      }
+      return null;
+    }
+
+    function openMcpModal() {
+      document.getElementById("mcpModal").classList.remove("hidden");
+    }
+    function closeMcpModal() {
+      document.getElementById("mcpModal").classList.add("hidden");
+    }
+    function closeApprovalModal() {
+      document.getElementById("approvalModal").classList.add("hidden");
+    }
+
+    function scrollToSchedule() {
+      var el = document.getElementById("scheduleSection");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      renderScheduleAndRules();
+    }
 
     function togglePinCourse(courseCode) {
       if (!selectedSections[courseCode]) {
-        alert("Sabitlemek için önce bu dersin bir şubesini seçmelisiniz.");
+        alert("Please select a section of this course first before pinning it.");
         return;
       }
-      if (pinnedCourses[courseCode]) delete pinnedCourses[courseCode];
-      else pinnedCourses[courseCode] = true;
+      if (pinnedCourses[courseCode]) {
+        delete pinnedCourses[courseCode];
+      } else {
+        pinnedCourses[courseCode] = true;
+      }
       renderAll();
     }
 
     function toggleDayOff(day) {
       var idx = daysOff.indexOf(day);
-      if (idx !== -1) daysOff.splice(idx, 1);
-      else {
-        if (daysOff.length >= 3) { alert("En fazla 3 boş gün seçebilirsiniz."); return; }
+      if (idx !== -1) {
+        daysOff.splice(idx, 1);
+      } else {
+        if (daysOff.length >= 3) {
+          alert("You can select at most 3 free days so that your weekly course load can fit.");
+          return;
+        }
         daysOff.push(day);
       }
       renderAll();
@@ -1651,16 +1577,15 @@
 
     function renderDayButtons() {
       var container = document.getElementById("dayOffContainer");
-      if (!container) return;
       var html = "";
       for (var i = 0; i < days.length; i++) {
         var day = days[i];
         var active = isDayOff(day);
-        var dayLabel = t("daysFull")[day] || day;
         var cls = active
-          ? "px-2.5 py-1.5 rounded-lg text-xs border border-emerald-600 bg-emerald-600 text-white font-bold transition shadow-sm cursor-pointer"
-          : "px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer";
-        html += '<button type="button" onclick="toggleDayOff(\'' + day + '\')" class="' + cls + '">' + (active ? "✓ " + dayLabel : dayLabel) + '</button>';
+          ? "px-3 py-2 rounded-lg text-xs border border-emerald-400 bg-emerald-500 text-slate-950 font-extrabold transition shadow cursor-pointer text-center"
+          : "px-3 py-2 rounded-lg text-xs font-semibold border border-indigo-600 bg-indigo-900/50 text-indigo-100 hover:bg-indigo-700 transition cursor-pointer text-center";
+        var label = active ? ("✓ " + day + " Off") : day;
+        html += '<button type="button" onclick="toggleDayOff(\'' + day + '\')" class="' + cls + '">' + label + '</button>';
       }
       container.innerHTML = html;
     }
@@ -1675,18 +1600,10 @@
       return total;
     }
 
-    function calculateCredits() {
-      var total = 0;
-      for (var code in selectedSections) {
-        var c = findCourse(code);
-        if (c) total += (c.credit || 3);
-      }
-      return total;
-    }
-
-    function generateSmartSchedule(closeDrawerAfter) {
+    function generateSmartSchedule() {
       if (courses.length === 0) {
-        loadDemoCatalog();
+        alert("Catalog is currently empty! Please upload your Excel/PDF schedule first, or click 'Load Demo Engineering Catalog' in the left panel.");
+        return;
       }
 
       var timePref = document.getElementById("timeFilterSelect").value;
@@ -1722,7 +1639,9 @@
       }
 
       function isSectionAllowed(courseCode, sec, strictFilter) {
-        if (pinnedCourses[courseCode]) return selectedSections[courseCode] === sec.id;
+        if (pinnedCourses[courseCode]) {
+          return selectedSections[courseCode] === sec.id;
+        }
         if (sec.quota >= sec.maxQuota) return false;
         if (strictFilter) {
           if (isDayOff(sec.day)) return false;
@@ -1761,10 +1680,18 @@
 
       if (solution) {
         selectedSections = solution;
-        reportBox.innerHTML = "✅ <b>Optimum Program Oluşturuldu!</b> Seçtiğiniz boş günler ve filtreler korunarak <b>" + Object.keys(solution).length + " ders (" + runningEcts + " AKTS)</b> 0 çakışma ile yerleştirildi.";
+        var offList = daysOff.length > 0 ? daysOff.join(", ") : "None";
+        var pinCount = Object.keys(pinnedCourses).length;
+        var pinText = pinCount > 0 ? " (" + pinCount + " pinned section preserved)" : "";
+        reportBox.innerHTML = '<div class="flex items-center justify-between flex-wrap gap-2">' +
+          '<span>✅ <b>Optimal Schedule Built!</b> Preserving your free days (<b>' + offList + '</b>) and time filters, <b>' + Object.keys(solution).length + ' courses (' + runningEcts + ' ECTS)</b> were placed with zero conflicts' + pinText + '.</span>' +
+          '<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2 py-0.5 rounded font-bold">0 Conflicts</span>' +
+          '</div>';
       } else {
         var partialMap = {};
         var occupied = {};
+        var relaxedCourses = [];
+
         for (var m = 0; m < targetCourses.length; m++) {
           var course = targetCourses[m];
           var placed = false;
@@ -1785,19 +1712,18 @@
               if (sec2.quota < sec2.maxQuota && !occupied[key2]) {
                 occupied[key2] = true;
                 partialMap[course.code] = sec2.id;
+                relaxedCourses.push(course.code + " (" + sec2.day + ")");
                 break;
               }
             }
           }
         }
         selectedSections = partialMap;
-        reportBox.innerHTML = "⚠️ <b>En Yakın Çakışmasız Program Kuruldu:</b> " + Object.keys(partialMap).length + " ders 0 çakışma ile yerleştirildi.";
+        var totalPlacedEcts = calculateEcts(null);
+        reportBox.innerHTML = '<div>⚠️ <b>Best Conflict-Free Schedule Built (' + Object.keys(partialMap).length + ' Courses, ' + totalPlacedEcts + ' ECTS):</b> Due to strict filters or single-section constraints, <b>' + (relaxedCourses.join(", ") || "some courses") + '</b> were placed in available open slots with 0 conflicts!</div>';
       }
 
       renderAll();
-      if (closeDrawerAfter) {
-        setTimeout(closeSmartDrawer, 550);
-      }
     }
 
     function resetSelections() {
@@ -1827,7 +1753,7 @@
       var course = findCourse(courseCode);
       if (!course || !course.prereqMet) return;
       if (currentProfile.isProbation && course.year === 4) {
-        alert("Sınamalı (Probation - GANO < 1.80) öğrenciler üst sınıftan (4. Sınıf) ders alamaz!");
+        alert("Probation students (GPA < 1.80) are not permitted to take 4th-year courses!");
         return;
       }
 
@@ -1835,15 +1761,22 @@
       if (sec.quota >= sec.maxQuota) {
         var backup = null;
         for (var i = 0; i < course.sections.length; i++) {
-          if (course.sections[i].quota < course.sections[i].maxQuota) { backup = course.sections[i]; break; }
+          if (course.sections[i].quota < course.sections[i].maxQuota) {
+            backup = course.sections[i];
+            break;
+          }
         }
         if (backup) {
           selectedSections[courseCode] = backup.id;
-          waitlistMap[courseCode] = { targetSec: sec.id, targetSlot: t("daysShort")[sec.day] + " " + sec.slot, backupSec: backup.id };
+          waitlistMap[courseCode] = {
+            targetSec: sec.id,
+            targetSlot: sec.day + " " + sec.slot,
+            backupSec: backup.id
+          };
           renderAll();
-          alert("🔔 AKILLI KONTENJAN BEKLEME LİSTESİ (Auto-Swap):\n\n" + courseCode + " (" + sec.id + ") şu an DOLU!\n• Sistem sizi " + sec.id + " için 1. sıradan Bekleme Listesine aldı.\n• Açıkta kalmamanız için açık olan " + backup.id + " şubesi 'B Planı' olarak programa eklendi.");
+          alert("🔔 SMART QUOTA WAITLIST (Auto-Swap):\n\n" + courseCode + " (" + sec.id + ") is currently FULL!\n• You have been placed #1 on the Waitlist for " + sec.id + ".\n• To protect your schedule, open section " + backup.id + " (" + backup.day + ") has been registered as your 'Plan B' backup!");
         } else {
-          alert(courseCode + " (" + sectionId + ") kontenjanı dolu!");
+          alert(courseCode + " (" + sectionId + ") quota is full!");
         }
         return;
       }
@@ -1855,7 +1788,7 @@
       } else {
         var currentEcts = calculateEcts(courseCode);
         if (currentEcts + course.ects > currentProfile.maxEcts) {
-          alert("AKTS Limiti Aşıldı! (Maksimum: " + currentProfile.maxEcts + " AKTS)");
+          alert("ECTS Limit Exceeded! (" + currentProfile.name + " limit: " + currentProfile.maxEcts + " ECTS)");
           return;
         }
         selectedSections[courseCode] = sectionId;
@@ -1873,38 +1806,38 @@
       selectedSections[courseCode] = w.targetSec;
       delete waitlistMap[courseCode];
       renderAll();
-      alert("🎉 AUTO-SWAP BAŞARILI: " + courseCode + " (" + w.targetSec + ") şubesinde kontenjan açıldı ve sistem sizi B Planından çıkartıp asıl istediğiniz şubeye otomatik geçirdi!");
+      alert("🎉 AUTO-SWAP SUCCESSFUL: A seat opened in " + courseCode + " (" + w.targetSec + ") and our engine automatically switched you from your Plan-B backup into your desired section!");
     }
 
     function simulateQuotaCrisis() {
-      if (courses.length === 0) loadDemoCatalog();
+      if (courses.length === 0) {
+        alert("Please upload a schedule or load the Demo Catalog first!");
+        return;
+      }
       var target = courses.length > 1 ? courses[1] : courses[0];
       var sec2 = target.sections.length > 1 ? target.sections[1] : target.sections[0];
       sec2.quota = sec2.maxQuota;
       selectedSections[target.code] = sec2.id;
       renderAll();
-      alert("🔥 KOTA KRİZİ SİMÜLASYONU: " + target.code + " (" + sec2.id + ") kontenjanı aniden doldu! '⚡ Filtrelere Göre Otomatik Oluştur' butonuna basarak programı kurtarın.");
+      alert("🔥 QUOTA CRISIS SIMULATION: " + target.code + " (" + sec2.id + ") just filled up (30/30 FULL)! Click '⚡ Build Optimal Schedule' or '🛠️ Auto-Resolve Conflicts' to see how the engine rescues your schedule.");
     }
 
-    // ============================================================================
-    // YAŞAR ÜNİVERSİTESİ OBS DERS KARTLARI RENDER MOTORU (FOTOĞRAFLA BİREBİR)
-    // ============================================================================
     function renderCourseList() {
       var container = document.getElementById("courseList");
       var html = "";
 
       if (courses.length === 0) {
         container.innerHTML =
-          '<div class="bg-white rounded-lg shadow-sm border border-slate-300 p-8 text-center space-y-3">' +
+          '<div class="p-8 text-center space-y-3 bg-slate-50/60">' +
             '<div class="text-3xl">📂</div>' +
-            '<div class="text-sm font-bold text-slate-800">' + t("emptyCatalogTitle") + '</div>' +
-            '<p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">' + t("emptyCatalogDesc") + '</p>' +
-            '<div class="flex flex-wrap justify-center gap-2.5 pt-2">' +
-              '<button type="button" onclick="openSmartDrawer()" class="bg-[#212529] hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow cursor-pointer">' +
-                t("btnOpenDrawer") +
+            '<div class="text-sm font-extrabold text-slate-800">No Courses Loaded Yet (Clean Slate)</div>' +
+            '<p class="text-xs text-slate-500 max-w-sm mx-auto">Upload your department Excel (.xlsx/.csv) or PDF schedule above so there are zero preloaded course conflicts, or load our Demo Engineering Catalog below.</p>' +
+            '<div class="flex flex-wrap justify-center gap-2 pt-2">' +
+              '<button type="button" onclick="loadDemoCatalog()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold px-4 py-2 rounded-xl shadow cursor-pointer">' +
+                '⚡ Load Demo Engineering Catalog' +
               '</button>' +
-              '<button type="button" onclick="loadDemoCatalog()" class="bg-[#198754] hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow cursor-pointer">' +
-                t("btnLoadDemo") +
+              '<button type="button" onclick="openQuickAddModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow cursor-pointer">' +
+                '➕ Add Course Manually' +
               '</button>' +
             '</div>' +
           '</div>';
@@ -1921,133 +1854,117 @@
         var isPinned = !!pinnedCourses[course.code];
         var hasSelected = !!selectedSections[course.code];
 
-        var typeBadge = "";
+        var badgeHtml = "";
         if (course.status === "FF") {
-          typeBadge = '<span class="bg-amber-100 text-amber-800 border border-amber-300 font-semibold px-2 py-0.5 rounded text-[10px]">Alttan (FF)</span>';
-        } else if (course.isMandatory) {
-          typeBadge = '<span class="bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded text-[10px]">' + t("legCore") + '</span>';
+          badgeHtml = '<span class="bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded text-[11px]">Mandatory Repeat (FF)</span>';
+        } else if (isLockedPrereq) {
+          badgeHtml = '<span class="bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded text-[11px]">🔒 Prereq: ' + course.prereq + '</span>';
+        } else if (isLockedProbation) {
+          badgeHtml = '<span class="bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded text-[11px]">🔒 Probation Lock (Year 4)</span>';
         } else {
-          typeBadge = '<span class="bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded text-[10px]">' + t("legElec") + '</span>';
+          badgeHtml = '<span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded text-[11px]">Year ' + course.year + (course.isMandatory ? ' Core' : ' Elective') + '</span>';
         }
 
         var pinBtnHtml = "";
         if (hasSelected) {
-          var pinCls = isPinned ? "bg-amber-400 text-slate-950 font-bold border-amber-500" : "bg-white text-slate-600 border-slate-300 hover:bg-slate-100";
-          pinBtnHtml = '<button id="pin-btn-' + i + '" type="button" onclick="togglePinCourse(\'' + course.code + '\')" class="text-[10px] px-2 py-0.5 rounded border cursor-pointer ' + pinCls + '">📌 ' + (isPinned ? "Sabit" : "Sabitle") + '</button>';
+          var pinCls = isPinned
+            ? "bg-amber-400 text-slate-950 border-amber-500 font-bold"
+            : "bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200";
+          var pinText = isPinned ? "📌 Pinned" : "📌 Pin";
+          pinBtnHtml = '<button id="pin-btn-' + i + '" type="button" onclick="togglePinCourse(\'' + course.code + '\')" class="text-[11px] px-2 py-0.5 rounded border transition cursor-pointer ' + pinCls + '">' + pinText + '</button>';
         }
 
-        var deleteBtnHtml = '<button type="button" onclick="removeCourse(\'' + course.code + '\', event)" title="Dersi Kaldır" class="text-[10px] px-1.5 py-0.5 rounded border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white cursor-pointer">🗑️</button>';
+        var deleteBtnHtml = '<button type="button" onclick="removeCourse(\'' + course.code + '\', event)" title="Remove this course from catalog" class="text-[11px] px-2 py-0.5 rounded border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition cursor-pointer font-bold">🗑️</button>';
 
-        // Önkoşul Satırı
-        var prereqRowHtml = course.prereqMet
-          ? '<div class="text-[11px] text-emerald-700 font-medium px-4 py-1.5 bg-white border-b border-slate-100">' + t("prereqMetText") + ' <b>' + (course.prereq || "Yok") + '</b></div>'
-          : '<div class="text-[11px] text-rose-700 font-bold px-4 py-1.5 bg-rose-50 border-b border-rose-200">' + t("prereqLockText") + ' <b>' + course.prereq + '</b></div>';
-
-        // Sarı Mezuniyet Gecikme Kutusu (Fotoğraftakiyle Birebir)
-        var gradDelayHtml = course.unlocks
-          ? '<div class="mx-4 my-2 px-3 py-2 rounded bg-[#fff8e6] border border-[#ffd88a] text-[#855a00] text-[11px] font-medium">' +
-              t("gradDelayPrefix") + ' <b>' + course.unlocks + '</b>' +
-            '</div>'
+        var chainInfo = course.unlocks
+          ? '<div class="text-[11px] text-slate-500 mt-0.5">🕸️ <b>Unlocks next course:</b> ' + course.unlocks + '</div>'
           : '';
 
-        // Şube Satırları (Fotoğraftaki Tablo Düzeni)
-        var sectionsRowsHtml = "";
+        var sectionsHtml = "";
         var safeCodeId = course.code.replace(/[^A-Za-z0-9]/g, "_");
-
         for (var j = 0; j < course.sections.length; j++) {
           var sec = course.sections[j];
           var isSelected = selectedSections[course.code] === sec.id;
           var isFull = sec.quota >= sec.maxQuota;
-          var remaining = Math.max(0, sec.maxQuota - sec.quota);
-          var fillPct = Math.min(100, Math.round((sec.quota / sec.maxQuota) * 100));
-          var dayShort = t("daysShort")[sec.day] || sec.day;
-          var displayHour = slotDisplayHours[sec.slot] || sec.slot;
+          var dayOffFlag = isDayOff(sec.day);
 
-          var btnLabel = isSelected ? t("selectedBtn") : (isFull ? t("waitlistBtn") : t("selectBtn"));
-          var btnCls = isSelected
-            ? "bg-[#198754] text-white font-bold border border-[#146c43]"
-            : (isFull ? "bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold border border-amber-400" : "bg-[#6ea88c] hover:bg-[#198754] text-white font-semibold");
+          var btnStyle = "border-slate-300 bg-white text-slate-700 hover:bg-slate-50";
+          if (isSelected) btnStyle = "border-indigo-600 bg-indigo-600 text-white font-semibold shadow-sm";
+          else if (isFull) btnStyle = "border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100";
+          else if (dayOffFlag) btnStyle = "border-slate-200 bg-slate-50 text-slate-400";
 
-          sectionsRowsHtml +=
-            '<div onmouseenter="setHoverPreview(\'' + course.code + '\', \'' + sec.id + '\')" onmouseleave="clearHoverPreview()" class="px-4 py-2.5 border-t border-slate-200 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 hover:bg-slate-50 transition ' + (isSelected ? 'bg-emerald-50/50' : '') + '">' +
-              '<!-- Sol: Şube No + Hoca & Saat/Derslik -->' +
-              '<div class="flex items-center gap-3 min-w-[210px]">' +
-                '<span class="text-xs font-bold text-slate-600 w-9">' + sec.id + '</span>' +
-                '<div>' +
-                  '<div class="text-xs font-bold text-slate-800">' + sec.instructor + '</div>' +
-                  '<div class="text-[11px] text-slate-500">' + dayShort + ' ' + sec.slot + ' • ' + (sec.room || "MF-201") + '</div>' +
-                '</div>' +
-              '</div>' +
+          var disabledAttr = isLocked ? "disabled" : "";
+          var lockCls = isLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer";
+          var dayOffBadge = (dayOffFlag && !isSelected) ? '<span class="text-[9px] bg-emerald-100 text-emerald-800 px-1 rounded ml-1">Day-Off</span>' : '';
 
-              '<!-- Orta: Turuncu Hoca Ortalaması Rozeti (Ort. 2,23 >) -->' +
-              '<div class="shrink-0">' +
-                '<span title="Öğretim üyesinin bu dersteki geçmiş dönem harf notu ortalaması" class="inline-flex items-center gap-1 bg-[#fff3e0] text-[#d96b16] border border-[#ffcc80] text-[11px] font-bold px-2.5 py-0.5 rounded-full cursor-help">' +
-                  t("avgLabel") + ' ' + (sec.avgGpa || "2,35") + ' <span class="text-[10px]">›</span>' +
-                '</span>' +
-              '</div>' +
+          var quotaBadgeCls = isFull
+            ? "bg-rose-600 text-white font-bold"
+            : (isSelected ? "bg-indigo-800 text-white" : "bg-slate-100 text-slate-600");
+          var quotaText = sec.quota + "/" + sec.maxQuota + (isFull ? " FULL (Waitlist)" : "");
 
-              '<!-- Kontenjan Barı (Kalan 11  49/60) -->' +
-              '<div class="w-32 shrink-0" title="Kayıtlı / Kontenjan: ' + sec.quota + ' / ' + sec.maxQuota + '">' +
-                '<div class="flex justify-between text-[10px] font-semibold mb-1">' +
-                  '<span class="' + (remaining === 0 ? 'text-rose-600 font-bold' : 'text-slate-600') + '">' + t("remainingText") + ' ' + remaining + '</span>' +
-                  '<span class="text-slate-500">' + sec.quota + '/' + sec.maxQuota + '</span>' +
-                '</div>' +
-                '<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">' +
-                  '<div class="' + (isFull ? 'bg-rose-600' : 'bg-[#2b547e]') + ' h-full" style="width:' + fillPct + '%"></div>' +
-                '</div>' +
-              '</div>' +
-
-              '<!-- Sağ: Yeşil Seç Butonu -->' +
-              '<div class="shrink-0">' +
-                '<button id="sec-btn-' + safeCodeId + '-' + j + '" type="button" onclick="selectSection(\'' + course.code + '\', \'' + sec.id + '\')" ' + (isLocked ? 'disabled' : '') + ' class="w-24 py-1.5 px-3 rounded text-xs transition ' + btnCls + ' ' + (isLocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer') + '">' +
-                  btnLabel +
-                '</button>' +
-              '</div>' +
-            '</div>';
+          sectionsHtml += '<button id="sec-btn-' + safeCodeId + '-' + j + '" type="button" onclick="selectSection(\'' + course.code + '\', \'' + sec.id + '\')" ' + disabledAttr + ' class="border rounded-xl px-3 py-2 text-left text-xs transition flex justify-between items-center gap-2 ' + btnStyle + ' ' + lockCls + '">' +
+            '<div>' +
+              '<div class="font-bold flex items-center flex-wrap">' + sec.id + ': ' + sec.day + dayOffBadge + '</div>' +
+              '<div class="text-[11px] opacity-85">' + sec.slot + '</div>' +
+              '<div class="text-[10px] opacity-75">' + sec.instructor + '</div>' +
+            '</div>' +
+            '<span class="text-[10px] px-2 py-0.5 rounded shrink-0 ' + quotaBadgeCls + '">' + quotaText + '</span>' +
+          '</button>';
         }
 
-        html +=
-          '<div class="bg-white rounded-lg shadow-sm border border-slate-300 overflow-hidden ' + (isLocked ? 'opacity-75' : '') + '">' +
-            '<!-- Gri Ders Başlık Barı -->' +
-            '<div class="bg-[#f1f3f5] px-4 py-2.5 border-b border-slate-300 flex flex-wrap justify-between items-center gap-2">' +
-              '<div class="flex items-center gap-2">' +
-                '<span class="font-extrabold text-xs sm:text-sm text-[#1e40af] tracking-tight">' + course.code + ' ' + course.name + '</span>' +
-                typeBadge +
-              '</div>' +
-              '<div class="flex items-center gap-2 text-[11px] text-slate-600 font-semibold">' +
-                '<span>T+U ' + (course.tu || "3+0") + ' • ' + (course.credit || 3) + ' Krd • ' + course.ects + ' AKTS</span>' +
-                pinBtnHtml +
-                deleteBtnHtml +
-              '</div>' +
+        var rowBg = isLocked ? "bg-slate-50/70" : "bg-white";
+        html += '<div class="p-3.5 sm:p-4 ' + rowBg + '">' +
+          '<div class="flex flex-wrap justify-between items-start gap-2 mb-1.5">' +
+            '<div>' +
+              '<span class="font-extrabold text-sm text-indigo-950">' + course.code + '</span>' +
+              '<span class="text-sm font-semibold text-slate-700"> - ' + course.name + '</span>' +
+              '<span class="text-xs font-bold text-indigo-600 ml-1">(' + course.ects + ' ECTS)</span>' +
+              chainInfo +
             '</div>' +
-            prereqRowHtml +
-            gradDelayHtml +
-            '<div class="divide-y divide-slate-200">' + sectionsRowsHtml + '</div>' +
-          '</div>';
+            '<div class="flex flex-wrap items-center gap-1.5">' + pinBtnHtml + badgeHtml + deleteBtnHtml + '</div>' +
+          '</div>' +
+          '<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">' + sectionsHtml + '</div>' +
+        '</div>';
       }
 
-      container.innerHTML = html;
+      container.innerHTML = html || '<div class="p-6 text-center text-xs text-slate-500">No courses found for this year filter.</div>';
     }
 
-    // ============================================================================
-    // SAĞ HAFTALIK PROGRAM GRİDİ & HOVER KESİKLİ ÇİZGİ ÖNİZLEMESİ
-    // ============================================================================
     function renderScheduleAndRules() {
+      var btnTable = document.getElementById("btnViewTable");
+      var btnMobile = document.getElementById("btnViewMobile");
+      var tableCont = document.getElementById("tableScheduleContainer");
+      var mobileCont = document.getElementById("mobileScheduleContainer");
+
+      if (currentViewMode === "mobile") {
+        btnMobile.className = "px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-400 text-slate-950 shadow cursor-pointer";
+        btnTable.className = "px-2.5 py-1 rounded-md text-xs font-bold text-indigo-200 hover:text-white cursor-pointer";
+        tableCont.classList.add("hidden");
+        mobileCont.classList.remove("hidden");
+      } else {
+        btnTable.className = "px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-400 text-slate-950 shadow cursor-pointer";
+        btnMobile.className = "px-2.5 py-1 rounded-md text-xs font-bold text-indigo-200 hover:text-white cursor-pointer";
+        tableCont.classList.remove("hidden");
+        mobileCont.classList.add("hidden");
+      }
+
       var headerRow = document.getElementById("calendarHeader");
-      var headerHtml = '<th class="border border-slate-200 p-1.5 w-14 text-center font-semibold">' + t("hourCol") + '</th>';
+      var headerHtml = '<th class="border border-indigo-800 p-2.5 w-24 bg-indigo-950 text-indigo-200">Time Slot</th>';
       for (var d = 0; d < days.length; d++) {
-        var dayKey = days[d];
-        var isOff = isDayOff(dayKey);
-        headerHtml +=
-          '<th class="border border-slate-200 p-1.5 text-center font-bold ' + (isOff ? 'bg-emerald-50 text-emerald-800' : '') + '">' +
-            t("daysShort")[dayKey] +
-            (isOff ? '<div class="text-[9px] text-emerald-600 font-extrabold">BOŞ</div>' : '') +
-          '</th>';
+        var dayName = days[d];
+        var isOff = isDayOff(dayName);
+        headerHtml += '<th class="border border-indigo-800 p-2.5 ' + (isOff ? 'bg-emerald-700 text-white' : 'bg-indigo-900 text-white') + '">' +
+          '<div class="font-extrabold">' + dayName + '</div>' +
+          (isOff ? '<div class="text-[10px] font-bold text-emerald-200">🌿 DAY-OFF</div>' : '') +
+        '</th>';
       }
       headerRow.innerHTML = headerHtml;
 
       var cellMap = {};
       var conflicts = [];
+      var quotaIssues = [];
+      var dayOffViolations = [];
+      var activeDaysMap = {};
 
       for (var code in selectedSections) {
         var secId = selectedSections[code];
@@ -2058,170 +1975,226 @@
         var key = sec.slot + "_" + sec.day;
         if (!cellMap[key]) cellMap[key] = [];
         cellMap[key].push({ course: course, sec: sec });
+        activeDaysMap[sec.day] = true;
+
+        if (sec.quota >= sec.maxQuota) {
+          quotaIssues.push(course.code + " (" + sec.id + ") section quota is full!");
+        }
+        if (isDayOff(sec.day)) {
+          dayOffViolations.push(course.code + " (" + sec.id + ") is scheduled on your protected free day (<b>" + sec.day + "</b>)!");
+        }
       }
 
       var grid = document.getElementById("scheduleGrid");
       var gridHtml = "";
-
       for (var s = 0; s < timeSlots.length; s++) {
         var slot = timeSlots[s];
-        var dispHour = slotDisplayHours[slot] || slot;
-        var rowHtml = '<td class="border border-slate-200 p-1.5 text-[10px] font-semibold text-slate-500 bg-[#f8f9fa] text-center">' + dispHour + '</td>';
+        var rowHtml = '<td class="border border-indigo-100 p-2 font-bold text-indigo-950 bg-indigo-100/70 text-center whitespace-nowrap">' + slot + '</td>';
 
         for (var d2 = 0; d2 < days.length; d2++) {
           var day = days[d2];
           var cellKey = slot + "_" + day;
           var items = cellMap[cellKey] || [];
           var offFlag = isDayOff(day);
-          var isHoveredHere = hoveredPreview && hoveredPreview.day === day && hoveredPreview.slot === slot;
 
           if (items.length === 0) {
-            if (isHoveredHere) {
-              // FOTOĞRAFTAKİ KESİKLİ ÇİZGİ (DASHED LINE) ÖNİZLEME KUTUSU
-              rowHtml +=
-                '<td class="border border-slate-200 p-1 h-16 align-top bg-slate-50/60">' +
-                  '<div class="border-2 border-dashed border-slate-500 bg-white/90 text-slate-700 p-1.5 rounded h-full flex flex-col justify-between text-[10px]">' +
-                    '<div class="font-bold">' + hoveredPreview.code + ' - ' + hoveredPreview.secId + '</div>' +
-                    '<div class="text-[9px] text-slate-500">' + hoveredPreview.room + '</div>' +
-                  '</div>' +
-                '</td>';
-            } else {
-              rowHtml += '<td class="border border-slate-200 p-1 h-16 ' + (offFlag ? 'bg-emerald-50/30' : 'bg-white') + '"></td>';
-            }
+            rowHtml += '<td class="border border-indigo-100 p-2 h-20 ' + (offFlag ? 'bg-emerald-100/50' : 'bg-white/80') + '"></td>';
           } else if (items.length === 1) {
             var item = items[0];
+            var isFull = item.sec.quota >= item.sec.maxQuota;
             var isPin = !!pinnedCourses[item.course.code];
-            var boxStyle = "bg-sky-50 border-sky-500 text-sky-950";
-            if (item.course.status === "FF") boxStyle = "bg-amber-50 border-amber-500 text-amber-950";
-            else if (!item.course.isMandatory) boxStyle = "bg-emerald-50 border-emerald-500 text-emerald-950";
+            var cardCls = isFull
+              ? "bg-amber-100 border-amber-500 text-amber-950"
+              : (offFlag ? "bg-amber-100 border-amber-500 text-amber-950" : "bg-indigo-600 border-indigo-900 text-white");
+            var statusLabel = isFull ? "⚠️ QUOTA FULL" : (offFlag ? "⚠️ Day-Off Warning" : (item.course.ects + " ECTS"));
 
-            rowHtml +=
-              '<td class="border border-slate-200 p-1 h-16 align-top">' +
-                '<div onclick="selectSection(\'' + item.course.code + '\', \'' + item.sec.id + '\')" title="Çıkarmak için tıklayın" class="' + boxStyle + ' border-l-4 border p-1.5 rounded h-full flex flex-col justify-between cursor-pointer hover:opacity-80 transition">' +
-                  '<div class="font-bold text-[10px] leading-tight">' + (isPin ? '📌 ' : '') + item.course.code + ' - ' + item.sec.id + '</div>' +
-                  '<div class="text-[9px] opacity-80">' + (item.sec.room || "MF-105") + '</div>' +
+            rowHtml += '<td class="border border-indigo-100 p-1.5 h-20 align-top ' + (offFlag ? 'bg-emerald-100/40' : 'bg-white/90') + '">' +
+              '<div class="' + cardCls + ' border-l-4 p-2 rounded-lg h-full flex flex-col justify-between shadow">' +
+                '<div class="font-extrabold text-xs flex justify-between items-center gap-1">' +
+                  '<span>' + (isPin ? '📌 ' : '') + item.course.code + '</span>' +
+                  '<div class="flex items-center gap-1">' +
+                    '<span class="opacity-90 text-[10px] bg-black/20 px-1.5 py-0.5 rounded">' + item.sec.id + '</span>' +
+                    '<button type="button" onclick="selectSection(\'' + item.course.code + '\', \'' + item.sec.id + '\')" title="Unselect from schedule" class="text-[10px] bg-black/25 hover:bg-rose-600 text-white px-1 rounded cursor-pointer">✕</button>' +
+                  '</div>' +
                 '</div>' +
-              '</td>';
+                '<div class="text-[11px] leading-tight font-medium opacity-95">' + item.course.name + '</div>' +
+                '<div class="text-[10px] font-bold opacity-90">' + statusLabel + '</div>' +
+              '</div>' +
+            '</td>';
           } else {
             var namesArr = [];
             for (var cIdx = 0; cIdx < items.length; cIdx++) {
-              namesArr.push(items[cIdx].course.code);
+              namesArr.push(items[cIdx].course.code + " (" + items[cIdx].sec.id + ")");
             }
-            conflicts.push(t("daysShort")[day] + " " + dispHour + " (" + namesArr.join(" & ") + ")");
-            rowHtml +=
-              '<td class="border border-slate-200 p-1 h-16 align-top bg-rose-50">' +
-                '<div onclick="generateSmartSchedule(false)" class="bg-rose-100 border-2 border-rose-600 text-rose-900 p-1 rounded h-full flex flex-col justify-between cursor-pointer animate-pulse">' +
-                  '<div class="font-extrabold text-[10px]">⚠️ ÇAKIŞMA</div>' +
-                  '<div class="text-[9px] font-bold">' + namesArr.join(" & ") + '</div>' +
-                '</div>' +
-              '</td>';
+            var namesStr = namesArr.join(" & ");
+            conflicts.push(day + " (" + slot + "): " + namesStr + " overlap!");
+
+            rowHtml += '<td class="border border-indigo-100 p-1.5 h-20 align-top bg-rose-100">' +
+              '<div class="bg-rose-600 border-l-4 border-rose-950 text-white p-2 rounded-lg h-full flex flex-col justify-between shadow animate-pulse">' +
+                '<div class="font-extrabold text-xs">⚠️ TIME CONFLICT</div>' +
+                '<div class="text-[11px] font-semibold">' + namesStr + '</div>' +
+                '<button type="button" onclick="generateSmartSchedule()" class="bg-white text-rose-700 text-[10px] py-0.5 px-1.5 rounded font-extrabold cursor-pointer">Auto-Resolve</button>' +
+              '</div>' +
+            '</td>';
           }
         }
         gridHtml += '<tr>' + rowHtml + '</tr>';
       }
       grid.innerHTML = gridHtml;
 
-      // Sağ Alt Uyarı Kutuları (Fotoğraftaki Sarı Seçmeli Uyarısı & Mavi Seçilmeyen Zorunlu Dersler Kutusu)
-      var alertsBox = document.getElementById("obsRightAlerts");
-      var alertsHtml = "";
+      // Mobile Daily Card View
+      var mobileHtml = "";
+      for (var md = 0; md < days.length; md++) {
+        var mDay = days[md];
+        var mOff = isDayOff(mDay);
+        var dayItemsHtml = "";
+        var dayCount = 0;
 
-      // Seçmeli ders seçilmiş mi kontrolü
-      var hasElectiveSelected = false;
-      for (var sCode in selectedSections) {
-        var sc = findCourse(sCode);
-        if (sc && !sc.isMandatory) hasElectiveSelected = true;
-      }
-      if (!hasElectiveSelected && courses.length > 0) {
-        alertsHtml +=
-          '<div class="px-3 py-2 rounded bg-[#fff8e6] border border-[#ffd88a] text-[#855a00] font-medium">' +
-            t("electiveWarn") +
-          '</div>';
-      }
-
-      // Seçilmeyen zorunlu/alttan dersler
-      var unselectedMandatory = [];
-      for (var u = 0; u < courses.length; u++) {
-        if (courses[u].isMandatory && courses[u].prereqMet && !selectedSections[courses[u].code]) {
-          unselectedMandatory.push('<b>' + courses[u].code + '</b> ' + (courses[u].status === "FF" ? "(mezuniyet +2 dönem gecikir)" : "(1 ders kayar)"));
+        for (var ms = 0; ms < timeSlots.length; ms++) {
+          var mSlot = timeSlots[ms];
+          var mKey = mSlot + "_" + mDay;
+          var mList = cellMap[mKey] || [];
+          if (mList.length === 1) {
+            dayCount++;
+            var mItem = mList[0];
+            var mPin = !!pinnedCourses[mItem.course.code];
+            dayItemsHtml += '<div class="flex items-center justify-between bg-indigo-600 text-white border-l-4 border-indigo-950 p-2.5 rounded-lg shadow-sm">' +
+              '<div>' +
+                '<div class="font-extrabold text-xs">' + (mPin ? '📌 ' : '') + mItem.course.code + ' - ' + mItem.course.name + '</div>' +
+                '<div class="text-[11px] text-indigo-100">' + mItem.sec.id + ' • ' + mItem.sec.instructor + '</div>' +
+              '</div>' +
+              '<div class="text-right shrink-0 ml-2">' +
+                '<div class="text-xs font-bold text-amber-300">' + mSlot + '</div>' +
+                '<div class="text-[10px] font-semibold text-indigo-100">' + mItem.course.ects + ' ECTS</div>' +
+              '</div>' +
+            '</div>';
+          } else if (mList.length > 1) {
+            dayCount += mList.length;
+            var cNames = [];
+            for (var x = 0; x < mList.length; x++) cNames.push(mList[x].course.code);
+            dayItemsHtml += '<div class="flex items-center justify-between bg-rose-600 text-white p-2.5 rounded-lg">' +
+              '<div>' +
+                '<div class="font-extrabold text-xs">⚠️ CONFLICT: ' + cNames.join(" & ") + '</div>' +
+                '<div class="text-[11px]">' + mSlot + '</div>' +
+              '</div>' +
+              '<button type="button" onclick="generateSmartSchedule()" class="bg-white text-rose-700 text-xs font-bold px-2.5 py-1 rounded-lg">Resolve</button>' +
+            '</div>';
+          }
         }
-      }
-      if (unselectedMandatory.length > 0) {
-        alertsHtml +=
-          '<div class="px-3 py-2 rounded bg-[#eef5ff] border border-[#b8d4fe] text-[#1e40af] leading-relaxed">' +
-            t("unselectedWarnPrefix") + ' ' + unselectedMandatory.join(", ") +
-          '</div>';
-      }
 
-      if (conflicts.length > 0) {
-        alertsHtml +=
-          '<div class="px-3 py-2 rounded bg-rose-50 border border-rose-300 text-rose-800 font-bold">' +
-            '❌ Saat Çakışması: ' + conflicts.join(", ") +
-          '</div>';
+        if (dayCount === 0) {
+          dayItemsHtml = '<div class="text-xs text-emerald-800 font-bold py-1">🌿 Completely Free Day (No classes)</div>';
+        }
+
+        var dayHeaderBg = mOff ? "bg-emerald-100/90 border-emerald-400" : "bg-white/90 border-indigo-200";
+        mobileHtml += '<div class="border-2 rounded-xl p-3 shadow-sm ' + dayHeaderBg + '">' +
+          '<div class="flex justify-between items-center mb-2">' +
+            '<span class="font-extrabold text-xs text-indigo-950 uppercase tracking-wider">' + mDay + (mOff ? ' (🌿 Day-Off Filter)' : '') + '</span>' +
+            '<span class="text-[11px] font-bold text-indigo-700">' + dayCount + ' Courses</span>' +
+          '</div>' +
+          '<div class="space-y-1.5">' + dayItemsHtml + '</div>' +
+        '</div>';
       }
+      mobileCont.innerHTML = mobileHtml;
 
-      alertsBox.innerHTML = alertsHtml;
-
-      // Waitlist Kutusu
       var waitlistBox = document.getElementById("waitlistBox");
       var waitKeys = Object.keys(waitlistMap);
       if (waitKeys.length > 0) {
         waitlistBox.classList.remove("hidden");
-        var wHtml = '<div class="font-bold text-indigo-900 mb-1">🔔 Aktif Yedek Liste & B Planı (Auto-Swap):</div>';
+        var wHtml = '<div class="font-bold text-indigo-900 mb-1.5">🔔 Active Quota Waitlist & Plan-B Protection (Auto-Swap Engine):</div>';
         for (var wIdx = 0; wIdx < waitKeys.length; wIdx++) {
           var wCode = waitKeys[wIdx];
           var wInfo = waitlistMap[wCode];
-          wHtml +=
-            '<div class="flex justify-between items-center bg-white p-2 rounded border border-indigo-200 mb-1 gap-2">' +
-              '<span><b>' + wCode + ':</b> ' + wInfo.targetSec + ' dolu olduğu için <b>' + wInfo.backupSec + '</b> B Planı olarak tutuldu.</span>' +
-              '<button type="button" onclick="simulateWaitlistOpen(\'' + wCode + '\')" class="bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded cursor-pointer">✨ Kontenjan Aç</button>' +
-            '</div>';
+          wHtml += '<div class="flex flex-wrap justify-between items-center bg-indigo-50 p-2.5 rounded-lg border border-indigo-200 mb-1.5 gap-2">' +
+            '<span><b>' + wCode + ':</b> Desired section <b>' + wInfo.targetSec + ' (' + wInfo.targetSlot + ')</b> is full; currently holding <b>' + wInfo.backupSec + '</b> as Plan-B backup.</span>' +
+            '<button type="button" onclick="simulateWaitlistOpen(\'' + wCode + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg cursor-pointer">' +
+              '✨ Simulate Seat Opening (Auto-Swap)' +
+            '</button>' +
+          '</div>';
         }
         waitlistBox.innerHTML = wHtml;
       } else {
         waitlistBox.classList.add("hidden");
       }
 
-      // Seçilen Dersler Özeti (0 ders • 0 Krd • 0 / 40 AKTS)
       var totalEcts = calculateEcts(null);
-      var totalCr = calculateCredits();
-      var selCount = Object.keys(selectedSections).length;
+      var ectsText = totalEcts + " / " + currentProfile.maxEcts + " ECTS";
+      document.getElementById("ectsCounter").innerText = ectsText;
+      var mobileEctsEl = document.getElementById("mobileEctsText");
+      if (mobileEctsEl) mobileEctsEl.innerText = ectsText;
 
-      document.getElementById("ectsCounter").innerText = selCount + " ders • " + totalCr + " Krd • " + totalEcts + " / " + currentProfile.maxEcts + " AKTS";
       var pct = Math.min(100, (totalEcts / currentProfile.maxEcts) * 100);
       document.getElementById("ectsBar").style.width = pct + "%";
 
-      var miniList = document.getElementById("selectedCoursesMiniList");
-      if (selCount === 0) {
-        miniList.innerHTML = t("emptySelected");
-      } else {
-        var mHtml = "";
-        for (var cKey in selectedSections) {
-          var cObj = findCourse(cKey);
-          if (!cObj) continue;
-          mHtml +=
-            '<div class="flex justify-between items-center py-1 border-b border-slate-100 text-slate-700">' +
-              '<span><b>' + cObj.code + '</b> (' + selectedSections[cKey] + ')</span>' +
-              '<span class="font-semibold">' + cObj.ects + ' AKTS</span>' +
-            '</div>';
+      var alertsDiv = document.getElementById("ruleAlerts");
+      var alertsHtml = "";
+
+      var ffMissing = [];
+      for (var f = 0; f < courses.length; f++) {
+        if (courses[f].status === "FF" && !selectedSections[courses[f].code]) {
+          ffMissing.push(courses[f]);
         }
-        miniList.innerHTML = mHtml;
       }
+
+      if (courses.length === 0) {
+        alertsHtml += '<div class="bg-slate-50 text-slate-600 border border-slate-200 p-2.5 rounded-lg font-medium">📂 <b>Ready for Schedule Upload:</b> Upload any Excel/PDF schedule above or load the Demo Catalog to begin.</div>';
+      } else if (Object.keys(selectedSections).length === 0) {
+        alertsHtml += '<div class="bg-indigo-50 text-indigo-800 border border-indigo-200 p-2.5 rounded-lg font-semibold">👈 <b>Awaiting Course Selection:</b> Click on any course section on the left catalog or click <b>⚡ Build Optimal Schedule</b>!</div>';
+      } else {
+        for (var fm = 0; fm < ffMissing.length; fm++) {
+          alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Mandatory Repeat Rule:</b> You must register for failed course ' + ffMissing[fm].code + ' (FF) first.</div>';
+        }
+        for (var cf = 0; cf < conflicts.length; cf++) {
+          alertsHtml += '<div class="bg-rose-50 text-rose-700 border border-rose-200 p-2 rounded-lg">❌ <b>Time Conflict:</b> ' + conflicts[cf] + '</div>';
+        }
+        for (var qi = 0; qi < quotaIssues.length; qi++) {
+          alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">⚠️ <b>Quota Crisis:</b> ' + quotaIssues[qi] + '</div>';
+        }
+        for (var dv = 0; dv < dayOffViolations.length; dv++) {
+          alertsHtml += '<div class="bg-amber-50 text-amber-800 border border-amber-200 p-2 rounded-lg">📅 <b>Day-Off Alert:</b> ' + dayOffViolations[dv] + '</div>';
+        }
+
+        if (ffMissing.length === 0 && conflicts.length === 0 && quotaIssues.length === 0 && dayOffViolations.length === 0 && totalEcts > 0) {
+          alertsHtml = '<div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-2.5 rounded-lg font-semibold">✅ All university regulations, prerequisites, and day-off filters verified. Ready to finalize!</div>';
+        }
+      }
+      alertsDiv.innerHTML = alertsHtml;
+
+      var activeDaysCount = Object.keys(activeDaysMap).length;
+      var freeDaysCount = 5 - activeDaysCount;
+      var pinnedCount = Object.keys(pinnedCourses).length;
+      var totalIssues = conflicts.length + ffMissing.length + quotaIssues.length;
+
+      document.getElementById("scheduleStats").innerHTML =
+        '<div class="bg-white/95 border border-indigo-200 rounded-xl p-2.5 shadow-sm">' +
+          '<div class="text-[11px] text-slate-500">Selected Load</div>' +
+          '<div class="text-xs sm:text-sm font-extrabold text-indigo-950">' + Object.keys(selectedSections).length + ' Courses (' + totalEcts + ' ECTS)</div>' +
+        '</div>' +
+        '<div class="bg-emerald-50 border border-emerald-300 rounded-xl p-2.5 shadow-sm">' +
+          '<div class="text-[11px] text-emerald-700">Weekly Free Days</div>' +
+          '<div class="text-xs sm:text-sm font-extrabold text-emerald-900">' + freeDaysCount + ' Days Free</div>' +
+        '</div>' +
+        '<div class="bg-amber-50 border border-amber-300 rounded-xl p-2.5 shadow-sm">' +
+          '<div class="text-[11px] text-amber-800">Pinned (📌) Sections</div>' +
+          '<div class="text-xs sm:text-sm font-extrabold text-amber-900">' + pinnedCount + ' Locked</div>' +
+        '</div>' +
+        '<div class="bg-white/95 border border-indigo-200 rounded-xl p-2.5 shadow-sm">' +
+          '<div class="text-[11px] text-indigo-700">Conflicts / Alerts</div>' +
+          '<div class="text-xs sm:text-sm font-extrabold text-indigo-900">' + totalIssues + ' Issues</div>' +
+        '</div>';
     }
 
     function completeRegistration() {
       if (Object.keys(selectedSections).length === 0) {
-        alert("Lütfen önce sol listeden derslerinizi seçin veya '✦ Otomatik Oluştur' butonunu kullanın!");
+        alert("Please select your courses from the left catalog first!");
         return;
       }
       for (var i = 0; i < courses.length; i++) {
         if (courses[i].status === "FF" && !selectedSections[courses[i].code]) {
-          alert("HATA: Alttan kalan zorunlu tekrar dersinizi (" + courses[i].code + " - FF) seçmeden kaydı kesinleştiremezsiniz!");
+          alert("ERROR: You must select your mandatory repeat course (" + courses[i].code + " - FF) before finalizing registration!");
           return;
         }
       }
-
-      document.getElementById("uiStudentApprovalVal").innerText = t("stuApprovalDone");
-      document.getElementById("uiStudentApprovalVal").className = "text-emerald-700 font-bold";
 
       var totalEcts = calculateEcts(null);
       var rowsHtml = "";
@@ -2230,33 +2203,34 @@
         if (!c) continue;
         var s = findSection(c, selectedSections[code]);
         if (!s) continue;
-        rowsHtml +=
-          '<tr class="border-b border-slate-200">' +
-            '<td class="py-2 font-bold text-indigo-950">' + c.code + '</td>' +
-            '<td class="py-2">' + c.name + '</td>' +
-            '<td class="py-2 font-semibold">' + s.id + ' (' + t("daysShort")[s.day] + ' ' + s.slot + ')</td>' +
-            '<td class="py-2 text-right font-bold">' + c.ects + ' AKTS</td>' +
-          '</tr>';
+        rowsHtml += '<tr class="border-b border-slate-200">' +
+          '<td class="py-2 font-bold text-indigo-950">' + c.code + '</td>' +
+          '<td class="py-2">' + c.name + '</td>' +
+          '<td class="py-2 font-semibold">' + s.id + ' (' + s.day + ' ' + s.slot + ')</td>' +
+          '<td class="py-2 text-right font-bold">' + c.ects + ' ECTS</td>' +
+        '</tr>';
       }
 
       document.getElementById("approvalSummaryContent").innerHTML =
-        '<div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center">' +
-          '<div><b>Öğrenci Statüsü:</b> ' + currentProfile.name + ' (GANO: ' + currentProfile.gpa + ')</div>' +
-          '<div class="font-extrabold text-emerald-700">Toplam: ' + totalEcts + ' / ' + currentProfile.maxEcts + ' AKTS</div>' +
+        '<div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex flex-wrap justify-between items-center gap-2">' +
+          '<div><b>Student Status:</b> ' + currentProfile.name + ' (GPA: ' + currentProfile.gpa + ')</div>' +
+          '<div class="font-extrabold text-indigo-700">Total Load: ' + totalEcts + ' / ' + currentProfile.maxEcts + ' ECTS</div>' +
         '</div>' +
-        '<table class="w-full text-left border-collapse">' +
-          '<thead>' +
-            '<tr class="border-b-2 border-slate-300 text-slate-500">' +
-              '<th class="py-1.5">Kod</th>' +
-              '<th class="py-1.5">Ders Adı</th>' +
-              '<th class="py-1.5">Şube & Saat</th>' +
-              '<th class="py-1.5 text-right">AKTS</th>' +
-            '</tr>' +
-          '</thead>' +
-          '<tbody>' + rowsHtml + '</tbody>' +
-        '</table>' +
+        '<div class="overflow-x-auto">' +
+          '<table class="w-full text-left border-collapse">' +
+            '<thead>' +
+              '<tr class="border-b-2 border-slate-300 text-slate-500">' +
+                '<th class="py-1.5">Code</th>' +
+                '<th class="py-1.5">Course Title</th>' +
+                '<th class="py-1.5">Section & Schedule</th>' +
+                '<th class="py-1.5 text-right">ECTS</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody>' + rowsHtml + '</tbody>' +
+          '</table>' +
+        '</div>' +
         '<div class="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3 rounded-xl font-medium">' +
-          '✓ Zorunlu tekrar (FF) önceliği, mezuniyet gecikme analizi, AKTS sınırı ve saat çakışması kontrolleri başarıyla doğrulandı.' +
+          '✓ Mandatory repeat (FF) priority, prerequisite chains, ECTS credit limits, and time conflicts have been officially verified.' +
         '</div>';
 
       document.getElementById("approvalModal").classList.remove("hidden");
