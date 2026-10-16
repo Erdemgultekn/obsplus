@@ -1,4 +1,4 @@
-# 🎓 OBS+ (v2.5 Pro) | Akıllı Ders Kayıt & Otomatik Program Motoru
+# 🎓 OBS+ (v2.0 Pro) | Akıllı Ders Kayıt & Otomatik Program Motoru
 
 **Canlı Demo (Live App):** [https://erdemgultekn.github.io/obsplus/](https://erdemgultekn.github.io/obsplus/)
 
